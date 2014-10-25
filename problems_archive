@@ -27,3 +27,5 @@ writing your first django app
 	)
 	sudo apt-get install python-dev
 	sudo pip install psycopg2
+2."Repository not found" when submitting to github
+

@@ -25,3 +25,22 @@ writing your first django app, part 1
 	automatic reload when code changes.
 5.creating models
 
+
+create git repository and upload to github
+------------------------------------------
+(reference:http://sirupsen.com/starting-with-git/)
+1.create ssh key, provide ssh key to git, introduce ourselves to git(https://help.github.com/articles/generating-ssh-keys/#platform-linux)
+	ls -al ~/.ssh
+	ssh-keygen -t rsa -C "mostevercxz@gmail.com"
+	eval "$(ssh-agent -s)"
+	ssh-add ~/.ssh/id_rsa
+	vim ~/.ssh/id_rsa.pub
+	(copy the content to github page, settings, ssh keys, add ssh key)
+	ssh -T git@github.com
+2.create git repository
+	git init
+	git add .
+	git commit . -m"first app"
+	(git log, git status, clone)
+	git remote add firstDjango git@github.com:mostevercxz/writingFirstDjango.git
+	git push -u firstDjango master 
