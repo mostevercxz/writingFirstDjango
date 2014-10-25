@@ -42,5 +42,5 @@ create git repository and upload to github
 	git add .
 	git commit . -m"first app"
 	(git log, git status, clone)
-	git remote add firstDjango git@github.com:mostevercxz/writingFirstDjango.git
-	git push -u firstDjango master 
+	git remote add origin git@github.com:mostevercxz/writingFirstDjango.git(must use the word "origin"!! not "firstDjangoApp")
+	git push -u origin master 
