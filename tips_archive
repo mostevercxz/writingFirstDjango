@@ -1,0 +1,27 @@
+writing your first django app, part 1
+-------------------------------------
+
+1.see the django version:
+	python -c "import django;  print(django.get_version())"
+2.create a project:
+	django-admin.py startproject websiteName
+	manage.py : A command-line utility that letss you interact with this DJango project
+	settings.py : settings for this project
+	urls.py : URL declartions for this project
+	wsgi.py : An entry point for wsgi-compatible web servers to server this project
+3.database setup:
+	settings.py:
+		'ENGINE':'django.db.backends.postgresql_psycopg2'
+		'NAME':'DBName'
+		'USER'
+		'PASSWORD'
+		'HOST'
+		'PORT'
+	python manage.py migrate
+4.the development server
+	python manage.py runserver 0.0.0.0:8080
+	
+	Don't use this server in anything resembling a production environment!!
+	automatic reload when code changes.
+5.creating models
+

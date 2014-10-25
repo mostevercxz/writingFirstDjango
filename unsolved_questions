@@ -1,0 +1,4 @@
+writing your first django app
+----------------------------
+
+1."Some of these applications make use of at least one database table, though, we need to create the tables in the database before we can use them. To do that, run 'python manage.py migrate' ". Why ??
