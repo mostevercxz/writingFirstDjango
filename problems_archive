@@ -1,0 +1,9 @@
+before learning
+---------------
+
+1,Vmware and ubuntu can't share the "CTRL + C" content.
+	Vmware choose "reinstall vmware tools"
+	In ubuntu, cp VMware---.tar.gz /username/Public/VMware---.tar.gz
+	tar -xzvf VMware---.tar.gz
+	cd VMware---.tar.gz
+	sudo ./installScriptName
