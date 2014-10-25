@@ -51,6 +51,29 @@ writing your first django app, part 1
 			manage.py sets DJANGO_SETTINGS_MODULE
 			os.environ : a mapping object representing the string environment
 		)
+		(
+			from django.utils import timezone
+			q = Question(questionText = 'this is my first question', pub_date = timezone.now());
+			q.save()
+			Question.objects.filter(id=1)
+			Question.obejcts.filter(questionText__startswith='this')
+			Question.objects.get(pub_date__year=timezone.now().year)
+			q = Question.objects.get(pk=1)(primary key)
+			q.choice_set.create(choiceText = 'do you believe,yes?', votes=0)
+			q.choice_set.create(choiceText = 'no,no', votes=0)
+			c = q.choice_set.create(choiceText = 'don't know', votes=0)
+			c.question
+			q.choice_set.all()
+			Choice.objects.filter(question__pub_date__year = timezone.now().year)
+			c = q.choice_set.filter(choiceText__startswith='don')
+			c.delete()
+		)
+	--7.2 add __str__() method to models(my own sanity, objects' representations are used throughout Django's automatically-generated admin)
+		(
+			Python 3, __str__()
+			Python 2, define __unicode__() method returning unicode values instead
+		)
+	--7.3 
 
 
 create git repository and upload to github
@@ -71,3 +94,8 @@ create git repository and upload to github
 	(git log, git status, clone)
 	git remote add origin git@github.com:mostevercxz/writingFirstDjango.git(must use the word "origin"!! not "firstDjangoApp")
 	git push -u origin master 
+3. cancel last commit
+	git reset --soft HEAD~1
+	eidt
+	git add ....
+	git commit -c ORIG_HEAD
