@@ -10,6 +10,8 @@ writing your first django app, part 1
 	urls.py : URL declartions for this project
 	wsgi.py : An entry point for wsgi-compatible web servers to server this project
 3.database setup:
+	create role xxxx createdb login password '123456'
+	drop role if exists xxxx
 	settings.py:
 		'ENGINE':'django.db.backends.postgresql_psycopg2'
 		'NAME':'DBName'
@@ -24,6 +26,31 @@ writing your first django app, part 1
 	Don't use this server in anything resembling a production environment!!
 	automatic reload when code changes.
 5.creating models
+	--5.1 Each application you write consists of a Python package.
+	--5.2 What is the difference between a project and an app??
+		An app is a web application that does something.
+		A project is a collection of configuration and apps for a particular web site. 
+		A project can contain multiple apps.An app can be in multiple apps.
+	--5.3 python manager.py startapp polls
+	--5.4 The first step in writing a database web app in Django is to define my models with additional metadata.
+		--5.4.1 What is a model???
+			A model is the single, definitive source of data about my data. It contains the essential fields and behaviors of the data you're storing.
+		--5.4.2 create two models : Question(question, publication date) & Choice(text, vote, associated with Question).
+
+6. activating models
+	--6.1 with models.py, Django can do :
+		create a database schema for this app
+		create a Python database-access API for accessing Question and Choice objects
+	--6.2 Tell Django the "polls" app is installed.(setting.py, INSTALL_APPS) Django apps are pluggable, they don't have to be tied to a given Django installation.
+	--6.3 python manage.py makemigrations polls. Migrations are how Django stores changes to your models(db schema)--they are files on disk.
+	--6.4 python manage.py sqlmigrate polls 0001 (sqlmigrate takes migration names and returns their SQL.)(before this ,can run 'python manage.py check')
+
+7. Playing with the API
+	--7.1 python manage.py shell 
+		(
+			manage.py sets DJANGO_SETTINGS_MODULE
+			os.environ : a mapping object representing the string environment
+		)
 
 
 create git repository and upload to github

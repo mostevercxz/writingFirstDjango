@@ -1,4 +1,12 @@
 writing your first django app
 ----------------------------
 
-1."Some of these applications make use of at least one database table, though, we need to create the tables in the database before we can use them. To do that, run 'python manage.py migrate' ". Why ??
+1."Some of these applications make use of at least one database table, though, we need to create the tables in the database before we can use them. To do that, run 'python manage.py migrate' ". Why "we need to create tables"??
+
+2."We'll create our poll app right next to your 'manage.py' file, so that it can be imported as its own top-level module, rather than a submodule of mywebsite", how could our poll app be a submodule of mywebsite??
+
+3."This includes the migrations that Django can roll through to update your database schema to match your current models." What does this mean?? How does Django roll through to update my database schema??
+
+4. Django supports all the common database relationships : many-to-one, many-to-many and one-to-one. How to express that kind of relationship in mySql and postgresql ??
+
+5. Don't understand "ALTER TABLE "polls_choice" ADD CONSTRAINT polls_choice_question_id_40fbbd72_fk_polls_question_id FOREIGN KEY ("question_id") REFERENCES "polls_question" ("id") DEFERRABLE INITIALLY DEFERRED; COMMIT"

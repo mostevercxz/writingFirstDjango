@@ -28,4 +28,11 @@ writing your first django app
 	sudo apt-get install python-dev
 	sudo pip install psycopg2
 2."Repository not found" when submitting to github
+	change the name 'firstDjango' to 'origin'
 
+3. django.db.utils.OperationalError: FATAL role "xxx" does not exist
+	postgresql, create role
+
+4. 'polls/' != 'polls'
+   "python manage.py makemigrations polls/" is wrong!!!
+   "python manage.py makemigrations polls" right!
