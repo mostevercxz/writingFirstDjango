@@ -73,7 +73,42 @@ writing your first django app, part 1
 			Python 3, __str__()
 			Python 2, define __unicode__() method returning unicode values instead
 		)
-	--7.3 
+
+
+writing my first Django APP, part 2
+-----------------------------------
+
+1.creating an admin user
+	--1.1 python manage.py createsuperuser
+
+2.start the development server, and turn to admin site
+	--2.1 http://ip-address:8080
+
+3.Enter the admin site
+	--3.1 Groups and Users are provided by django.contrib.auth
+
+4.Make the poll APP editable in admin site
+	--4.1 /polls/admin.py
+		from django.contrib import admin
+		from polls.models import Question
+		admin.site.register(Question)
+
+5.Explore the free admin functionality
+	--5.1 The form is automatically generated from the Question model
+	--5.2 Different model field types correspond to the appropriate HTML input widget.
+	--5.3 Each DateTimeField gets javascript shortcuts
+
+6.Customize the admin form
+	--6.1 re-oredering the items on Question edit form
+		class QuestionAdmin(admin.ModelAdmin):
+			fields = ['pub_date', 'questionText']
+		admin.site.register(Question, QuestionAdmin)
+	--6.2 Split the form up into fields
+		fieldsets = [
+			('111', {'fields':['pub_date']}),
+		]
+	--6.3 assign HTML classes to each fieldset
+		fieldsets=[('111'), {'fields':['pub_date'], 'class':['collapse']}]
 
 
 create git repository and upload to github

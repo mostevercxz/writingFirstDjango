@@ -1,3 +1,8 @@
 from django.contrib import admin
+from polls.models import Question
 
-# Register your models here.
+class QA(admin.ModelAdmin):
+	fields = ['pub_date', 'questionText']
+
+
+admin.site.register(Question, QA)
