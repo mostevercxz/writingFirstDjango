@@ -165,9 +165,25 @@ Writing my first Django app, part 3(creating views and template language)
 	--2.1 edit polls/views.py
 	(
 		from django.http import HttpResponse
-        def index(HttpResponse):
+        def index(abc):
             return HttpResponse("this is my first view!")
 	)
+	--2.2 The url function
+	(
+		url(regex, view, kwargs = None, name=None, prefix='')
+		url(r'^blog/(?P<year>\d{4})/$', views.year_archive, {'foo':'bar'})
+	)
+	--2.3 The url function arguments
+	(
+		regex : Django starts at the first regular expression and makes its way down the list, comparing the requested URL against each regex until it finds one that match. These regexes do not search GET and POST parameters, or the domain name. Theses regexes are compiled the first time the URLconf module is loaded.
+		view : an HttpRequest object as first argument, any "captured" values from the regex as other arguments. (don't understand, an example ??)
+		kwargs : arbitrary arguments can be passed to the target view
+		name : naming my URL
+	)
+
+3. Writing more views
+	--3.1 Edit polls/views.py & polls/urls.py(referenced by name regex, views with arguments)
+	
 
 
 create git repository and upload to github
