@@ -10,3 +10,4 @@ writing your first django app
 4. Django supports all the common database relationships : many-to-one, many-to-many and one-to-one. How to express that kind of relationship in mySql and postgresql ??
 
 5. Don't understand "ALTER TABLE "polls_choice" ADD CONSTRAINT polls_choice_question_id_40fbbd72_fk_polls_question_id FOREIGN KEY ("question_id") REFERENCES "polls_question" ("id") DEFERRABLE INITIALLY DEFERRED; COMMIT"
+

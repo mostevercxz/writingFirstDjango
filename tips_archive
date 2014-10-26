@@ -51,6 +51,105 @@ writing your first django app, part 1
 			manage.py sets DJANGO_SETTINGS_MODULE
 			os.environ : a mapping object representing the string environment
 		)
+		(
+			from django.utils import timezone
+			q = Question(questionText = 'this is my first question', pub_date = timezone.now());
+			q.save()
+			Question.objects.filter(id=1)
+			Question.obejcts.filter(questionText__startswith='this')
+			Question.objects.get(pub_date__year=timezone.now().year)
+			q = Question.objects.get(pk=1)(primary key)
+			q.choice_set.create(choiceText = 'do you believe,yes?', votes=0)
+			q.choice_set.create(choiceText = 'no,no', votes=0)
+			c = q.choice_set.create(choiceText = 'don't know', votes=0)
+			c.question
+			q.choice_set.all()
+			Choice.objects.filter(question__pub_date__year = timezone.now().year)
+			c = q.choice_set.filter(choiceText__startswith='don')
+			c.delete()
+		)
+	--7.2 add __str__() method to models(my own sanity, objects' representations are used throughout Django's automatically-generated admin)
+		(
+			Python 3, __str__()
+			Python 2, define __unicode__() method returning unicode values instead
+		)
+
+
+writing my first Django APP, part 2
+-----------------------------------
+
+1.creating an admin user
+	--1.1 python manage.py createsuperuser
+
+2.start the development server, and turn to admin site
+	--2.1 http://ip-address:8080
+
+3.Enter the admin site
+	--3.1 Groups and Users are provided by django.contrib.auth
+
+4.Make the poll APP editable in admin site
+	--4.1 /polls/admin.py
+		from django.contrib import admin
+		from polls.models import Question
+		admin.site.register(Question)
+
+5.Explore the free admin functionality
+	--5.1 The form is automatically generated from the Question model
+	--5.2 Different model field types correspond to the appropriate HTML input widget.
+	--5.3 Each DateTimeField gets javascript shortcuts
+
+6.Customize the admin form
+	--6.1 re-oredering the items on Question edit form
+		class QuestionAdmin(admin.ModelAdmin):
+			fields = ['pub_date', 'questionText']
+		admin.site.register(Question, QuestionAdmin)
+	--6.2 Split the form up into fields
+		fieldsets = [
+			('111', {'fields':['pub_date']}),
+		]
+	--6.3 assign HTML classes to each fieldset
+		fieldsets=[('111'), {'fields':['pub_date'], 'classes':['collapse']}]
+
+7.Adding related objects
+	--7.1 Django knows ForeignKey should be represented in the admin site as a <select> box
+	--7.2 Every object with a ForeignKey relationship to another gets "Add another" link.
+	--7.3 How to add a bunch of Choices directly when you create the Question object???
+		class ChoiceInline(admin.StackedInline):
+			model = Choice
+			extra = 3
+		class QA(admin.ModelAdmin):
+			fieldsets=...
+			inlines=[ChoiceInline]
+
+8.Customize the admin change list
+	--8.1 BY default, Django displays the str() of each object
+	--8.2 list_display = ('questionText','pub_date')
+	--8.3 change the column header, adn the string representation:
+		( Mind the indentation!!!!)
+		def was_published_recently(self):
+			return balabala...
+		was_published_recently.admin_order_field = 'pub_date'
+
+9.Cosutomize the admin look and feel(introducing the template system of Django)
+	--9.1 customizing my project's templates
+		(
+			--9.1.1 Create a templates directory, edit myWebsite/settings.py
+				TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
+			--9.1.2 cd templates; mkdir admin
+			--9.1.3 cp xxx/django/contrib/admin/templates/admin/base_site.html BASE_DIR/templates/admin/base_site.html
+			--9.1.4 edit base_site.html,  replace {{ site_header|default:_('Django administration') }} (including the curly braces) with whatever name I want
+		)
+		I can use (New in Django 1.7) AdminSite.site_header to do the same thing as above.
+		(
+			edit polls/admin.py, admin.site.site_header = 'go fuck!'
+			but,, precedure, site_header < base_site.html
+		)
+	--9.2 where are the Django source files??
+		python -c "import sys; sys.path = sys.path[1:]; import django;print(django.__path__)"
+	--9.3 Customizing my application's templates
+		How django find the template files???
+		1. filesystem.loader, Loads templates from the filesystem, according to TEMPLATE_DIRS
+		2. app_directories.Loader, Loads templates from Django apps on the filesystem. For each app in INSTALL_APPS, the loader looks for a template subdirectory.(The order of INSTALLED_APPS is significant! It will use the one it first finds. This explains why 'go fuck' appears after deleting 'my first django')
 
 
 create git repository and upload to github
@@ -71,3 +170,8 @@ create git repository and upload to github
 	(git log, git status, clone)
 	git remote add origin git@github.com:mostevercxz/writingFirstDjango.git(must use the word "origin"!! not "firstDjangoApp")
 	git push -u origin master 
+3. cancel last commit
+	git reset --soft HEAD~1
+	eidt
+	git add ....
+	git commit -c ORIG_HEAD
