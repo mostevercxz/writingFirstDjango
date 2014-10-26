@@ -23,4 +23,5 @@ import pdb
 pdb.set_trace()
 admin.site.site_header = "go fuck ahead!!"
 var = var + 1
+
 admin.site.register(Question, QA)
