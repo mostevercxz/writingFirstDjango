@@ -175,3 +175,5 @@ create git repository and upload to github
 	eidt
 	git add ....
 	git commit -c ORIG_HEAD
+	(use git commit -a -m"revision:10 balabala", if you use <git commit . -m"bala">, it will not commit the parent directory!! Fuck!!!)
+4.conflicts when using git
