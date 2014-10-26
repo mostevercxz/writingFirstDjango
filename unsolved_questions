@@ -11,3 +11,4 @@ writing your first django app
 
 5. Don't understand "ALTER TABLE "polls_choice" ADD CONSTRAINT polls_choice_question_id_40fbbd72_fk_polls_question_id FOREIGN KEY ("question_id") REFERENCES "polls_question" ("id") DEFERRABLE INITIALLY DEFERRED; COMMIT"
 
+6. If I add file "<project-dir>/templates/admin/base_site.html",change the title block to title 'admin template title', and edit file polls/models.py "admin.site.site_header = 'admin site title'" at the same time, then the title would be 'admin template title', but why?? What is the order between these two??
