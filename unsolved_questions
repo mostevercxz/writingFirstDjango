@@ -14,3 +14,6 @@ writing your first django app
 6. If I add file "<project-dir>/templates/admin/base_site.html",change the title block to title 'admin template title', and edit file polls/models.py "admin.site.site_header = 'admin site title'" at the same time, then the title would be 'admin template title', but why?? What is the order between these two??
 
 7.view : an HttpRequest object as first argument, any "captured" values from the regex as other arguments (I need an example to understand this.)
+
+8. search 'full details' in the part 1-4
+	--8.1 part 4, generic views

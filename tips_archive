@@ -183,6 +183,35 @@ Writing my first Django app, part 3(creating views and template language)
 
 3. Writing more views
 	--3.1 Edit polls/views.py & polls/urls.py(referenced by name regex, views with arguments)
+
+4. Write views that actually do something
+	--4.1 All Django wants is HttpResponse.
+	--4.2 Why use get_obj_or_404() other than try, catch??
+		Because that would couple the model layer to the view layer
+
+5. Use the template system
+	--5.1 The template sys uses dot-syntax to access variable attributes.
+
+6. Removing hard-coded URLs in templates
+	{% url %} template tag
+	url(r'^(?P<qID>\d+)/$', views.detail, name = 'detail')
+	{% url 'detail' %}(polls/123)
+	url(r'^specifics/(?P<qID>\d+)/$', views.detail, name = 'detail')
+
+7. Namespacing URL names
+	url(r'^polls/', include('polls.urls', namespace="polls"))
+	{% url 'polls:detail' %}
+
+
+Writing my first Django app, part 4
+-----------------------------------
+
+1. Write a simple form
+	--1.1 edit polls/detail.html
+
+2. Use generic views
+	--2.1 BY default, the DetailView generic view uses a template called <app_name>/<model_name>_detail.html. Use template_name to specific the template name.
+	--2.2 For DetailView, knowing model Question, the automatically generated context variable is questoin; while for LIstView, the variable is question_list.
 	
 
 
