@@ -213,7 +213,22 @@ Writing my first Django app, part 4
 	--2.1 BY default, the DetailView generic view uses a template called <app_name>/<model_name>_detail.html. Use template_name to specific the template name.
 	--2.2 For DetailView, knowing model Question, the automatically generated context variable is questoin; while for LIstView, the variable is question_list.
 	
+	
+Writing my first Django app, part 5(writing testing)
+-----------------------------------
 
+1. Automated tests , the testing work is done for you by system.
+	--1.1 Why create tests??
+		Test will save you time checking 'it still seems to work'
+		Test don't just identify problems, they prevent them
+		Tests make your code more attractive
+		Tests help teams work together
+
+2. Basic testing strategies
+	--2.1 create a method is polls/tests.py, begin with test_was_published_recently_with_future_question
+
+3. Test a view
+	--3.1 The Django test client, simulate a user interacting with the code at the view level
 
 create git repository and upload to github
 ------------------------------------------
@@ -240,3 +255,23 @@ create git repository and upload to github
 	git commit -c ORIG_HEAD
 	(use git commit -a -m"revision:10 balabala", if you use <git commit . -m"bala">, it will not commit the parent directory!! Fuck!!!)
 4.conflicts when using git
+
+
+
+git Howtos, 2014-11-03
+----------------
+1.How to checkout the first commit??
+	git log --oneline(list all commit logs, just pick the last commit)
+	git checkout 47abcdef
+2.How to return to a branch??
+	git checkout master
+3.How to count the number of commits??
+	git rev-list HEAD --count
+4.How to list all branches??
+	git branch -l
+5.How to create a new branch??
+	git branch bugfixes141103
+	git checkout bugfixes141103
+	git commit -a
+	git checkout master
+	git merge bugfixes141103
