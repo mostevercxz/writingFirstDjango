@@ -267,6 +267,7 @@ git Howtos, 2014-11-03
 	git checkout master
 3.How to count the number of commits??
 	git rev-list HEAD --count
+	(git shortlog | grep -E '^[ ]+\w+'|wc -l)
 4.How to list all branches??
 	git branch -l
 5.How to create a new branch??
@@ -275,3 +276,153 @@ git Howtos, 2014-11-03
 	git commit -a
 	git checkout master
 	git merge bugfixes141103
+6.How to complete a git clone for a big project on an unstable connection??
+	1.Use shallow clone
+		git cloen --depth=1
+		git fetch --depth=N
+		git fetch --unshallow
+	2.Ask someone to prepare a bundle, then download the bundle!!
+
+
+linux commands archived
+-----------------------
+1.netstat -n 1 |grep 192.168.204.128(find the number of sockets)
+2. time writes its output to stderr, time is part of the syntax of bash, and it times an entire pipeline. Consequetnly, I need to wrap the pipeline in braces, or run it in a subshell:
+	{ time ls -l > /dev/null; } |& grep real(tested in ubuntu)
+	(\& is an abbreviation for '2>&1 |')
+	{ time ls -all; } 2> timeLog.txt
+	(time ls) > ls_results 2> timeLog
+	(time ls) > outfile 2>&1
+
+	--2.1 Redirects stderr to the same stream as stdout, then redirects stdout to /dev/null, then pipes the output of time into the stdin of grep:
+		(time ls -l)  2>&1 > /dev/null |grep real | awk '{print $2}'
+
+	I can also use the time utility to control the format of output.(man time)
+	/usr/bin/time -f%e ls -l > /dev/null
+
+3. which mysql, /usr/local/mysql/bin/mysql
+
+
+mysql commands archived
+-----------------------
+1. backup mysql databases
+	mysqldump databaseName > bak.sql
+	mysqldump -A -ucxz -p123456 databaseName > bak.sql
+	mysqldump --opt -d databaseName -h192.168.0.0 -ucxz -p > bak.sql(only table structure, no data)
+	mysqldump -t databaseName -ucxz -p > bak.sql
+2.recover a database
+	mysql -h192... -ucxz -p123456 databaseName < /home/cxz/dbBak/bak.sql
+
+3. mysql user management
+	###########
+	create user 'cxz'@'192.0.0.1' identified by 'password 123456';
+	set password for 'cxz'@'192.0.0.1' = password('newpass');
+	rename user 'cxz'@'192.0.0.1' to 'chen'@'localhost'
+	drop user 'cxz'@'localhost'
+
+4. Mysql user privileges management
+	(################# must run 'flush privileges' after change privileges)
+
+	grant select, insert, update, delete on testdb.* to userName@'%'
+
+	privileges:
+	create 
+	alter
+	drop
+	references(foreign key privilege)
+	create temporary
+	index
+
+	create view
+	show view
+
+	create routine(show procedure status)
+	alter routine(drop a procedure)
+	execute
+
+	all privileges
+
+	grant all on *.* to userName@'%'
+	grant select(id, name, score) on students.scores to userName@'%'
+	grant execute on procedure testdb.procedure_add to ...
+	grant execute on function testdb.fun_add to ...
+
+	show grants for cxz@localhost;
+
+5. MYsql revoke privileges
+	revoke all on *.* from cxz@'%'
+
+6. ''@'localhost' will be matched first than 'cxz'@'localhost'
+
+7. mysql -ucxz -p123456 testdb -e "show tables"
+
+2. press HOME keyborad, just print "~"
+
+3. to be continued
+	mysql.user privileges
+
+
+gcc compile options, 2014-11-04
+-------------------
+1. _GNU_SOURCE. 
+	If you define this macro, everything is included: ISO C89, ISO C99, POSIX.1, POSIX.2, BSD, SVID, X/Open, LFS, and GNU extensions. In the cases where POSIX.1 conflicts with BSD, the POSIX definitions take precedence.
+	The _GNU_SOURCE will most likely limits source code usage to GNU/Linux and GNU/Hard systems, unless additional work is done to address the non-portability of such functionality on other platforms.
+	Feel free to use such extensions, if my development is locked into GNU/Linux and GNU/Hard. Avoid such usages dot any apllications that may be deployed on other Unix and Unix-like operating systems.
+
+2. _REENTRANT(_THREAD_SAFE)
+	If I define one of those macros, reentrant versions of several functions get declared. Some of the functions are specified in POSIX.1c but many others are onlt avialable on a few other systems or are unique to the GNU C Library. The problem is the delay in the standardization of the thread safe C library interface.
+
+3. -Wall
+	gcc -Wall enables all compiler's warning messages. This option should always be used, in order to generate better code. They do not prevent the compliation of my programs, unless -Werror is specified.
+
+4. -Werror
+	turn all warning into errors!!
+
+5. -Bstatic
+	tells the linker to use the static versions for all default libraries like libc etc...
+
+6. -g3(-g level)
+	Request debugging info anf also use level to specify how much info.THe default level is 2.
+	Level 0 produces no debug info at all.
+	Level 1 produces minimal info, enough for making breaktraces in parts of the program. This includes descriptions of functions and external variables, but no information about local variables and no line numbers.
+	Level 3 includes extra information, such as all the macro definitions present in the program. Some debuggers support macro expansion when you use -g3.
+
+7. -rdynamic
+	Pass the flag -export-dynamic to the ELF linker, on targets that support it. This instructs the linker to add all symbols, not only used ones, to the dynamic symbol table. This option is needed for some uses of dlopen or to allow obtaining backtraces from within a program. 
+
+8. -fPIC
+	suitable for dynamic linking and avoiding any limit on the size of the global offset table. When this flag is set, the macros __pic__ and __PIC__ are defined to 2.
+
+9. -c
+	Compile or assemble the source files, but do not link.
+
+10. -o ofile
+	Place output in file ofile.
+
+11. -Idir
+	Add the directory dir to the head of the list of directories to be searched for header files.
+	If you use more than one -I option, the directories are scanned in left-to-right order; the standard system directories come after.
+	If a standard system include directory, or a directory specified with -isystem, is also specified with -I, the -I option will be ignored. 
+	The directory will still be searched but as a system directory at its normal position in the system include chain. 
+	This is to ensure that GCC's procedure to fix buggy system headers and the ordering for the include_next directive are not inadvertently changed. 
+	If you really need to change the search order for system directories, use the -nostdinc and/or -isystem options.
+
+12. What is the difference between 'xml2-config --cflags' and 'xml2-config --libs'?? what does the latter option mean??
+
+13. keyword "view macro expansion"
+	g++ -c test.cpp -I. -I../ `mysql_config --cflags` `xml2-config --cflags` -E -o test.i
+
+	eit makefile, make -g3 test.cpp -o test
+	macro expand/exp
+
+
+
+
+Svn tips
+------------------------------
+1. return to an older version of the code, and set it to the current
+	svn merge -r 150:140
+	svn commit -m "roll back to revision 140"
+
+2. svn tricks website
+	https://gcc.gnu.org/wiki/SvnTricks

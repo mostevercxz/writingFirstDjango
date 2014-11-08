@@ -1,0 +1,14 @@
+# this is a new file recording shell scripting tips
+# created by cxz, 2014-11-07
+
+1. special shell variables(http://unixhelp.ed.ac.uk/scrpt/scrpt2.2.2.html)
+
+	$# the number of positional arguments given to this invocation of the shell.
+	$? the exit status of the last command executed(given as a decimal string)
+	$$ the process number of this shell
+	$! the process id of the last command run in the background
+	$- the current options supllied to this invocation of the shell
+	$* a string containing all the arguments to the shell, starting at $1
+	$@ same as above
+	"$*" is a single word, comprising all the arguments to the shell, joined together with spaces. '1 2' 3 becomes "1 2 3"
+	"$@" is identical to the arguments received by the shell, the resulting list of words completely match what was given to the shell.'1 2' 3 becomes "1 2" "3"
