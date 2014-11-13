@@ -1,0 +1,5 @@
+#this file is used to record some problems solved during using c++
+c++ tricks
+---------------------------
+1. remove comments from c++ code(http://stackoverflow.com/questions/2394017/remove-comments-from-c-c-code)
+	gcc -fpreprocessed -dD -E test.c

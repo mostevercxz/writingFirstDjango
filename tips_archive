@@ -360,6 +360,11 @@ mysql commands archived
 
 3. to be continued
 	mysql.user privileges
+	
+10. copy one table's data from one db to another db
+	create table db2.table like db1.table
+	insert into db2.table select * from db1.table
+	(create table db2.table select * from db1.table, just copys the data, not index.)
 
 
 gcc compile options, 2014-11-04
@@ -421,13 +426,23 @@ gcc compile options, 2014-11-04
 Svn tips
 ------------------------------
 1. return to an older version of the code, and set it to the current
+	svn up
 	svn merge -r 150:140
 	svn commit -m "roll back to revision 140"
+	
+2. just revert to an older version
+	svn update -r 100
 
-2. svn tricks website
+3. svn tricks website
 	https://gcc.gnu.org/wiki/SvnTricks
+	
 
 website archives
 -----------------------------
 1. c++ online 
     http://ideone.com/
+	
+#########################	
+	python tips
+#########################
+1. 
