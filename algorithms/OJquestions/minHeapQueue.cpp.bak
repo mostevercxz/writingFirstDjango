@@ -1,0 +1,115 @@
+#include <sstream>
+#include <iostream>
+#include <string.h>
+
+class minHeapQueue{
+    public:
+        int _currentSize;
+        int _maxSize;
+        int *_array;
+
+        minHeapQueue(const int capacity = 100) : _currentSize(0), _maxSize(capacity) 
+        {
+            _array = new int[capacity];
+        }
+
+        void insertQueue(const int x);
+
+        void find(const int x);
+
+        void doubleSpace();
+
+        void findPositionForX(const int &_currPosition, const int x);
+
+        void decrease(const int  nodeNum, const int privilegeNum);
+
+};
+
+void minHeapQueue::doubleSpace()
+{
+    int *newArray = new int[2 * _maxSize];
+    strncpy((char *)newArray, (char *)_array, sizeof(int) * _maxSize);
+    _array = newArray;
+}
+
+void minHeapQueue::findPositionForX(const int &_currPosition, const int x)
+{
+    int currPosition = _currPosition;
+    for (; currPosition / 2 > 0;currPosition = currPosition / 2)
+    {
+        if (_array[currPosition] < _array[currPosition / 2])
+        {
+            _array[currPosition] = _array[currPosition / 2];
+        }
+        else { break; }
+    }
+    _array[currPosition] = x;
+}
+
+void minHeapQueue::insertQueue(const int x)
+{
+    if (_currentSize == _maxSize - 1){doubleSpace();}
+    ++_currentSize;
+    _array[_currentSize] = x;
+    findPositionForX(_currentSize, x);
+}
+
+void minHeapQueue::find(const int x)
+{
+	for (int index = 1; index <= _currentSize; ++index)
+	{
+		if (_array[index] > x)
+		{
+			std::cout << index << std::endl;
+			return ;
+		}
+	}
+}
+
+void minHeapQueue::decrease(const int nodeNum, const int privilegeNum)
+{
+    if (nodeNum > _currentSize){return ;}
+    _array[nodeNum] -= privilegeNum;
+    findPositionForX(nodeNum, _array[nodeNum]);
+}
+
+int main()
+{
+    minHeapQueue queue;
+
+    int numOfArgs;
+    std::cin >> numOfArgs;
+    std::cin.ignore(1, '\n');
+    if (!(numOfArgs <= 20000 && numOfArgs >=1)){return 0;}
+
+    while (numOfArgs--)
+    {
+        std::string operation;
+        std::getline(std::cin, operation);
+        std::istringstream iss(operation);
+
+        if (strncmp(operation.c_str(), "insert", 6) == 0)
+        {
+            int x;
+            iss >> operation >> x;
+            queue.insertQueue(x);
+        }
+        else if (strncmp(operation.c_str(), "find", 4) == 0)
+        {
+            int x;
+            iss >> operation >> x;
+            queue.find(x);
+        }
+        else if (strncmp(operation.c_str(), "decrease", 8) == 0)
+        {
+            int nodeNum, privilegeNum;
+            iss >> operation >> nodeNum >> privilegeNum;
+            queue.decrease(nodeNum, privilegeNum);
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    return 0;
+}
