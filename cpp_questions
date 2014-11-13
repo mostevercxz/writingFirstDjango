@@ -1,0 +1,11 @@
+// this file is used to record my puzzles when dealing with cpp files
+
+1. what does the function int() do ??(int with parentheses)
+	(http://stackoverflow.com/questions/620137/do-the-parentheses-after-the-type-name-make-a-difference-with-new)	
+
+2. how to remove comments from c++ source code??
+	g++ -fpreprocessed -dD -E test.c
+	(http://stackoverflow.com/questions/2394017/remove-comments-from-c-c-code)
+
+3. c special characters
+	(http://en.wikipedia.org/wiki/Special_characters)

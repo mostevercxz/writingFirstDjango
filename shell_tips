@@ -12,3 +12,24 @@
 	$@ same as above
 	"$*" is a single word, comprising all the arguments to the shell, joined together with spaces. '1 2' 3 becomes "1 2 3"
 	"$@" is identical to the arguments received by the shell, the resulting list of words completely match what was given to the shell.'1 2' 3 becomes "1 2" "3"
+
+2. shell scripts manipulating(http://tldp.org/LDP/abs/html/string-manipulation.html)
+	-----------
+	string length:
+		${#stringVariable}
+		expr length $stringVariable
+		expr "$stringVariable" : '.*'
+
+	-----------
+	substr index
+		expr index $string $substr
+
+	-----------
+	substr removal
+		${string#substring},deletes shortest match of $substring from front of $string
+		${string##substring}, deletes longest match
+
+	-----------
+	string replacement
+		${string/substring/replacement},replace first match of $substring with $replacement
+		${string//substring/replacement}, replace all matches
