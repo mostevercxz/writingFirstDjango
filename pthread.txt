@@ -1,0 +1,190 @@
+------------------------
+ gbd debugging tips
+------------------------
+1. gdb show all characters other than "..."
+set print elements 0
+
+2. How to set breakpoints on all functions in a file??(http://sourceware.org/gdb/download/onlinedocs/gdb/Set-Breaks.html#Set-Breaks)
+(stackoverflow上的方法还没试过http://stackoverflow.com/questions/475283/using-gdb-stop-the-program-when-it-is-using-any-function-from-file-x)
+rbreak fileName.cpp:.
+rbreak fileName.cpp:<regex>
+(If I used the commands above, then run "gdb Server", it prompts "core dumped")我一用就core dumped...
+So, Use the commands below :
+rbreak fileName.cpp:.
+info b
+then copy all the breakpoints info to a notepad++, then replace 'at fileName.cpp:401' to none, then copy it to gdb.
+将info b的输出拷贝到notepad++里面，然后将后面的部分替换掉即可
+
+vs .net 2003 查找 死机
+找到VS2003的安装目录，修改"...\Microsoft Visual Studio .NET 2003\Common7\IDE"目录下的devenv.exe的属性，
+将其兼容性中的“禁用视觉主题”打钩
+
+resource script file format
+1. Comments, C-style syntax
+2. Predefined Macros
+3. Preprocessor Operators
+	#	Encloses the argument in quotes.
+	#@	Encloses the argument in single quotes.
+	##	Concatenates tokens used as arguments to form other tokens.
+	
+mysql启动时候file not found /tmp/mysql_execute.log,死活不能打日志
+解决方法：修改/etc/my.cnf,将其中日志改为/tmp/mysql_execute.log，再chmod 777 /tmp/mysql_execute.log即可	
+
+What does the "Init DB" means in mysql execute log??
+Init DB occurs when selecting a database.
+
+How to add Microsoft.office.Interop.Excel.dll to add namespace Microsoft.office.Interop ?
+Just add reference and browse to C:\Program Files\Microsoft Office\Office14, select "EXCEL.exe", 
+that will  automatically add a reference to the interop dll.
+
+
+
+
+The subroutines which comprise the Pthreads API can be informally grouped into four major groups:
+1.Thread management: Routines that work directly on threads - creating, detaching, joining, etc. 
+	They also include functions to set/query thread attributes (joinable, scheduling etc.)
+2.Mutexes: Routines that deal with synchronization, called a "mutex", 
+which is an abbreviation for "mutual exclusion". 
+Mutex functions provide for creating, destroying, locking and unlocking mutexes. 
+These are supplemented by mutex attribute functions that set or modify attributes associated with mutexes.
+3.Condition variables: Routines that address communications between threads that share a mutex.
+4.Synchronization: Routines that manage read/write locks and barriers.
+
+pthread_	Threads themselves and miscellaneous subroutines
+pthread_attr_	Thread attributes objects
+pthread_mutex_	Mutexes
+pthread_mutexattr_	Mutex attributes objects.
+pthread_cond_	Condition variables
+pthread_condattr_	Condition attributes objects
+pthread_key_	Thread-specific data keys
+pthread_rwlock_	Read/write locks
+pthread_barrier_	Synchronization barriers
+
+----------------------------------------
+Creating and Terminating Threads
+pthread_create (thread,attr,start_routine,arg)
+pthread_exit (status)
+pthread_cancel (thread)
+pthread_attr_init (attr),used to initialize the thread attribute object.
+pthread_attr_destroy (attr),used to destroy the thread attribute object.
+
+Thread attributes:
+	Detached or joinable state
+	Scheduling inheritance
+	Scheduling policy
+	Scheduling parameters
+	Scheduling contention scope
+	Stack size
+	Stack address
+	Stack guard (overflow) size
+	
+	
+(Thread Binding and Scheduling:
+These topics are not covered here, 
+however a good overview of "how things work" under Linux can be found 
+(https://computing.llnl.gov/tutorials/pthreads/man/sched_setscheduler.txt)
+)
+
+There are several ways in which a thread may be terminated:
+	The thread returns normally from its starting routine. It's work is done.
+	The thread makes a call to the pthread_exit subroutine - whether its work is done or not.
+	The thread is canceled by another thread via the pthread_cancel routine.
+	The entire process is terminated due to making a call to either the exec() or exit()
+	If main() finishes first, without calling pthread_exit explicitly itself
+
+
+Cleanup: the pthread_exit() routine does not close files; 
+any files opened inside the thread will remain open after the thread is terminated.	
+
+pthread_exit() will exit the thread that calls it.
+In your case since the main calls it, main thread will terminate whereas your spawned threads will continue to execute. 
+This is mostly used in cases where the main thread is only required to spawn threads and leave the threads to do their job
+
+pthread_join will suspend execution of the thread that has called it unless the target thread terminates
+This is useful in cases when you want to wait for thread/s to terminate before further processing in main thread.
+
+
+------------------------------------
+Joining and Detaching Threads
+------------------------------------
+	pthread_join (threadid,status)
+	pthread_detach (threadid)
+	pthread_attr_setdetachstate (attr,detachstate)
+	pthread_attr_getdetachstate (attr,detachstate)
+
+Only threads that are created as joinable can be joined	
+To explicitly create a thread as joinable or detached, the attr argument in the pthread_create() routine is used. The typical 4 step process is:
+Declare a pthread attribute variable of the pthread_attr_t data type
+Initialize the attribute variable with pthread_attr_init()
+Set the attribute detached status with pthread_attr_setdetachstate()
+When done, free library resources used by the attribute with pthread_attr_destroy()
+
+The pthread_detach() routine can be used to explicitly detach a thread even though it was created as joinable.
+
+---------------------------
+Stack Management
+---------------------------
+pthread_attr_getstacksize (attr, stacksize)
+pthread_attr_setstacksize (attr, stacksize)
+pthread_attr_getstackaddr (attr, stackaddr)
+pthread_attr_setstackaddr (attr, stackaddr)
+
+
+Miscellaneous Routines
+
+pthread_self ()
+pthread_equal (thread1,thread2)
+
+pthread_once (once_control, init_routine)
+pthread_once_t once_control = PTHREAD_ONCE_INIT;
+
+########################################
+Creating and Destroying Mutexes
+########################################
+pthread_mutex_init (mutex,attr)
+pthread_mutex_destroy (mutex)
+pthread_mutexattr_init (attr)
+pthread_mutexattr_destroy (attr)
+	Mutex variables must be declared with type pthread_mutex_t, and must be initialized before they can be used.
+	pthread_mutex_t mymutex = PTHREAD_MUTEX_INITIALIZER;
+	pthread_mutex_init()
+
+The Pthreads standard defines three optional mutex attributes:
+	Protocol: Specifies the protocol used to prevent priority inversions for a mutex.
+	Prioceiling: Specifies the priority ceiling of a mutex.
+	Process-shared: Specifies the process sharing of a mutex.
+	
+Locking and Unlocking Mutexes
+	pthread_mutex_lock (mutex),If the mutex is already locked by another thread, 
+this call will block the calling thread until the mutex is unlocked.
+	pthread_mutex_trylock (mutex),if the mutex is already locked, 
+the routine will return immediately with a "busy" error code.
+	pthread_mutex_unlock (mutex)
+	
+#######################################
+Conditional Variables
+#######################################
+a call to pthread_cond_wait() automatically and atomically unlocks the associated mutex variable 
+so that it can be used by Thread-B.	
+
+#######################################
+Using Read/write locks
+#######################################
+Initialize a read-write lock, "pthread_rwlock_init(3THR)"
+Read lock on read-write lock,"pthread_rwlock_rdlock(3THR)"
+Read lock with a nonblocking read-write lock, "pthread_rwlock_tryrdlock(3THR)"
+Write lock on read-write lock, "pthread_rwlock_wrlock(3THR)"
+Write lock with a nonblocking read-write lock, "pthread_rwlock_trywrlock(3THR)"
+Unlock a read-write lock, "pthread_rwlock_unlock(3THR)"
+Destroy a read-write lock,  "pthread_rwlock_destroy(3THR)"
+
+#include <pthread.h>
+int pthread_rwlock_init(pthread_rwlock_t *rwlock, const pthread_rwlockattr_t *attr);
+int  pthread_rwlock_rdlock(pthread_rwlock_t *rwlock );
+int pthread_rwlock_tryrdlock(pthread_rwlock_t *rwlock);
+int  pthread_rwlock_wrlock(pthread_rwlock_t *rwlock );
+int pthread_rwlock_trywrlock(pthread_rwlock_t  *rwlock);
+
+	
+要思考的问题，由1到多，还有什么？
+When more than one thread is waiting for a locked mutex, which thread will be granted the lock first after it is released?
