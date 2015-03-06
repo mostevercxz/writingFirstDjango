@@ -1,0 +1,288 @@
+At that time, the CLR marks it as eligible for garbage collection
+CLR是什么
+##################################
+	mysql chapter
+##################################
+======= tricks
+0.	What is the story behind mySql set default character set to "latin1_swedish_ci"	??
+	The bloke who wrote it was co-head of a Swedish company.
+1. shell环境下,mysql的执行结果和想象的有差异时,看mysql执行日志的sql语句,对比命令行输入的.
+	(特别是用mysql -e 直接执行mysql语句时,且某个表字段值里带双引号)
+	
+2.当srting里面有database的特殊字符时，如何select?
+(使用Access是必须避免的特殊字符，http://support.microsoft.com/kb/826763)
+(mysql special characters in string literals, )
+
+======== questions
+2. press HOME keyborad, just print "~"
+
+3. to be continued
+	mysql.user privileges
+	the \ character is used by the LIKE operator itself
+
+======= advanced commands
+1. backup mysql databases
+	mysqldump -u... -p... mydb t1 t2 t3 > mydb_tables.sql
+	mysqldump databaseName > bak.sql
+	mysqldump -A -ucxz -p123456 databaseName > bak.sql
+	mysqldump --opt -d databaseName -h192.168.0.0 -ucxz -p > bak.sql(only table structure, no data)
+	mysqldump -t databaseName -ucxz -p > bak.sql
+2.recover a database
+	mysql -h192... -ucxz -p123456 databaseName < /home/cxz/dbBak/bak.sql
+
+3. mysql user management
+	###########
+	create user 'cxz'@'192.0.0.1' identified by 'password 123456';
+	set password for 'cxz'@'192.0.0.1' = password('newpass');
+	rename user 'cxz'@'192.0.0.1' to 'chen'@'localhost'
+	drop user 'cxz'@'localhost'
+
+4. Mysql user privileges management
+	(################# must run 'flush privileges' after change privileges)
+
+	grant select, insert, update, delete on testdb.* to userName@'%'
+
+	privileges:
+	create 
+	alter
+	drop
+	references(foreign key privilege)
+	create temporary
+	index
+
+	create view
+	show view
+
+	create routine(show procedure status)
+	alter routine(drop a procedure)
+	execute
+
+	all privileges
+
+	grant all on *.* to userName@'%'
+	grant select(id, name, score) on students.scores to userName@'%'
+	grant execute on procedure testdb.procedure_add to ...
+	grant execute on function testdb.fun_add to ...
+
+	show grants for cxz@localhost;
+
+5. MYsql revoke privileges
+	revoke all on *.* from cxz@'%'
+
+6. ''@'localhost' will be matched first than 'cxz'@'localhost'
+
+7. mysql -ucxz -p123456 testdb -e "show tables"
+
+8. mysqladmin shutdown
+	mysqld_safe
+
+9. edit /etc/my.cnd(if character_set_database=latin1, and Chinese chars show as"??????")
+	[client]
+	default-character-set=utf8
+	[mysqld]
+	character-set-server=utf8
+	[mysql]
+	default-character-set=utf8
+	
+10. copy one table's data from one db to another db
+	create table db2.table like db1.table
+	insert into db2.table select * from db1.table
+	(create table db2.table select * from db1.table, just copys the data, not index.)	
+
+11. mysqld --log=/usr/local/mysql/log/mysqlexecute.log, 
+	file not found, could not use '' for logging (error 13)
+	"not found" sounds like a permission problem, chmod g+w /usr/local/mysql/log/. Solved!!!
+	
+12. 加@和不加有什么区别吗,@是session变量,不加是局部变量。
+
+========= mysql functions
+1. mysql list built-in functions(not found yet), help + command
+	help show
+	help create
+	help insert
+	help select
+	
+2.	cast functions and operators
+	read mysql manual carefully.(the manual says type="unsigned", date, datetime, decimal(10), signed, time, binary(1),char(5))
+	cast (substr('abc_00000', 5, 5) as unsigned);
+	
+3.	string functions(http://dev.mysql.com/doc/refman/5.0/en/string-functions.html#function_substring-index)
+	replace('E:\\d1\\d2\\d3.xml', substring_index('E:\\d1\\d2\\d3.xml', '.', 1), '')='.xml'	
+
+4.	number functions, max(id)
+insert into tableName(path, configname, id) select "C:\\windows\\", "config.xml", max(id)+1 from tableName where id > 10000	
+	
+
+========= basic commands
+1. alter (mysql basic commands)
+	alter table tableName change columnName columnName bigint(20);
+2. create
+	create table tableName (index indexName(column1, column2)) select * from anotherTable;
+	create table if not exists 
+3.	update
+	update table set column1 = cast(substr(column2 from 8 for 6) as unsigned)
+4.	show
+	show indexes from tableName		
+5.	insert	
+	insert into tableName(path, configname, id) select "C:\\windows\\", "config.xml", max(id)+1 from tableName where id > 10000
+6.	select	
+	select * from tableName where columnName like "%\\"%"
+	select * from tableName where columnName like '%"%'
+	select 'This is quote with ''single quote'	
+	select 'This is quote with \'single quote'
+	select distinct tableName, indexName from infomation_schema.statistics where table_schema = 'my_schema'
+	(show the column names of a table with a simple sql query)
+	select column_name from information_schema.columns where table_name='table'
+	
+======== interact with shell, files
+1. 	output to a file
+	select column1, column2 from tableName into outfile "c:/users/file.csv" fields terminated by ',' enclosed by '"' lines terminated by "\n"
+	mysql -u USERNAME --password=PASSWORD --database=DATABASE --execute='SELECT FIELD FROM TABLE LIMIT 0, 10000 ' -X > file.xml
+2.		
+	
+========= procedure commands and scripts
+1. How to create procedure?
+	delimiter $$
+	create procedure tempProcedure(in tableName varchar(20), in dbName varchar(100), out dbName varchar(4))
+	begin
+	end$$
+	delimiter ;
+	
+	delimiter $$
+	create function square_func(p_input int) returns int
+	begin
+	return pow(p_input, 2)
+	end$$
+	delimiter ;	
+	set @outVar = square_func(2);
+	
+2. 	How to call another procedure in a procedure??
+	create procedure proc_1(out para varchar(100))
+	begin
+		...
+	end
+	
+	create procedure proc_2()
+	begin
+		call proc_1(@para);
+		select @para;
+	end	
+	
+3.	How to skip errors in procedures?(for example. 'search fuck from tableName', error 1064)
+	declare continue handler for 1064 begin end;
+	
+4.	How to debugging procedure??
+	建存储过程，call storedPrecedureName(para1, para2),结果出现错误，check the right syntax to use near NULL at line 1	
+	how to debug stored procedure?如何调试存储过程
+	将prepare和exexute语句注释掉（）
+	建一张用于存储查询字符串的表create table tempStr(str varchar(200));
+	新建一张表，将每个query string都insert into 一张临时表tempStr中(insert into tempStr values(@selectOrUpdateStr);)
+	
+5.	prepare stat from 'select * from ? limit 1'; Why error 1064??
+	Can not pass in table names as prepared statements parameters. 
+	offical documentation: Parameter markers can be used only where data values should appear, not for SQL keywords, identifies, and so forth.
+	The only thing I can parametrize are fileds in where clauses and for update(update .. set id=?)
+	
+6. How to make an array and cycle it in mysql??
+	set @zoneLists = "zone1,zone2,zone3,";
+	while @zoneLists != "" do
+		set @firstZone := get_first_zone_in_string(@zoneLists);
+		@zoneLists = zoneLists.Replace(@firstZone, "");
+	end while
+
+7.	How to rename a mysql database?
+	(For innoDB, create empty DB, then rename each table in turn into new db, then change,flush privileges)
+	rename TABLE old_db.table1 to new_db.table2	
+	---------------------
+	using shell script:
+	for eachtable in `mysql -ucxz -p123456 -h0.0.0.0 --skip-column-names -e "show tables from old_db"`
+	do
+		mysql -ucxz -p123456 -h0.0.0.0 -e "rename table old_db.$eachtable to new_db.$eachtable"
+	done
+	
+8. (performance)select data from a table, where a specific field has the min value
+	(Better way)select * from tableName where column = (select min(filed) from tableName)
+	select * from tableName order by field asc limit 1	
+
+9.	idString          	idNum
+   sys_info_012345_a 	12346
+   sys_info_012346_a 	12347
+   sys_info_012347_ab 	12348
+   如何replace idString column's num from idNum,将idNum中的数字替换到idString中
+	1. alter table tableName add column temp varchar(128)
+		update tableName set temp=concat('sys_info_0',idNum,substr(idString from 16 for length(idString)-16))
+	2.update tableName set idString=replace(idString, substr(idString from 11 for 5),idNum)	
+10.	How to dump "show tables" to a variable??
+	Mysql Before 5.0, can not
+	Mysql after 5.0, SELECT table_name from INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='database_name';	
+	
+11. insert vietnamese to mysql use navicat(Do not do this, it will 乱码,just write a program myself)
+	set names 'utf8' collate 'utf8_general_ci'
+	alter table testTable CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci
+	navicat, right click the connection name, choose 'connection properties', advanced, change encoding to utf8.
+	右键 连接，选连接属性，高级，编码改成65001-UTF8		
+12.	How to convert latin1_swedish_ci data into utf8_general_ci?
+	alter database dbName DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+	alter table table_name CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci		
+
+========= confused mysql conceptions
+1.	What's the difference, @variable vs variable??加@和不加有什么区别？
+		MySql has the concept of user-defined variables. They are loosely typed variables 
+	that may be initialized somewhere in a session and keep their value until the session ends.
+	They are prepended with an "@" sign.
+	
+		User-defined variables declaration : SET @var := 1, SELECT @var1 := 2
+	User-defined variables are not case-sensitive in MySql 5.0 and up, but are case-sensitive before MySql 5.0	
+	For SET,either := or =	can be used as assignment operator
+	For SELECT , the assignment operator must be :=, because = is treated as the comparison operator= in non-SET statements.
+	SELECT @maxid := id from tableName order by id limit 1;
+	
+		Local variables(not prepended with any prefixes) declaration: declare localVariable INT default 1;
+	Local variables declaration must appear before cursor or handle declarations.
+	not case-sensitive, scope is BEGIN ... END	
+		
+		System variables, which maybe "global variables" such as @@global.port, or "session variables" such as @@session.sql_mode, 
+	these are unrelated to session-specific user-defined variables. 
+	(SELECT @@version, is also a reason why using delimiter @@ is not a good idea.)
+	
+		The difference between a procedure variable(local variable defined in procedure) and @variable is :
+	Procedure variables is reinitialized to NULL, while session-specific user-defined variables is not.	
+	Local variable can not be used in prepare statements created with procedure programs.
+	(Because prepared statements scope is the current session, so the statement can be executed after the procedure ends, at which point Local vars is no longer in scope)
+	Local variable should not have the same name as the table column name.Mysql interprets the reference to a column as the name of localVars.
+	(select local_var_same_as_table_column from tableName where local_var_same_as_table_column = local_var_same_as_table_column)
+	
+	example:
+	create procedure test_proc()
+	begin
+		declare procedureVar int default 1;
+		set procedureVar := procedureVar + 1;
+		set @user_definedVar := @user_definedVar + 1;
+		select procedureVar, @user_definedVar;
+	end
+	
+	call test_proc()
+	procedureVar     @user_definedVar
+	-----------      ----------------
+		2				2
+		
+	call test_proc()
+	procedureVar	@user_definedVar
+	------------	----------------
+		2				3
+		
+2.	Multiple Indexes vs Multi-Column Indexes
+	(http://stackoverflow.com/questions/179085/multiple-indexes-vs-multi-column-indexes)			
+	
+
+#####################################
+access 
+#####################################
+1. 使用Access是必须避免的特殊字符，http://support.microsoft.com/kb/826763)
+
+
+#####################################
+	excel chapter
+#####################################
+1. How to read excel spreadsheet in C# quickly??
+http://stackoverflow.com/questions/7613898/how-to-read-an-excel-spreadsheet-in-c-sharp-quickly
