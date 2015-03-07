@@ -278,7 +278,45 @@ insert into tableName(path, configname, id) select "C:\\windows\\", "config.xml"
 #####################################
 access 
 #####################################
-1. 使用Access是必须避免的特殊字符，http://support.microsoft.com/kb/826763)
+0.1. 使用Access是必须避免的特殊字符，http://support.microsoft.com/kb/826763)
+
+:(  Access is not written as a multiple CPU app even though parts of it have multiple threads of execution.
+:)  Use Access 查询设计视图来检测自己的语法是否正确
+1. is there an equivalent to the substring function in MS Access??
+	(can search "MS Access string functions")
+	select distinct left(string_column, 1), tight(string_column, 2), mid(string_column, 14, 1) from table_name;
+	
+2. How to join on memo fields in Microsoft Access?
+	SELECT table1.*, table2.*
+	FROM table1, table2
+	WHERE (table1.MemoField = table2.MemoField)
+	
+	update table1, table2
+	SET table1.field1 = table2.field2
+	WHERE table1.MemoField = table2.MemoField
+	
+	update table1
+	set table1.field1=table2.field
+	from table1
+	left join table2
+	on table1.join_column = tabl2.join_column
+	where table2.field=true
+	
+3. concatenate two columns in an Access table
+	select column1 & """" & column2 & "," & column3 from table;
+
+4. Why access is too slow??
+	"select long_string from table1"
+	string temp = row.ItemArray[0].ToString()
+	"insert into table2 where column1 = temp"
+	
+	table2 has 70000 rows, a long text column, and the operation is too slow!
+	
+5. Specify delimeter when exporting data from excel	
+
+6. How to do INSERT into a table records extracted from another table
+	INSERT INTO Table2(LongIntColumn2, CurrencyColumn2)
+	SELECT LongIntColumn1, Avg(CurrencyColumn) as CurrencyColumn1 FROM Table1 GROUP BY LongIntColumn1;
 
 
 #####################################
