@@ -1,20 +1,3 @@
-------------------------
- gbd debugging tips
-------------------------
-1. gdb show all characters other than "..."
-set print elements 0
-
-2. How to set breakpoints on all functions in a file??(http://sourceware.org/gdb/download/onlinedocs/gdb/Set-Breaks.html#Set-Breaks)
-(stackoverflow上的方法还没试过http://stackoverflow.com/questions/475283/using-gdb-stop-the-program-when-it-is-using-any-function-from-file-x)
-rbreak fileName.cpp:.
-rbreak fileName.cpp:<regex>
-(If I used the commands above, then run "gdb Server", it prompts "core dumped")我一用就core dumped...
-So, Use the commands below :
-rbreak fileName.cpp:.
-info b
-then copy all the breakpoints info to a notepad++, then replace 'at fileName.cpp:401' to none, then copy it to gdb.
-将info b的输出拷贝到notepad++里面，然后将后面的部分替换掉即可
-
 vs .net 2003 查找 死机
 找到VS2003的安装目录，修改"...\Microsoft Visual Studio .NET 2003\Common7\IDE"目录下的devenv.exe的属性，
 将其兼容性中的“禁用视觉主题”打钩
@@ -185,6 +168,5 @@ int pthread_rwlock_tryrdlock(pthread_rwlock_t *rwlock);
 int  pthread_rwlock_wrlock(pthread_rwlock_t *rwlock );
 int pthread_rwlock_trywrlock(pthread_rwlock_t  *rwlock);
 
-	
 要思考的问题，由1到多，还有什么？
 When more than one thread is waiting for a locked mutex, which thread will be granted the lock first after it is released?

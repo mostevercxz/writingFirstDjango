@@ -235,12 +235,12 @@ create git repository and upload to github
 (reference:http://sirupsen.com/starting-with-git/)
 1.create ssh key, provide ssh key to git, introduce ourselves to git(https://help.github.com/articles/generating-ssh-keys/#platform-linux)
 	ls -al ~/.ssh
-	ssh-keygen -t rsa -C "mostevercxz@gmail.com"
+	ssh-keygen -t rsa -C "mostevercxz@gmail.com" (passphrase必须要输入,Creates a new ssh key, using the provided email as a label)
 	eval "$(ssh-agent -s)"
 	ssh-add ~/.ssh/id_rsa
-	vim ~/.ssh/id_rsa.pub
+	xclip -i < ~/.ssh/id_rsa.pub
 	(copy the content to github page, settings, ssh keys, add ssh key)
-	ssh -T git@github.com
+	ssh -T git@github.com(test connection, Attempts to ssh to GitHub)
 2.create git repository
 	git init
 	git add .
@@ -281,164 +281,8 @@ git Howtos, 2014-11-03
 		git cloen --depth=1
 		git fetch --depth=N
 		git fetch --unshallow
-	2.Ask someone to prepare a bundle, then download the bundle!!
-
-
-linux commands archived
------------------------
-1.netstat -n 1 |grep 192.168.204.128(find the number of sockets)
-2. time writes its output to stderr, time is part of the syntax of bash, and it times an entire pipeline. Consequetnly, I need to wrap the pipeline in braces, or run it in a subshell:
-	{ time ls -l > /dev/null; } |& grep real(tested in ubuntu)
-	(\& is an abbreviation for '2>&1 |')
-	{ time ls -all; } 2> timeLog.txt
-	(time ls) > ls_results 2> timeLog
-	(time ls) > outfile 2>&1
-
-	--2.1 Redirects stderr to the same stream as stdout, then redirects stdout to /dev/null, then pipes the output of time into the stdin of grep:
-		(time ls -l)  2>&1 > /dev/null |grep real | awk '{print $2}'
-
-	I can also use the time utility to control the format of output.(man time)
-	/usr/bin/time -f%e ls -l > /dev/null
-
-3. which mysql, /usr/local/mysql/bin/mysql
-4. grep -P "[\x80-\xff]" fileWithChinesesChar.cpp
-	(find the Chinese characters in a file)
-
-5. get rid of xml comments in an xml file(removing single and multiple line comments)	
-	(http://stackoverflow.com/questions/19230407/remove-xml-comments-using-regex-in-bash)
-
-
-mysql commands archived
------------------------
-1. backup mysql databases
-	mysqldump databaseName > bak.sql
-	mysqldump -A -ucxz -p123456 databaseName > bak.sql
-	mysqldump --opt -d databaseName -h192.168.0.0 -ucxz -p > bak.sql(only table structure, no data)
-	mysqldump -t databaseName -ucxz -p > bak.sql
-2.recover a database
-	mysql -h192... -ucxz -p123456 databaseName < /home/cxz/dbBak/bak.sql
-
-3. mysql user management
-	###########
-	create user 'cxz'@'192.0.0.1' identified by 'password 123456';
-	set password for 'cxz'@'192.0.0.1' = password('newpass');
-	rename user 'cxz'@'192.0.0.1' to 'chen'@'localhost'
-	drop user 'cxz'@'localhost'
-
-4. Mysql user privileges management
-	(################# must run 'flush privileges' after change privileges)
-
-	grant select, insert, update, delete on testdb.* to userName@'%'
-
-	privileges:
-	create 
-	alter
-	drop
-	references(foreign key privilege)
-	create temporary
-	index
-
-	create view
-	show view
-
-	create routine(show procedure status)
-	alter routine(drop a procedure)
-	execute
-
-	all privileges
-
-	grant all on *.* to userName@'%'
-	grant select(id, name, score) on students.scores to userName@'%'
-	grant execute on procedure testdb.procedure_add to ...
-	grant execute on function testdb.fun_add to ...
-
-	show grants for cxz@localhost;
-
-5. MYsql revoke privileges
-	revoke all on *.* from cxz@'%'
-
-6. ''@'localhost' will be matched first than 'cxz'@'localhost'
-
-7. mysql -ucxz -p123456 testdb -e "show tables"
-
-8. mysqladmin shutdown
-	mysqld_safe
-
-9. edit /etc/my.cnd(if character_set_database=latin1, and Chinese chars show as"??????")
-	[client]
-	default-character-set=utf8
-	[mysqld]
-	character-set-server=utf8
-	[mysql]
-	default-character-set=utf8
-
-2. press HOME keyborad, just print "~"
-
-3. to be continued
-	mysql.user privileges
+	2.Ask someone to prepare a bundle, then download the bundle!!				
 	
-10. copy one table's data from one db to another db
-	create table db2.table like db1.table
-	insert into db2.table select * from db1.table
-	(create table db2.table select * from db1.table, just copys the data, not index.)
-
-
-gcc compile options, 2014-11-04
--------------------
-1. _GNU_SOURCE. 
-	If you define this macro, everything is included: ISO C89, ISO C99, POSIX.1, POSIX.2, BSD, SVID, X/Open, LFS, and GNU extensions. In the cases where POSIX.1 conflicts with BSD, the POSIX definitions take precedence.
-	The _GNU_SOURCE will most likely limits source code usage to GNU/Linux and GNU/Hard systems, unless additional work is done to address the non-portability of such functionality on other platforms.
-	Feel free to use such extensions, if my development is locked into GNU/Linux and GNU/Hard. Avoid such usages dot any apllications that may be deployed on other Unix and Unix-like operating systems.
-
-2. _REENTRANT(_THREAD_SAFE)
-	If I define one of those macros, reentrant versions of several functions get declared. Some of the functions are specified in POSIX.1c but many others are onlt avialable on a few other systems or are unique to the GNU C Library. The problem is the delay in the standardization of the thread safe C library interface.
-
-3. -Wall
-	gcc -Wall enables all compiler's warning messages. This option should always be used, in order to generate better code. They do not prevent the compliation of my programs, unless -Werror is specified.
-
-4. -Werror
-	turn all warning into errors!!
-
-5. -Bstatic
-	tells the linker to use the static versions for all default libraries like libc etc...
-
-6. -g3(-g level)
-	Request debugging info anf also use level to specify how much info.THe default level is 2.
-	Level 0 produces no debug info at all.
-	Level 1 produces minimal info, enough for making breaktraces in parts of the program. This includes descriptions of functions and external variables, but no information about local variables and no line numbers.
-	Level 3 includes extra information, such as all the macro definitions present in the program. Some debuggers support macro expansion when you use -g3.
-
-7. -rdynamic
-	Pass the flag -export-dynamic to the ELF linker, on targets that support it. This instructs the linker to add all symbols, not only used ones, to the dynamic symbol table. This option is needed for some uses of dlopen or to allow obtaining backtraces from within a program. 
-
-8. -fPIC
-	suitable for dynamic linking and avoiding any limit on the size of the global offset table. When this flag is set, the macros __pic__ and __PIC__ are defined to 2.
-
-9. -c
-	Compile or assemble the source files, but do not link.
-
-10. -o ofile
-	Place output in file ofile.
-
-11. -Idir
-	Add the directory dir to the head of the list of directories to be searched for header files.
-	If you use more than one -I option, the directories are scanned in left-to-right order; the standard system directories come after.
-	If a standard system include directory, or a directory specified with -isystem, is also specified with -I, the -I option will be ignored. 
-	The directory will still be searched but as a system directory at its normal position in the system include chain. 
-	This is to ensure that GCC's procedure to fix buggy system headers and the ordering for the include_next directive are not inadvertently changed. 
-	If you really need to change the search order for system directories, use the -nostdinc and/or -isystem options.
-
-12. What is the difference between 'xml2-config --cflags' and 'xml2-config --libs'?? what does the latter option mean??
-
-13. keyword "view macro expansion"
-	g++ -c test.cpp -I. -I../ `mysql_config --cflags` `xml2-config --cflags` -E -o test.i
-
-	eit makefile, make -g3 test.cpp -o test
-	macro expand/exp
-
-
-
-
 Svn tips
 ------------------------------
 1. return to an older version of the code, and set it to the current
@@ -456,9 +300,362 @@ Svn tips
 website archives
 -----------------------------
 1. c++ online 
-    http://ideone.com/
+    http://ideone.com/	
+
+access, oledb, IErrorInfo.GetDescription failed with E_FAIL(0x80004005) using Windows Search API via OleDB
+string query = "select * from TRANSLATE";
+方法：将TRANSLATE加反引号string query = "select * from `TRANSLATE`"
+
+accdb --> mdb的转化，直接“文件”，“保存并发布”
+
+try, catch, finally
+
+access select where not equal
+
+c# append content to file
+
+check dataset is null
+http://bbs.csdn.net/topics/80340652
+http://www.nathanma.com/article.asp?id=13
+
+c# string from index 1 to index length-1
+substring()
+
+出现问题的时候，将问题简单化。比如access里，select `translate` from tableNme where 
+将where的条件简单到只有一个，看下能否查询出来
+最后发现问题是clientcode表里没有字段
+
+turn a single quote into an escaped single quote
+
+c# replace one line in file
+c# readalllines 汉字 乱码
+
+#ifdef else
+no newline at end of file
+
+error : stray '\235' in program宏定义的时候加双引号即可
+
+regex get text between parentheses,正则表达式得到括号里的数字
+http://stackoverflow.com/questions/17779744/regular-expression-to-get-a-string-between-parentheses-in-javascript
+
+
+Cannot join on Memo or OLE Object <name>. (Error 3118)
+不能在Memo, OLE, 或超级链接对象(`tables`.context=tables_translate.context)中连接
+	The field I use to logically tie two or more tables together 
+must be some other data type, such as text or integer.
+但是什么是Memo, 什么是OLE type??
+https://support.office.com/en-US/Article/Introduction-to-data-types-and-field-properties-30ad644f-946c-442e-8bd2-be067361987c
+
+
+在shell脚本里，用sed -r pattern file_name > temp
+mv temp file_name
+结果文件里内容是空的，这是为什么呢？？
 	
-#########################	
-	python tips
-#########################
-1. 
+
+
+-----------------------
+	C# tips,http://www.dotnetperls.com/substring
+-----------------------
+1. how to add a string to string[] array?		
+	an array has fixed length.
+	List<string> str_list = new List<string>();
+	str_list.Add(another_string);
+	List<string> words = new string[] {"string1", "string2"}.ToList();
+	words.Insert(0, "Well")
+	str_list.ToArray();
+	
+2. How to use Regexes to match more than one patterns in C#??
+	Match m = Regex.Match(input, pattern, options)
+	while(m.Success)
+	{
+		match = match.NextMatch();
+	}
+	
+	foreach(Match match in Regex.Matches(sentence, pattern))
+	{
+		console.Write(match.Value + match.Index)
+	}
+
+3. Convert string to int
+	int a = Convert.ToInt32(string)	
+	
+4. File input and out with encoding
+	using (StreamWriter sw = new StreamWriter(filename, true, Encoding.getEncoding("gb2312")))
+	{
+		sw.Write(this_line);
+	}
+	
+	error: 参数2 Encoding bool ,原因是脑残，看错参数类型了
+	StreamWriter sw = new StreamWriter(Stream stream, Encoding encoding)
+	
+5. How to replace specific line in a text file??
+	You can not rewrite a line without rewriting the entire file.
+	
+	string[] all_lines = File.ReadAllLines(path_of_file);
+	all_lines[specific_line_number] = "write this line";
+	File.WriteAllLines(path_of_file, all_lines);
+	
+	string[] all_lines = File.ReadAllLines(path_of_file);
+	using(StreamWriter sw = new StreamWriter(path_of_file))
+	{
+		for (int current_line = 1; current_line < all_lines.Length; ++current_line)
+		{
+			if (current_line == line_to_edit)
+			{
+				sw.WriteLine(lineToWrite);
+			}
+			else
+			{
+				sw.WriteLine(lines[current_line - 1]);
+			}
+		}
+	}
+	
+6. What does the at sign means in C#?
+	
+7. Turning a signle quote into an escaped single quote??
+	'\'' is char literals
+	"\'" is string
+	string.Replace("'", @"\'");
+8. Replace all signle quotes with two single quotes?
+	string.Replace("'", "''");
+	
+9. What does the at symbol before a variable name means in C#?	
+	allow using a reserved keyword as a variable
+	
+10. then, the @ at symbol before a string??(http://www.yoda.arachsys.com/csharp/strings.html)
+	There are two types of string literals in C#, regualr string literals and verbatim string literals.
+Verbatim string literals are distinguished by having an @ before the opening quote.
+Various characters need to be "escaped" to be represented in the string, for example(", \, carriage return(CR), line feed(LF)).
+Verbatim string literals allow pretty much anything within "", and end at the first " which isn't double.
+To obtain a " within the string itself, you need to write ""
+
+	It marks the string as a verbatim string literal, anything int the string that would 
+normally be interpreted as an escaped sequence is ignored.
+	"C:\\Users\\Rich" is the same as @"C:\Users\Rich"
+	
+11. How to use C# to operate oledb database?
+	OleDbConnection conn = new OleDbConnection(conn_string);
+	conn.Open();
+	OleDbCommand cmd = new OleDbCommand("Update table_name set column1=?, col2=?,email=?", conn);
+	cmd.Parameters.AddWithValue("@a", value1);
+	cmd.Parameters.AddWithValue("@b", value2);
+	cmd.Parameters.AddWithValue("@c", email);
+	cmd.ExecuteNonQuery();
+	conn.Close();
+	
+12. What about a mysql database??
+	add reference, downloaded from mysql official website
+	
+	MySqlConnectionStringBuilder conn_string = new MySqlConnectionStringBuilder();
+	conn_string.Server = "mysql7.000webhost.com";
+	conn_string.UserID = "a455555_test";
+	conn_string.Password = "a455555_me";
+	conn_string.Database = "xxxxxxxx";
+	
+	using (MySqlConnection conn = new MySqlConnection(conn_string.ToString()))
+	using (MySqlCommand cmd = conn.CreateCommand())
+	{    //watch out for this SQL injection vulnerability below
+		cmd.CommandText = string.Format("INSERT Test (lat, long) VALUES ({0},{1})",
+										OSGconv.deciLat, OSGconv.deciLon);
+		connection.Open();
+		cmd.ExecuteNonQuery();
+	}
+
+13. copy file from one directory to another directory
+	system.IO.File.Copy(sourceFile, destinationFile, true)
+	
+14. How to convert a C# string value to an escaped string literal??
+(http://stackoverflow.com/questions/323640/can-i-convert-a-c-sharp-string-value-to-an-escaped-string-literal)
+	private static string ToLiteral(string input)
+	{
+		using(var writer = new SrtingWriter())
+		using(var provider = CodeDomProvider.CreateProvider("CSharp"))
+		{
+			provider.GenerateCodeFromExpression(new CodePrimitiveExpression(input), writer, null);
+			return writer.ToString();
+		}
+	}	
+	
+15. What is StringBuilder??
+	I have a string read from another source such as "\b\bfoo\bx". 
+	In this case, it would translate to the word "fox" as the first 2 \b's are ignored, and the last 'o' is erased, and then replaced with 'x'. 
+	Also another case would be "patt\b\b\b\b\b\b\b\b\b\bfoo" should be translated to "foo"
+	
+	public string ReplaceBackspace(string hasBackspace)
+{
+    if( string.IsNullOrEmpty(hasBackspace) )
+        return hasBackspace;
+
+    StringBuilder result = new StringBuilder(hasBackspace.Length);
+    foreach (char c in hasBackspace)
+    {
+        if (c == '\b')
+        {
+            if (result.Length > 0)
+                result.Length--;
+        }
+        else
+        {
+            result.Append(c);
+        }
+    }
+    return result.ToString();
+}
+
+16. Strip non-ascii characters from a string in C#?
+	string s = "søme string";
+	s = Regex.Replace(s, @"[^\u0000-\u007F]", string.Empty);
+	
+17. Call Directory.GetFiles() with multiple filters??
+	get all files in a certain directory
+	string[] files = Directory.GetFiles(txtFolderPath.Text, "*ProfileHandler.cs", SearchOption.AllDirectories);
+	
+	Get the folder name from a path
+	string path = "C:/folder1/folder2/file.txt";
+	string lastFolderName = Path.GetFileName( Path.GetDirectoryName( path ) );
+	
+	if a directory does not exist, create it
+	string subPath ="ImagesPath"; // your code goes here
+	bool exists = System.IO.Directory.Exists(Server.MapPath(subPath));
+	if(!exists)
+    System.IO.Directory.CreateDirectory(Server.MapPath(subPath));
+
+	For .Net 4.0
+	var files = Directory.EnumerateFiles("C:\\path", "*.*", SearchOption.AllDirectories)
+            .Where(s => s.EndsWith(".mp3") || s.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase));	//ignore lower and upper忽略大小写
+	
+	For earlier versions
+	var files = Directory.GetFiles("C:\\path", "*.*", SearchOption.AllDirectories)
+            .Where(s => s.EndsWith(".mp3") || s.EndsWith(".jpg"));
+			
+	Directory.CreateFile(file_name_string)		
+			
+18. Read an Excel file using C#
+	string con = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=D:\temp\test.xls;Extended Properties='Excel 8.0;HDR=Yes;'";    
+using(OleDbConnection connection = new OleDbConnection(con))
+{
+    connection.Open();
+    OleDbCommand command = new OleDbCommand("select * from [Sheet1$]", connection); 
+    using(OleDbDataReader dr = command.ExecuteReader())
+    {
+         while(dr.Read())
+         {
+             var row1Col0 = dr[0];
+             Console.WriteLine(row1Col0);
+         }
+    }
+}
+	(高版本Microsoft.ACE.OLEDB.12.0;)
+	
+19. Unicode & Vietnamese character encoding
+	The most excat range : 
+	(http://blog.int3ractive.com/2010/06/optimal-unicode-range-for-vietnamese.html)
+	(http://vietunicode.sourceforge.net/charset/)
+	(http://vietunicode.sourceforge.net/charset/v3.htm)
+	(vovisoft.com/unicode/utilities/vietencoding.htm)
+	non-excat range : \u0020-\u00ff, \u0102-\u01b0, \u1ea0-\u1ef9
+
+20. getconfig LONG_BIT
+	
+21.	Make DataTable and add value to it(msdn official example,http://msdn.microsoft.com/en-us/library/system.data.datarow.itemarray(v=vs.110).aspx)
+	private DataTable MakeTableWithAutoIncrement()
+{
+    // Make a table with one AutoIncrement column.
+    DataTable table = new DataTable("table");
+    DataColumn idColumn = new DataColumn("id", 
+        Type.GetType("System.Int32"));
+    idColumn.AutoIncrement = true;
+    idColumn.AutoIncrementSeed = 10;
+    table.Columns.Add(idColumn);
+
+    DataColumn firstNameColumn = new DataColumn("Item", 
+        Type.GetType("System.String"));
+    table.Columns.Add(firstNameColumn);
+    return table;
+}
+
+private void CreateRowsWithItemArray()
+{
+    // Make a DataTable using the function below.
+    DataTable dt = MakeTableWithAutoIncrement();
+    DataRow relation;
+    // Declare the array variable. 
+    object [] rowArray = new object[2];
+    // Create 10 new rows and add to DataRowCollection. 
+    for(int i = 0; i <10; i++)
+    {
+        rowArray[0]=null;
+        rowArray[1]= "item " + i;
+        relation = dt.NewRow();
+        relation.ItemArray = rowArray;
+        dt.Rows.Add(relation);
+    }
+}
+
+22. How to write cells to Excel with fastest way??
+	avoid reading and writing cell by cell if you can. 
+	It is much faster to work with arrays, and read or write entire blocks at once.
+	
+	var sheet = (Worksheet)Application.ActiveSheet;
+  var range = sheet.get_Range("A1", "B2");
+  var data = new string[3,3];
+  data[0, 0] = "A1";
+  data[0, 1] = "B1";
+  data[1, 0] = "A2";
+  data[1, 1] = "B2";
+  range.Value2 = data;
+  
+ 23. get last cell (for example, "F24567") of an excel sheet
+	worksheet.Cells.SpecialCells(Excel.XlCellType.xlCellTypeLastCell, Type.Missing);
+	
+24. Does anyone know of a good C# API for Subversion?
+	SharpSVN
+	
+25. What is the best way to iterate over a Dictionary C#??	
+	foreach(KeyValuePair<string, string> entry in MyDic)
+	{
+		// do something with entry.Value or entry.Key
+	}
+	
+26. Get the column names of a table and store them in a string or var c# asp.net
+DataTable schema = null;
+using (var con = new MySql.Data.MySqlClient.MySqlConnection(connection))
+{
+    using (var schemaCommand = new MySql.Data.MySqlClient.MySqlCommand("SELECT * FROM TestTable", con))
+    {
+        con.Open();
+        using (var reader = schemaCommand.ExecuteReader(CommandBehavior.SchemaOnly))
+        {
+            schema = reader.GetSchemaTable();
+        }
+    }
+}
+foreach (DataRow col in schema.Rows)
+{
+    Console.WriteLine("ColumnName={0}", col.Field<String>("ColumnName"));
+}
+
+27. Visual Studio 2013: Build for Windows XP, make my program running on XP. VS2013 C#如何在XP上运行
+You got to right-click in the solution name on the Solution Explorer and go to Properties. 
+In there, you can not only change the platform (x64 or x86) but the .NET Framework. 
+I downgraded to .Net Framework 4 and worked perfectly!
+
+28. new a array with some items
+public string[] array = new string[] {"a", "aa", "aaa", "b"};
+public int[] arrayInt = new int[] {1, 2, 3};
+
+29. longjmp causes uninitialized stack frame ***
+answered in : http://stackoverflow.com/questions/9191668/error-longjmp-causes-uninitialized-stack-frame
+1.If you can't rebuild libcurl, then you can call curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1) on all curl handles that you use
+2.There is an asynchronous DNS resolver library called c-ares that curl is capable of using for name resolution. 
+Using this library is the preferred solution to the problem (and I would imagine most Linux packagers have figured this out by now). 
+To enable c-ares support, first build and install the library, then pass the --enable-ares flag to curl's configure script before you build.
+(http://curl.haxx.se/dev/readme-ares.html)
+
+MAX.	
+	
+	
+	strncpy没用sizeof的不能通过
+	直接用常量的不让通过
+	发现内网少了很多道具，直接问发哥了，应该看看丢失哪些道具，是不是因为道具有时效		

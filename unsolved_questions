@@ -1,5 +1,28 @@
-writing your first django app
+Why I need to save questions here???
+	As said in http://stackoverflow.com/questions/8886065/bash-script-error-catching
+	For the sake of learning than of absolute necessity
+	
+-------------------------
+	Regex
+-------------------------
+1. Regex match open tags except XHTML self-contained tags
+	http://stackoverflow.com/questions/1732348/regex-match-open-tags-except-xhtml-self-contained-tags
+
+--------------------------
+1. Single Quotes vs double quotes in Python
+	http://stackoverflow.com/questions/56011/single-quotes-vs-double-quotes-in-python
+
+
 ----------------------------
+1. What's different between utf-8 and utf-8 without BOM?
+	http://stackoverflow.com/questions/2223882/whats-different-between-utf-8-and-utf-8-without-bom	
+
+（http://dev.mysql.com/doc/refman/5.0/en/string-functions.html#function_ascii）	
+将mysql官网上的示例代码，提取出来，在自己的手机上看。将mysql官方文档转为手机上可看的阅读格式。
+
+-----------------------------	
+writing your first django app
+-----------------------------
 
 1."Some of these applications make use of at least one database table, though, we need to create the tables in the database before we can use them. To do that, run 'python manage.py migrate' ". Why "we need to create tables"??
 
@@ -17,3 +40,54 @@ writing your first django app
 
 8. search 'full details' in the part 1-4
 	--8.1 part 4, generic views
+	
+9. what does this mean??	 ls -l | sed -n -e '2{p;q}'
+
+--------------------------------------	
+2. resource management, context management,http://stackoverflow.com/questions/8774830/how-with-is-better-than-try-catch-to-open-a-file-in-python
+	http://en.wikipedia.org/wiki/Reference_counting
+3. https://docs.python.org/2/howto/unicode.html
+4. python logging
+5. python execute shell commands, especially using subprocess
+
+-----------------------------------------
+C++ design patterns of get rid of if-else
+1. if (book.type == A) do_some();
+	else if (book.type ==B ) do_other();
+	...
+	else do_something()
+	
+	Make a different class for each type of book, implement the same interface, then invoke BookParent::Parse()
+	对每本书,都建立个类，父类虚函数，子类继承。直接调用父类的解析函数即可
+	using std::map<>, key is book type, value is a pointer to function
+	
+2. switch case AND polymorphic	
+3. How to remove the constness of const iterator??
+	http://stackoverflow.com/questions/765148/how-to-remove-constness-of-const-iterator
+
+-------------------------------------
+mysql single quotes double quotes
+	What are the diffrences between utf8_general_ci and utf8_unicode_ci
+	(http://stackoverflow.com/questions/1036454/what-are-the-diffrences-between-utf8-general-ci-and-utf8-unicode-ci)
+	
+	How mysql use indexes ??
+	http://dev.mysql.com/doc/refman/5.0/en/mysql-indexes.html
+	
+What is unicode??gbk?	
+
+re.match(u"[\u4e00-9fa5]")
+re.match(ur"[\u4e00-9fa5]")的区别在哪里？
+line feed means what??
+
+--------------------------
+	book resources archive
+--------------------------
+1.C# sharp in depth
+http://csharpindepth.com/	
+
+.co file format
+what is it and how to open it??
+http://pcsupport.about.com/od/fileextensions/f/cofile.htm
+
+How to validate the non-ascii characters in a string?如何识别字符串中的中文字符
+(suggested way : iterate each character to see if each character is in ascii range.)
