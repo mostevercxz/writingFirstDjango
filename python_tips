@@ -1,0 +1,211 @@
+2014-11-15 python tips
+------------------------
+pyCon many python tips
+1. pragmatic unicode(http://nedbatchelder.com/text/unipain.html)
+
+
+
+--------------------------
+	Python basic
+--------------------------
+1. How to raise an exception in python?
+	raise Exception("I know python!!")
+
+2. matches = re.findall(r'balabala', text)
+	",".join(matches)
+	
+3. Find the nth occurrence of substring in a string, like mystring.find("substr", 2nd)
+	
+	---3.1 Bad for large string manipluate
+	def findnth(string, needle, n):
+		parts = string.split(needle, n+1)
+		if len(parts) <= n+1:
+			return -1
+		return len(string) - len(parts[-1]) - len(needle)	
+		
+	def findnth(string, needle, n):
+		start = string.find(needle)
+		while start>=0 and n>1:
+			start = string.find(needle, start+len(needle))# for overlapped strings, change len(needle) to 1
+			n -= 1
+		return start	
+
+4. substring a string in Python
+	>>> x = "hello python!"	
+	>>> x[2:]
+	'llo Python!'
+	>>> x[:2]
+	'he'
+	>>> x[:-2]
+	'hello pytho'
+	>>> x[-2:]
+	'n!'
+	>>> x[2:-2]
+	'llo pytho'
+5. reverse a string 
+	some_string[::-1](the third parameter to an array slice is a step)	
+	
+6. Permanently add a directory to PYTHONPATH
+	确保该目录下有_init.py文件
+	export PYTHONPATH=$PYTHONPATH:/usr/temp/pythonPath
+	
+7. use subprocess to get the result of a bash script
+	import subprocess
+	proc = subprocess.Popen(['ls', '-a'], stdout=subprocess.PIPE)
+	out, err = proc.communicate()
+	print(out)
+	
+	def mygrep(grepStr):
+		proc = subprocess.Popen(["test.sh", grepStr], stdout=subprocess.PIPE)
+		result = proc.communicate()
+	
+
+--------------------------	
+	python errors handle
+--------------------------	
+1. UnicodeDecodeError: 'utf8' codec can't decode bytes in position 1689-1692
+	determine which line which character is wrong
+	(iso--8859-1)
+	
+	buf = open('filename', 'rb').read()
+	len(buf)
+	ubuf = buf.decode('utf8')
+	buf[50:60]
+2. catch all errors
+	import sys
+	try:
+		untrusted.execute()
+	except:#catch all exceptions
+		e = sys.exc_info()[0]
+		print(str(e))
+3. encoding problem: with BOM		
+	#coding='Unicode'
+	....
+	
+	change the coding to utf8. 改变文件头的coding
+--------------------------------
+1. Illegal mix of collations (latin1_swedish_ci,IMPLICIT) and (utf8_general_ci,COERCIBLE) for operation '='
+	(Illegal mix of collations MySql Error)
+	SET collation_connection = 'utf8_general_ci'
+	ALTER DATABASE db CHARACTER SET utf8 COLLATE utf8_general_ci
+	ALTER TABLE table CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci
+	
+----------------------------------
+errors met when using python mysql connector
+0. an example
+	# coding=<gbk>
+	import mysql.connector
+	conn = mysql.connector.connect(user='', passwd='', db='', host='',port='',encoding='latin1')
+	cur = conn.cursor()
+	cur.execute('SELECT * FROM tableName where name like \"张三\"')
+	list=cur.fetchall()
+	#deal with list
+	cur.execute(
+		'insert into tableName(name,date,id) select ' + '\"张三\",' + '20141118, max(id)+1 from tableName'
+		)
+	cur.commit()
+	conn.close()	
+	
+1.SyntaxError : Non-ASCII character '\..' in file ... but no encoding declared; see see http://www.python.org/peps/pep-0263.html for details
+	错误语句(str='select * from tableName where name=小新')
+	解决方法：参照网址中的方法，在文件头
+	To define a source code encoding, a magic comment must be placed into the source files,
+	either as first or second line in the file, such as:
+	# coding=<encoding name>
+	
+	#!/usr/bin/python
+    # -*- coding: <encoding name> -*-
+
+	#!/usr/bin/python
+    # vim: set fileencoding=<encoding name> :
+	
+	
+2.python connector 查询条件中带汉字,结果为0;查询结果中没有汉字,一切返回正常,改一下，连接数据库的编码
+	conn = mysql.connector.connect(host='0.0.0.0', ..., charset='latin1')
+
+3.在这之后，latin-1 codec can't encode characters in position ..., ordinal not in range(256)
+	mysql = 'select * from tableName where columnName=' + '\"' + keyword + '\"'
+	conn.cursor().execute(mysql.encode('gbk'))
+	问题解决
+
+4. TypeError: can't write str to text stream
+	Change fout=io.open('filename', 'a')	-->fout = open('test.txt','a'),or, fout = io.open('test.txt','ab')
+
+5. fout = open('log.txt', 'a')	
+	sys.stdout = fout
+	fout.close()
+	
+	发现log.txt文件中汉字是乱码
+	file -bi log.txt
+	text/plain; chraset=unknown
+	
+	解决方法：
+	vim log.txt; 随便写2行，保存，再file -bi log.txt; text/plain; charset=us-ascii,在写日志，汉字正常
+	
+6. 	redirect print output to a file using python
+	fout = open('out.txt', 'a')
+	print >> fout, 'Filename:',filename( f.write('...\n') )
+	
+	origin_stdout = sys.stdout
+	sys.stdout = fout
+	print('now this sentence is written to files')
+	sys.stdout = origin_stdout
+	fout.close()
+	
+7. write utf-8 file with bom in python(https://docs.python.org/2/library/codecs.html#module-encodings.utf_8_sig
+	fout = open('out.txt', 'w')
+	fout.write(codecs.BOM_UTF8)
+	fout.close()
+	
+	file = codecs.open('out.txt', 'w', 'utf8-sig')
+	file.write("hi dad\n")
+	file.write(u"This has bom")
+	
+8. check if an insert was successfully	
+	sql_insert = 'insert into table (column1, column2) values (%s,%s,1)'
+	cursor = conn.cursor()
+	try:
+		affected_count = cursor.execute(sql_insert, (id, filename))
+		conn.commit()
+		logging.warn("%d", affected_count)
+		logging.info("inserted values %d, %s", id, filename)
+	except MySQLdb.IntegrityError:
+		logging.warn("failed to insert values %d, %s", id, filename)
+	finally:
+		cursor.close()
+
+9. How to check a string in Python is in ascii??
+	A string in Python has no property corresponding to 'ascii', utf8, or any other encoding.
+	所以问题这样问，Is this string the result of encoding a unicode string in ascii??
+	try:
+		mystring.decode('ascii')
+	except UnicodeDecodeError:
+		print "it was not a ascii-encoded Unicode string"	
+		
+		
+10. replace string A in file with string b in a file
+	with open("out.txt", "wt") as fout:
+    with open("Stud.txt", "rt") as fin:
+        for line in fin:
+            fout.write(line.replace('A', 'Orange'))		
+		
+-------------------------------
+	Python Built-in functions
+-------------------------------		
+1. ord(c), return an integer representing the Unicode code point of the character 
+when the argument is a unicode object; or the value of the byte when the argument is an 8-bit string.
+	ord('a')=97; ord(u'\u2020')=8224
+	
+
+-------------------------------
+ web scraping errors
+1. sometimes works with some pages, and sometimes, it barfs by throwing a UnicodeEncodeError
+	agent_telno = agent.find('div', 'agent_contact_number')
+	agent_telno = '' if agent_telno is None else agent_telno.contents[0]
+	p.agent_info = str(agent_contact + ' ' + agent_telno).strip()
+	
+	when you call str(), python uses the default character encoding to try and encode the bytes you gave it, 
+	which in your case are sometimes representations of unicode characters.
+	
+	stop using str to convert from unicode to encoded text / bytes
+	p.agent_info = u' '.join((agent_contact, agent_telno)).encode('utf-8').strip()
