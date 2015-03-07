@@ -1,6 +1,92 @@
 # this is a new file recording shell scripting tips
 # created by cxz, 2014-11-07
 
+####################
+	Linux commands comes first
+####################
+1.netstat -n 1 |grep 192.168.204.128(find the number of sockets)
+2. time writes its output to stderr, time is part of the syntax of bash, and it times an entire pipeline. Consequetnly, I need to wrap the pipeline in braces, or run it in a subshell:
+	{ time ls -l > /dev/null; } |& grep real(tested in ubuntu)
+	(\& is an abbreviation for '2>&1 |')
+	{ time ls -all; } 2> timeLog.txt
+	(time ls) > ls_results 2> timeLog
+	(time ls) > outfile 2>&1
+
+	--2.1 Redirects stderr to the same stream as stdout, then redirects stdout to /dev/null, then pipes the output of time into the stdin of grep:
+		(time ls -l)  2>&1 > /dev/null |grep real | awk '{print $2}'
+
+	I can also use the time utility to control the format of output.(man time)
+	/usr/bin/time -f%e ls -l > /dev/null
+
+3. which mysql, /usr/local/mysql/bin/mysql
+4. grep -P "[\x80-\xff]" fileWithChinesesChar.cpp
+	(find the Chinese characters in a file)
+
+5. get rid of xml comments in an xml file(removing single and multiple line comments)	
+	(http://stackoverflow.com/questions/19230407/remove-xml-comments-using-regex-in-bash)
+	
+6. file -bi filename
+	text/x-c; charset=iso-8859-1	
+7. iconv -f ascii -t utf8 filename > newfilename
+	iconv -c -f utf-8 -t ascii filename	
+
+8. su - userName@
+	make the shell as a login shell	
+9. how to list source files(extensions .h .cpp .hpp)
+	ls *h *cpp *hpp
+	
+10. using grep specific directories instead of findexp(grep is the fatest!)
+	2 > /dev/null 是亮点,把烦人的找不到文件的错误隐藏起来,显示最终结果
+	
+	before:
+	find . -iname \.*h -exec grep -nH keyword {} \;
+	find . -iname \.*cpp -exec grep -nH keyword {} \;
+	
+	after:
+	
+	#!/bin/bash
+	DIRS='
+	dir_a
+	dir_b
+	dir_c
+	'
+	
+	function grepDirs()
+	{
+		for eachDir in $DIRS
+		do
+			grep -nH $1 $eachDir/*h 2> /dev/null
+			grep -nH $1 $eachDir/*cpp 2> /dev/null
+		done
+	}
+	grepDirs $1
+
+11. run script in current shell without dot before command( ./script_name.sh)
+	alias script_name.sh='. ./script_name.sh'
+	
+12. check linux distribution
+	cat /proc/version	
+	
+13. xshell里越南文显示为问号，中文的·显示不正常（数字键1左边的键）
+	xshell连接里，translation, encoding,选UTF-8
+	.bash_profile , export LANG=zh_CN.utf-8, export LC_ALL=zh_CN.utf-8
+	日文，中文，越南文都能显示出来
+	
+14.shell get nth line of stdout
+	ls -l |sed -n 2p
+	ls -l | awk 'NR==2'
+	ls -l |sed -n 2,4p
+	ls -l | sed -n -e 2,4p -e 20,30p
+	ls -l | sed -n -e '2,4p;20,30p'		
+
+15. How to sed specific line?
+	sed -r '30s/origin_content/new_content/g' filename > temp	
+
+16. the awk command
+	awk 'NR==34 { sub("AAA", "BBB") }'
+	awk 'FNR==34 { sub("AAA", "BBB") }'	
+
+
 1. special shell variables(http://unixhelp.ed.ac.uk/scrpt/scrpt2.2.2.html)
 
 	$# the number of positional arguments given to this invocation of the shell.
@@ -13,7 +99,7 @@
 	"$*" is a single word, comprising all the arguments to the shell, joined together with spaces. '1 2' 3 becomes "1 2 3"
 	"$@" is identical to the arguments received by the shell, the resulting list of words completely match what was given to the shell.'1 2' 3 becomes "1 2" "3"
 
-2. shell scripts manipulating(http://tldp.org/LDP/abs/html/string-manipulation.html)
+2. shell scripts string manipulating(http://tldp.org/LDP/abs/html/string-manipulation.html)
 	-----------
 	string length:
 		${#stringVariable}
@@ -33,3 +119,41 @@
 	string replacement
 		${string/substring/replacement},replace first match of $substring with $replacement
 		${string//substring/replacement}, replace all matches
+
+3. search keywords : 'for line in grep'
+	--how to process each line received as a result of grep command??
+	grep xyz abc.txt | while read -r line ; do
+		echo $line
+		# do something here
+	done
+	
+	If I need to change variables inside the loop, and have that change be visible outside of it
+	while read -r line ; do
+		echo $line
+		# change the variable
+	done < <(grep xyz abc.txt)
+	
+4. [: =: unary operator function expected
+	[ unary operator function expected
+	if [ "arg1" = "and" ];
+	if $arg1 is undefined, then , is not valid.
+	Use modern [[
+	
+5. How to use shell variables in sed??
+	1.double quotes, sed 's/xxx/'"example$shell_variable"'/'	
+	2. check if $shell_variable contains a slash, then do not use slash as delimeter of sed.
+	检查shell变量里面，是否有斜线，如果有的话，要换分隔符
+	
+6.	concatenating shell variable and string literal without space
+	shellVar='/home'
+	"${shellVar}/cxz"
+	${shellVar}"/cxz"	
+	
+	
+	
+Bash Script error catching
+--------------------------
+1. test the exit status of a command directly
+	if cp -rv /path/from/ /path/to
+	then echo "successful"
+	fi
