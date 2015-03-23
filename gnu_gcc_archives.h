@@ -67,6 +67,45 @@
 
 	eit makefile, make -g3 test.cpp -o test
 	macro expand/exp
+15.	gcc -O1 -S code_example.c
+	gcc -O1 -o program code_example.o main.c
+	ATT assembly-code formats VS Intel assembly-code formats
+	gcc -O1 -S -masm=intel code_example.c
+	
+	sizeof C data types in IA32:
+	char b
+	short w
+	int,long int l
+	char* l
+	float s
+	double l
+	long double t
+	eax
+	ecx
+	edx
+	ebx
+	esi
+	edi
+	esp,stack pointer
+	ebp,frame pointer
+16.	Operand specifies : the different operand possibilities can be classified into three types.
+	1. immediate, is for constant values. a '$' followed by an integer. Form:$Immediate, Value:Immediate
+	2. registers, denotes the contents of one of the registers. Form: Ei, Value: R[Ei]
+	3. memory reference, Form: Imm(Eb, Ei, s), Value: M[Imm + R[Eb] + R[Ei] * s], s must be 1,2,4,8
+
+17.	Data movement Instructions
+	mov s,d(movb, movw, movl,byte,word,double word)
+	
+	movs s,d(move with sign extension)
+	movsbw sign-extended byte to word
+	movsbl sign-extended byte to double word
+	movswl sign-extended word to double word
+	
+	movz s,d(move with zero extension)
+	movzbw, movzbl, movzwl
+	
+	pushl S(R[%esp] <-- R[%esp] - 4, M[R[%esp]] <-- S) push double word
+	popl D(D <-- M[R[%esp]]; R[%esp] <-- R[%esp] + 4) pop double word
 	
 //gdb debugging tips
 
