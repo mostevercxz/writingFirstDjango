@@ -212,3 +212,48 @@ How to build qt5 with visual studio 2013??
 	(the -no-warnings-are-errors is necessary in case you get errors on a 64-bit automatic build of ANGLE; -platform is automatically set to win32-msvc2012, so by default the 32-bit build of Qt is used, and -platform probably does not need to be supplied at the command line (EVEN if you have previous versions of VS installed). For VS2013, use -platform win32-msvc2013.)
 	2.3 nmake
 	2.4 nmake install
+	
+3.	How to fix errors?
+	3.1 (Download VS2013.Update.4.exe, and update VS2013)
+	error C2059: syntax error : '<fake-expression>'
+        f:\myworkspace\chromium\chromium\src\gin\function_template.h(152) : while compiling class template member function 'gin::internal::Invoker<Indices,>::Invoker(gin::Arguments *,int)'
+        f:\myworkspace\chromium\chromium\src\gin\function_template.h(201) : see reference to function template instantiation 'gin::internal::Invoker<Indices,>::Invoker(gin::Arguments *,int)' being compiled
+        f:\myworkspace\chromium\chromium\src\gin\function_template.h(201) : see reference to class template instantiation 'gin::internal::Invoker<Indices,>' being compiled
+        f:\myworkspace\chromium\chromium\src\gin\function_template.h(190) : while compiling class template member function 'void gin::internal::Dispatcher<Sig>::DispatchToCallback(const v8::FunctionCallbackInfo<v8::Value> &)'
+        with
+        [
+            Sig=void (void)
+        ]
+        f:\myworkspace\chromium\chromium\src\gin\function_template.h(225) : see reference to function template instantiation 'void gin::internal::Dispatcher<Sig>::DispatchToCallback(const v8::FunctionCallbackInfo<v8::Value> &)' being compiled
+        with
+        [
+            Sig=void (void)
+        ]
+        f:\myworkspace\chromium\chromium\src\gin\function_template.h(223) : see reference to class template instantiation 'gin::internal::Dispatcher<Sig>' being compiled
+        with
+        [
+            Sig=void (void)
+        ]
+        f:\myworkspace\chromium\chromium\src\gin\object_template_builder.h(42) : see reference to function template instantiation 'v8::Local<v8::FunctionTemplate> gin::CreateFunctionTemplate<void(void)>(v8::Isolate *,const base::Callback<void (void)>,int)' being compiled
+        f:\myworkspace\chromium\chromium\src\gin\object_template_builder.h(41) : while compiling class template member function 'v8::Handle<v8::FunctionTemplate> gin::`anonymous-namespace'::CallbackTraits<T,void>::CreateTemplate(v8::Isolate *,const base::Callback<void (void)> &)'
+        with
+        [
+            T=base::Callback<void (void)>
+        ]
+        f:\myworkspace\chromium\chromium\src\gin\object_template_builder.h(106) : see reference to function template instantiation 'v8::Handle<v8::FunctionTemplate> gin::`anonymous-namespace'::CallbackTraits<T,void>::CreateTemplate(v8::Isolate *,const base::Callback<void (void)> &)' being compiled
+        with
+        [
+            T=base::Callback<void (void)>
+        ]
+        f:\myworkspace\chromium\chromium\src\gin\object_template_builder.h(106) : see reference to class template instantiation 'gin::`anonymous-namespace'::CallbackTraits<T,void>' being compiled
+        with
+        [
+            T=base::Callback<void (void)>
+        ]
+        f:\myworkspace\chromium\chromium\src\gin\modules\timer.cc(37) : see reference to function template instantiation 'gin::ObjectTemplateBuilder &gin::ObjectTemplateBuilder::SetMethod<base::Callback<void (void)>>(const base::StringPiece &,const T &)' being compiled
+        with
+        [
+            T=base::Callback<void (void)>
+        ]
+	ninja: build stopped: subcommand failed.
+
