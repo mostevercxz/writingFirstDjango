@@ -1,0 +1,214 @@
+Specifying delimiter for Excel 2007 export
+------------------------------------------
+1.Bring up your default options window by clicking Start -> Settings -> Control Panel -> Regional Settings.
+2.Click the "Customize" button.
+3.Click the “Number” tab and in the “List Separator” field, replace the current default separator with the one you want to use (in your case, the pipe symbol).
+4.Click “OK” to save the change and close the window.
+
+How to view chrome saved passwords??
+-------------------------------------
+chorme://settings/passwords
+
+
+
+Batch scripting
+--------------------
+http://ss64.com/nt/
+1. What does the %~dp0 mean??
+The driver letter and path of that batch file.
+
+
+VC .NET 2003中
+std::vector<float *> vecEmpty;
+sizeof(vecEmpty)=16
+std::_Vector_val<>
+_Myfirst
+_Myend
+_Mylast
+
+C#
+1. Changing the value of a DataRow.ItemArray does not work
+The ItemArray property creates a new array and copies the values from the row in that array. Changing it has no impact on the row.
+foreach (DataRow dr in dtBilder.Rows)
+if (dr[0].Equals(b.ID))
+{
+  dr[1] = b.Name;                 // string
+  dr[2] = b.Beschreibung;         // string - probably null
+  dr[3] = b.QString;              // string
+  dr[4] = b.InformationenGeladen; // bool
+  dr[5] = b.Hash;                 // int
+  dr[6] = b.Hoehe;                // int
+  dr[7] = b.Breite;               // int
+  dr[8] = b.AuflX;                // float
+  dr[9] = b.AuflY;                // float
+  dr[10] = b.MD5;                 // byte[] - currently null
+  break;
+}
+
+2.	system.IO.FileNotFoundException: cannot find assembly or file Mysql.Data
+You added Mysql.Data in your project's references folder, if I understood well.
+Now, right click on this in VS Explorer, go to properties, and set Attribute "Copy Local" to true.
+So it will be copied in the "debug" or "release" folder whenever you build your app.
+
+3. system.runtime.interopservices.comexception (0x800a03ec) 无法访问文件。请尝试下列方法之一:
+确认所指令的文件夹已存在
+确认文件所在的文件夹不是只读的
+确认给出的文件名不包含下列字符
+确认文件/路径名长度不超过218个字符
+	解决方法：杀掉任务管理器，里面所有的EXCEL.EXE进程.就可以了。
+	(tips:遇到无法访问文件，先看下文件是否被另一个进程占用,或者文件的路径名,写文件的权限够不够)
+	
+	网上有说windows server 上的解决办法：
+	The solution for this appalling BUG in Microsoft IIS & Excel is terrific:
+Create directory "C:\Windows\SysWOW64\config\systemprofile\Desktop " (for 64 bit Windows) or "C:\Windows\System32\config\systemprofile\Desktop " (for 32 bit Windows)
+Set Full control permissions for directory Desktop (for example in Win7 & IIS 7 & DefaultAppPool set permissions for user 
+"IIS AppPool\DefaultAppPool")
+
+4.	修改MTU
+	netsh interface ipv4 show subinterfaces
+	netsh interface ipv4 set subinterface "VPN连接名称" mtu=1280 store=persistent
+	
+
+batch file tips
+1.Commenting multiple lines (block comments) in batch file
+goto comment
+...skip this
+:comment
+(Notepad++, select the code blocks, CTRL + Q)
+2.Delete files in a directory recursively
+rd /s /q /path/of_directory
+md /path/of_directory
+
+3.How to copy recursively??
+mkdir dstFolder
+xcopy srcFolder dstFolder /s /e /y
+
+4.How to append A file to B file??
+type A >> B
+5.How to append text to file named FILE??
+echo %textVariable% >> FILE
+6.more than one remote source not supported
+路径名中带空格,需要加引号,将路径引起来
+7.How to set a variable with the result of a command??
+for /f "delims=" %%a in ('command') do @set theValue=%%a
+8.Batch file get current date as yyyymmdd?? get time stamp(http://stackoverflow.com/questions/203090/how-to-get-current-datetime-on-windows-command-line-in-a-suitable-format-for-us)
+@echo off
+For /f "tokens=2-4 delims=/ " %%a in ('date /t') do (set mydate=%%c-%%a-%%b)
+For /f "tokens=1-2 delims=/:" %%a in ('time /t') do (set mytime=%%a%%b)
+echo %mydate%_%mytime%
+
+
+FOR /F “TOKENS=1* DELIMS= ” %%A IN (‘DATE/T’) DO SET CDATE=%%A
+FOR /F “TOKENS=1,2 eol=/ DELIMS=/ ” %%A IN (‘DATE/T’) DO SET mm=%%B
+FOR /F “TOKENS=1,2,3 DELIMS=/ eol=/” %%A IN (‘echo %CDATE%’) DO SET dd=%%C
+FOR /F “TOKENS=1,2,3 DELIMS=/ ” %%A IN (‘echo %CDATE%’) DO SET yyyy=%%A
+SET date=%mm%%dd%%yyyy%
+
+9. Set a variable with space?
+	set "tempVar= ohohoh"
+	echo %tempVar%
+	
+10.	pscp.exe basics
+	http://the.earth.li/~sgtatham/putty/0.60/htmldoc/Chapter5.html
+	To receive (a) file(s) from a remote server:
+	pscp [options] [user@]host:source target
+	
+	To send (a) file(s) to a remote server:
+	pscp [options] source [source...] [user@]host:target
+	
+11.	How to make the pscp  execute in batch script without break?? plink first time
+	Add SSH host key to another user's PuTTY cache
+	pscp the server's host key is not cached in the registry 
+	
+	echo y | pscp -i /path/to/key/file user@remote:/tmp/file  .
+	echo y | plink -i /path/to/key/file scripts.sh
+
+中英文术语对照表
+空格 whitespace
+
+
+svn 删除错误提交
+http://blog.csdn.net/netwalk/article/details/14122419
+
+=================
+LNK1000: Internal error during IMAGE::BuildImage
+It began work as soon as I have changed "Whole program optimization" option from "Use Link Time Code Generation" to "Profile Guided Optimization-Instrument".
+“Whole program optimization” VS .ENT 2003,Open the project's Property Pages,Configuration Properties, General property,Whole Program Optimization 
+将选项设置为 开
+
+==================
+小番茄破解目录(http://velep.com/archives/1055.html)
+C:\Users\username\AppData\Local\Microsoft\VisualStudio\12.0\Extensions\o2xc5z32.hww
+
+===================
+gcc -std=gnu99 -O2 -Wall -Wextra -DLUA_COMPAT_5_2 -DLUA_USE_LINUX    -c -o lua.o lua.c
+lua.c:80:31: fatal error: readline/readline.h: No such file or directory
+ #include <readline/readline.h>
+sudo apt-get install libreadline-dev 
+
+
+====================
+why public virtual deconstructor??
+what is the structure of static template classes ?  What does the compiler do??
+
+
+===================
+the name of the thread
+the thread id of the thread
+Runnable function of the thread
+mutex lock of the thread
+Condition variable lock of the the thread
+
+======================
+undeclared identifier 'NULL'
+#include <stddef.h>
+
+======================
+undefined reference to `pthread_create'
+use -lpthread as the last compile flag
+
+========================
+convert tabs to spaces
+find ./ -type f -not -iwholename '*.git*' -exec sed -i 's/\t/####/g' {} \;
+
+
+========================
+template multiple definition of
+将构造函数申明放在.h文件
+实现一定要放在.cpp文件里面,否则会报错s
+g++ -g test_client.cpp BaseTCPClient.cpp BaseSocket.cpp BaseThread.cpp BaseByteBuffer.cpp  -lpthread -o test_client
+g++ -g test_client.cpp BaseTCPClient.cpp BaseSocket.cpp BaseThread.cpp BaseByteBuffer.cpp  -lpthread -o test_client
+
+
+============================
+How to build qt5 with visual studio 2013??
+(http://stackoverflow.com/questions/15826893/building-qt5-with-visual-studio-2012-visual-studio-2013-and-integrating-with)
+1. Install DirectX11 SDK
+	1.1 install DirectX10 SDK
+		1.1.1  Remove the Visual C++ 2010, 2012, 2013(any version greater than 10.0.40219,所有高版本的都要移除) Redistributable Package version 10.0.40219
+				MsiExec.exe /passive /X{F0C3E5D1-1ADE-321E-8167-68EF0DE699A5}
+				MsiExec.exe /passive /X{1D8E6291-B0D5-35EC-8441-6616F567A0F7}
+				Control Panel -> Uninstall programs -> C++2012
+				Restart the computer, 先重启电脑,否则有些进程会占用
+		1.1.2  Install the DirectX SDK (June 2010)
+		1.1.3  Reinstall the Visual C++ 2010 Redistributable Package version 10.0.40219(KB 2565063)
+	1.2 install DirectX11 SDK(Do not choose "Application Verifier", 只安装必要的就行了,别多装,会失败的)
+	1.3 install Python for windows	
+	1.4 install Perl for windows from ActiveState(http://www.activestate.com/activeperl/downloads)
+	1.5 install GitHub for Windows. Add git.exe to system path.
+		(记得Perl的环境变量的路径,要在github的前面,否则会报错)
+	1.6 (该项可选,可不选)"GetOptionsFromArray" is not exported by the Getopt::Long module Can't continue after import errors at init-repository line 201 BEGIN failed--compilation aborted at init-repository line
+		find the git.exe directory, rename perl.exe to perl1.exe(删掉git自带的perl.exe)
+	1.7 Uninstall Avast
+2.	cd E:\
+	git clone https://gitorious.org/qt/qt5.git qt5
+	Visual studio 2013 tools, VS2013 x86 Native Tools Command Prompt, copy to E:\, right click, Properties, Start Position.
+	(VS2013 tools, 选择VS2013 x86 Native Tools Command Prompt, 打开目录,拷贝到E盘,右键,属性,起始位置改为E:\qt5)
+	双击VS2013 x86 Native Tools Command Prompt
+	
+	2.1 perl ./init-repository --no-webkit
+	2.2 configure -prefix "e:\qt5\make_product" -developer-build -opensource -confirm-license -mp -nomake examples -nomake tests -debug-and-release -c++11 -no-warnings-are-errors -platform win32-msvc2013.
+	(the c++11 option might not be necessary with the VS2012 compiler, but works with VS2013)
+	(the -no-warnings-are-errors is necessary in case you get errors on a 64-bit automatic build of ANGLE; -platform is automatically set to win32-msvc2012, so by default the 32-bit build of Qt is used, and -platform probably does not need to be supplied at the command line (EVEN if you have previous versions of VS installed). For VS2013, use -platform win32-msvc2013.)
+	2.3 nmake
+	2.4 nmake install
