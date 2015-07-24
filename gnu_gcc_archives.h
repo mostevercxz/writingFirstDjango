@@ -12,6 +12,12 @@
 	learn CPU instructions
 	
 ------------------------
+	dynamic librarys
+------------------------	
+protobuf/bin/protoc: /usr/lib64/libstdc++.so.6: version GLIBCXX_3.4.20 not found
+strings /usr/lib64/libstdc++.so.6| grep -i glibc
+	
+------------------------
 	gcc compile options	
 ------------------------
 1. _GNU_SOURCE. 
@@ -106,16 +112,49 @@
 	
 	pushl S(R[%esp] <-- R[%esp] - 4, M[R[%esp]] <-- S) push double word
 	popl D(D <-- M[R[%esp]]; R[%esp] <-- R[%esp] + 4) pop double word
+18.	pushl $0xFF
+	movw %dx, (%eax)
+	movb $0xF, (%bl) ?? Address is a double word, bl is a byte.
+	
 	
 //gdb debugging tips
+------------------------
+ gbd installing tips
+------------------------
+(ftp://ftp.gnu.org/old-gnu/Manuals/gdb/html_chapter/gdb_27.html)
+su
+tar -zxvf xxx.tar.gz -C /tmp/gdb
+cd /tmp/gdb
+./configure --with-python=yes --exec-prefix=/usr/local/bin
+sudo apt-get install python2.6-dev(rpm -ivn /mnt/iso/Packages/python-develxxx.rpm)要装python,否则error检查不通过的
+(Error in sourced command file:
+Python scripting is not supported in this copy of GDB, use ./configure --with-python=yes)
+make 
+make install
+rm -rf gdbxxx
+rm -rf xxx.tar.gz
+执行script的速度受到很大影响
+
+-----------------------
+Debugging libc.so.2-12.so
+0. Where to download glibc ?
+http://ftp.gnu.org/gnu/glibc/
+1. What is the difference between libc and glibc ??
+
+
 
 ------------------------
  gbd debugging tips
 ------------------------
 1. gdb show all characters other than "..."
 set print elements 0
+set logging file xml2015
+set logging on
+set logging off
 
 2. How to set breakpoints on all functions in a file??(http://sourceware.org/gdb/download/onlinedocs/gdb/Set-Breaks.html#Set-Breaks)
+rbreak fileName:. 提示can't find member of namespace class (Note leading single quote)
+原因是gdb version >= 7.3才可以,我的是7.2版本的
 (stackoverflow上的方法还没试过http://stackoverflow.com/questions/475283/using-gdb-stop-the-program-when-it-is-using-any-function-from-file-x)
 rbreak fileName.cpp:.
 rbreak fileName.cpp:<regex>
@@ -139,6 +178,49 @@ STeven Watanabe has proposed a template profiler , available in boost sandbox th
 -Q Makes the compiler print out each function name as it is compiled, and print some statistics about each pass when it finishes.
 make &> results.txt
 make > results.txt 2>&1
+
+6.	info registers
+info registers rax
+i r
+7.	help layout
+	close layout window:ctrl + x + a
+8.	Disable warnings being treated as errors
+You need to remove -Werror from CFLAGS, CPPFLAGS etc.; these are usually set in Makefile's or build scripts.
+9.	自从装了valgrind之后,编译的时候,会多出很多错误出来.会帮助我查出很多内存溢出的错误,但是也很烦人
+比如
+daemon(1,1)
+这条语句,error:ignoring return value of 'int daemon(int,int)', declared with attribute warn_unused_result
+这是为什么呢？
+10.	How to use my own glibc built from source code?(glibc debug symbols)
+	10.1	build,The Glibc documentation recommends building Glibc outside of the source directory in a dedicated build directory.
+	tar -zxvf glibc.tar.gz -C /home/userName/develop/
+	mkdir -p /home/userName/develop/glibc-build
+	cd /home/userName/develop/glibc-build
+	vim ../glibc-2.21/configure, CXXFLAGS="-g -O2" to CXXFLAGS="-g"
+	../glibc-2.21/configure --prefix=/home/userName/bin/glibc --enable-kernel=2.6.32 libc_cv_forced_unwind=yes libc_cv_ctors_header=yes libc_cv_c_cleanup=yes
+	make(--enable-kernel=2.6.32,This tells Glibc to compile the library with support for 2.6.32 and later Linux kernels)
+	make install
+	10.2	set path, ld_library_path
+	su
+	mv /lib64/libc.so.6 /lib64/libc.so.6_bak
+	ls /lib64/(ls, error while loading shared libraries: libc.so.6: cannot open shared object file: No such file or directory)
+	我慌了,移动错对象了...
+	ldconfig
+	10.3	build program with my own glibc
+	g++ -g main.c -o main -Wl,--rpath=/path/to/newglibc(--rpath linker option will make the runtime loader search for libraries in /path/to/newglibc)
+	ldd not a dynamic executable(because of missing ld-linux.so.2)(found http://www.tldp.org/)
+	ln -s /home/userName/bin/glibc/lib/ld-2.12.1.so /home/userName/bin/glibc/lib/ld-linux.so.2
+	10.4	debugging system functions(ex, bcopy)
+	gdb ScenesServer/ScenesServer
+	run and immediately CTRL + C
+	b bcopy
+	OK
+	
+	locale -a, cannot set lc_ctype to default locale no such file or directory
+	cp /usr/lib/locale/locale-archive /home/userName/bin/glibc/lib/locale/
+	
+	date, local time zone must be set--see zic manual page
+	cp /usr/share/zoneinfo/Asia/Shanghai /home/userName/bin/glibc/etc/localtime
 
 -------------------------------
 	gdb tricks I should know
@@ -196,6 +278,72 @@ The SIZE argument can be one of: b, h, w, and g, for one-, two-, four-, and eigh
 9. the @ symbol
 p *&a[0]@5	
 
+------------------------
+	gdb scripting 
+------------------------
+1. used-defined commands
+define _command_
+_code_
+end
+
+document _command_
+_help_text
+end
+2. parameter(no array like $argv)
+$argc,$arg0,$arg1,$arg2
+3. statements
+	3.1 the set statements
+	3.2 the if control 
+		if _expression_
+			_state1
+		else
+			_state1
+		end	
+	3.3 the while control
+		while _expression_
+			_statement
+		end
+4.	Controlled ouptut
+	During the execution of a command file, or use-defined commands, normal gdb output is suppressed.
+	The only output that appears is what is explicitly printed by the commands in the definition.
+	3 commands to generate output:
+	echo _text_(print _text_ including ant nonprintable character escaped in a C-style string, echo "abc\tdef\n")
+	output _expression_(nothing but the value of the _expression_)
+	printf _string_, _expressions_(this prints the values pof the _expressions_ under the control of the format string _string_)
+	(printf "level=%d",GetLevel())
+5.	Invoking the shell
+	shell ~/script.sh	
+6.	Prompt look
+	set prompt \033[01;31mgdb$ \033[0m
+7.	Preventing gdb from pausing during long output	
+	set width  0
+	set height 0
+8.	set confirm off	
+9.	define hook-stop(the hook-stop is a special function that gdb calls at every breakpoint event.)
+	end
+10.	not a numeric type	
+	set $valpos++
+	出现这个，多半是复制代码,变量名打错了,应该是$statepos++
+	
+-----------------------
+	valgrind
+-----------------------
+Invalid write of size 4
+Address 0xabcd is 144 bytes inside a block of size 146 alloc'd
+
+144 + 4 > 146
+
+
+valgrind --db-attach
+
+Invalid write of size 1
+Address 0xabcd is 0 bytes after a block of size 8 alloc'd
+0 bytes after is "It's adjacent", "directly after it"
+
+
+
+
+
 struct argp_option{
 	const char *name;	//the log name for this option, corresponding to the long option '--name'
 	int key;			//The integer key provided by the current option to the option parser.
@@ -231,3 +379,32 @@ int main()
 	tzset();
 	std::cout << "timezone is" << timezone << std::endl;
 }
+
+//epoll
+epoll is a new system call introduced in Linux 2.6. It is designed to replace the deprecated select (and also poll). 
+1.Unlike these earlier system calls, which are O(n), epoll is an O(1) algorithm
+select uses a linear search through the list of watched file descriptors, which causes its O(n) behaviour, whereas epoll uses callbacks in the kernel file structure.
+2.Another fundamental difference of epoll is that it can be used in an edge-triggered, as opposed to level-triggered, fashion.
+An epoll instance is created by epoll_create or epoll_create1,which return an epoll instance.
+epoll_ctl is used to add/remove descriptors to be watched on the epoll instance.
+To wait for events on the watched set, epoll_wait is used,which blocks until events are available.
+
+When descriptors are added to an epoll instance, they can be added in two models : level triggered and edge triggered.
+When you use level triggered mode, and data is available for reading, epoll_wait will always return with ready events.
+If you don't read the data completely, and call epoll_wait on the epoll instance watching the descriptor again,it will return again with a ready event because data is available.
+In edge triggered mode, you will only get a readiness notification once. If you don't read data fully, and call epoll_wait on the epoll instance watching the descriptor again, 
+it will block because the readiness event was already delivered.
+
+typedef union epoll_data
+{
+	void *ptr;
+	int fd;
+	__uint32_t u32;
+	__uint64_t u64;
+}epoll_data_t;
+
+struct epoll_event
+{
+	__uint32_t events;
+	epoll_data_t data;
+};

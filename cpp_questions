@@ -9,3 +9,9 @@
 
 3. c special characters
 	(http://en.wikipedia.org/wiki/Special_characters)
+
+	
+	ConvertToUTCTime(BYTE hours, BYTE mins, BYTE secs)
+	ConvertToLocalTime(BYTE hours, BYTE mins, BYTE secs)
+	const char *GetUTCTimeString() const
+	const char *GetLocalTimeString() const

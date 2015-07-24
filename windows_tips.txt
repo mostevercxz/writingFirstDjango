@@ -104,6 +104,7 @@ FOR /F “TOKENS=1,2,3 DELIMS=/ eol=/” %%A IN (‘echo %CDATE%’) DO SET dd=%
 FOR /F “TOKENS=1,2,3 DELIMS=/ ” %%A IN (‘echo %CDATE%’) DO SET yyyy=%%A
 SET date=%mm%%dd%%yyyy%
 
+
 9. Set a variable with space?
 	set "tempVar= ohohoh"
 	echo %tempVar%
@@ -122,6 +123,12 @@ SET date=%mm%%dd%%yyyy%
 	
 	echo y | pscp -i /path/to/key/file user@remote:/tmp/file  .
 	echo y | plink -i /path/to/key/file scripts.sh
+	
+12.	securecrt the folder is not valid
+	将文件名或者目录名 改短一些就可以了
+
+13.	SecureCRT 将标签栏 设置为 不包含 路径
+	选项 -> 全局设置 -> General -> Default Session -> Edit Default Settings -> terminal -> emulation -> advanced -> ignore window title change requests即可，这样session名字就永远不会变了。
 
 中英文术语对照表
 空格 whitespace
@@ -151,6 +158,19 @@ sudo apt-get install libreadline-dev
 why public virtual deconstructor??
 what is the structure of static template classes ?  What does the compiler do??
 
+====================
+How to eliminate certain annoying message during framework source code debugging
+1.Open "Region" from Control Panel
+2.Choose "Administrative" tab
+3.Check if "Language for non-Unicode programs" is any UTF-8 or Unicode language that other than English (In my case it is Chinese). If so, click "Change system locale..." to change it to English.
+4.Reboot
+
+====================
+Use 7z to pack .bz2 file
+7z a -ttar test.tar source\* -r
+7z a -tbzip2 test.tar.bz2 test.tar
+
+
 
 ===================
 the name of the thread
@@ -178,6 +198,20 @@ template multiple definition of
 实现一定要放在.cpp文件里面,否则会报错s
 g++ -g test_client.cpp BaseTCPClient.cpp BaseSocket.cpp BaseThread.cpp BaseByteBuffer.cpp  -lpthread -o test_client
 g++ -g test_client.cpp BaseTCPClient.cpp BaseSocket.cpp BaseThread.cpp BaseByteBuffer.cpp  -lpthread -o test_client
+
+=========================
+visual studio auto refresh file changes
+Options --> Environment --> Documents --> Detect when file is changed outside the document, auto-load changes, if saved
+
+========================
+make errors(vim Makefile :%s/^[ ]\+/^I/)
+NUL character seen; rest of line ignored
+Q: When I invoke Make, it refuses to do anything and prints a cryptic message: "makefile:10: *** missing separator. Stop." Now what kind of excuse is that? 
+A: Unlike most other DOS Make programs which accept any whitespace character at the beginning of a command in a rule, GNU Make insists that every such line begins with a TAB. (Most other Unix Make programs also require TABs, and the Posix standard requires it as well.) Make sure that the line whose number is printed in the error message (in this case, line 10) begins with a TAB.
+
+Beginning with version 3.78, GNU Make prints a message that hints at a possible SPACEs-vs-TAB problem, like this:
+*** missing separator (did you mean TAB instead of 8 spaces?).  Stop.
+
 
 
 ============================
@@ -257,3 +291,9 @@ How to build qt5 with visual studio 2013??
         ]
 	ninja: build stopped: subcommand failed.
 
+
+服务器最重要的：
+thread
+socket
+thread pool
+epoll

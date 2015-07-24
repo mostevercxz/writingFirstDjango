@@ -1,7 +1,82 @@
+--- 0.Books and Websites: ---
+	https://docs.python.org/3/tutorial/
+	Invent with python(games)
+	Dive into Python3
+	Python challenge(http://www.pythonchallenge.com/)
+	Building Machine Learning Systems with Python
+	Dive Into Python: Python for Experienced Programmers
+	Python Standard Library
+--- 1. Links Useful ---
+	1.1 python source code search
+	http://nullege.com/codes/search/django.utils.text.Truncator
+	
+Python PEPs
+1.Decorators for Functions and Methods
+	https://www.python.org/dev/peps/pep-0318/
+2.
+
+===============================================
+Problems when learning Django Blog Zinnia
+===============================================
+
+1. models_bases
+===============
+
+Search google and record some founds.
+
+ * 1.1 django.db.models import Q
+ 
+ Q objects are used for complex queries(for example involving AND, OR statements).
+ Poll.objects.filter(Q(question_contains='keyword1'))
+ Poll.objects.filter(Q(question_contains='keyword1') & Q(question_contains='keyword2'))
+ #no logic is the same as and
+ Poll.objects.filter(Q(question__contains='dinner'), Q(question__contains='meal'))
+ #(A OR B) AND C
+ Poll.objects.filter((Q(question__contains='key1') | Q(question__contains='key2')) & Q(pub_date=datetime.date.today()))
+ 
+ * 1.2 django.utils.text import Truncator
+ 
+ trun = Truncator('this may be a such long long text')
+ >>> trun.chars(7)
+ u'this...'
+ >>>trun.chars(7, truncate='--')
+ u'this --'
+ >>>trun.chars(7, truncate='> %(truncated_text)s...')
+ u'> th...'
+ 
+ * 1.3 django.utils.html import strip_tags
+ 
+ Strip HTML tags.
+ 
+ >>>html='<p>paragraph</p>'
+ 
+ >>>stripped = strip_tags(html)
+ u'paragraph'
+ 
+ {{ template | striptags }}
+ 
+ * 1.4 django.utils.html import linebreaks
+ 
+ Convert plain text to include html line breaks
+ 
+ * 1.5 django.template.defaultfilters import removetags
+ 
+ html = '<strong>Bold...</strong><p>paragraph....</p>'
+ removetags(html, 'strong')
+ removetags(html, 'strong p')
+ {{ template | removetags:"a span" | safe }}
+
+
+ 
+ 
+ 
+
 2014-11-15 python tips
 ------------------------
 pyCon many python tips
 1. pragmatic unicode(http://nedbatchelder.com/text/unipain.html)
+2.	How to debug python structure like "ptype structName" in gdb c++??
+	The python's inspect module(2.7).
 
 
 
@@ -58,7 +133,98 @@ pyCon many python tips
 	def mygrep(grepStr):
 		proc = subprocess.Popen(["test.sh", grepStr], stdout=subprocess.PIPE)
 		result = proc.communicate()
+		
+	Python 2.7 provides the subprocess.check_output(*popenargs, **kwargs) function.
+	subprocess.check_output(["echo", "Hello World!"])
+	subprocess.check_output(
+    "ls non_existent_file; exit 0",
+    stderr=subprocess.STDOUT,
+    shell=True)
 	
+	use subprocess to redirect output to a file
+	with open(fileName, 'w') as saveFile:
+		subprocess.call(cmd, stdout=saveFile)
+
+8. How to put a time delay in a Python script?
+	import time
+	time.sleep(5)	
+	
+9.	Get dictionary sorted by key
+	sorted_key=sorted(dicts.keys())
+
+10.	How to exit a Python script?
+	exit(1)
+
+11.	How to tranverse all the files in Specific directory??
+	import os
+	import glob
+	for root,dirs, filenames in os.walk(specific_dir):
+		for filename in glob.glob(root + "*.xml"):
+			self.file_list.append(os.path.join(root, filename))
+			
+12.	How to do "rm -rf" in Python?
+	import shutil
+	shutil.rmtree("path_to_remove")
+	
+13.	get time stamp in python
+	int(time.time())
+	
+14.	python command line yes/no input
+import sys
+def query_yes_no(question, default="yes"):
+    """Ask a yes/no question via raw_input() and return their answer.
+
+    "question" is a string that is presented to the user.
+    "default" is the presumed answer if the user just hits <Enter>.
+        It must be "yes" (the default), "no" or None (meaning
+        an answer is required of the user).
+
+    The "answer" return value is True for "yes" or False for "no".
+    """
+    valid = {"yes": True, "y": True, "ye": True,
+             "no": False, "n": False}
+    if default is None:
+        prompt = " [y/n] "
+    elif default == "yes":
+        prompt = " [Y/n] "
+    elif default == "no":
+        prompt = " [y/N] "
+    else:
+        raise ValueError("invalid default answer: '%s'" % default)
+
+    while True:
+        sys.stdout.write(question + prompt)
+        choice = input().lower()
+        if default is not None and choice == '':
+            return valid[default]
+        elif choice in valid:
+            return valid[choice]
+        else:
+            sys.stdout.write("Please respond with 'yes' or 'no' "
+                             "(or 'y' or 'n').\n")
+	
+15.	python3 
+	directory\
+		file_a.py
+			
+		file_b.py
+		
+		
+16.	with open('aa.txt', 'r') as file:
+		content = file.read()
+		
+17. regex recursion in regular expressions
+	
+18.	python shutil move no such file or directory
+	shutil.copyfile(fromPath, toPath)
+	
+19.	How to check if file exists in Python ??
+	if os.path.exists("C:\AAA\BBB.txt"):
+		os.remove(file_name)
+		# remove an empty directory
+		os.rmdir(dir_name)
+		# delete a directory and all its contents
+		shutil.rmtree(dir_name)
 
 --------------------------	
 	python errors handle
@@ -83,6 +249,17 @@ pyCon many python tips
 	....
 	
 	change the coding to utf8. 改变文件头的coding
+
+4. OSError: [Errno 8] Exec format error, when using subprocess.Popen(["~/bashScript.sh", "grepContent"], stdout=subprocess.PIPE)
+	subprocess.Popen(['bash','my_script.sh'])
+
+5.	IndentationError: unindent does not match any outer indentation level
+	Spaces are mixed with tabs.(:%s#        #\t\t#,replace eight spaces with two tabs)
+	(or using "python -m tabnanny yourfile.py" to check)
+	("#!/usr/bin/python -tt" at the beginning of the code)
+	It is recommended that you don't use tabs in Python code.
+	
+	
 --------------------------------
 1. Illegal mix of collations (latin1_swedish_ci,IMPLICIT) and (utf8_general_ci,COERCIBLE) for operation '='
 	(Illegal mix of collations MySql Error)
@@ -187,7 +364,32 @@ errors met when using python mysql connector
 	with open("out.txt", "wt") as fout:
     with open("Stud.txt", "rt") as fin:
         for line in fin:
-            fout.write(line.replace('A', 'Orange'))		
+            fout.write(line.replace('A', 'Orange'))	
+
+11.	Read a tab seperated file using python
+	import csv
+	with open(filename, 'r') as f:
+		rows = csv.reader(f, delimiter='\t')
+		for row in rows:
+			print row
+
+12.	Read binary file in python
+	with open(filename, 'rb') as file:
+		byte = file.read(1)
+		while byte:
+			byte = file.read(1)
+13.	Convert bytes to string
+	b"abcde".decode("utf-8")
+	
+	string to bytes
+	bytearray(str, encoding="utf-8")
+
+14.	os.mkdir(path[,mode])#default mode is 0o777
+	os.makedirs(path[,model])#default mode is Oo777
+	
+15.	python print sys.stderr
+	print >> sys.stderr, 'entering function'
+	
 		
 -------------------------------
 	Python Built-in functions
@@ -196,7 +398,131 @@ errors met when using python mysql connector
 when the argument is a unicode object; or the value of the byte when the argument is an 8-bit string.
 	ord('a')=97; ord(u'\u2020')=8224
 	
+-------------------------------
+	Python libs
+-------------------------------		
+1.0	install virtual python on non-ubuntu machine
+	python3 -m venv myenvname
+1.1	install virtual python on ubuntu 14.04
+	sudo apt-get install python3 curl -y
+	pyvenv-3.4 --without-pip myvenv
+	source ./myvenv/bin/activate
+	wget https://pypi.python.org/packages/source/s/setuptools/setuptools-3.4.4.tar.gz
+	tar -vzxf setuptools-3.4.4.tar.gz
+	cd setuptools-3.4.4
+	python setup.py install
+	cd ..
+	wget https://pypi.python.org/packages/source/p/pip/pip-1.5.6.tar.gz
+	tar -vzxf pip-1.5.6.tar.gz
+	cd pip-1.5.6
+	python setup.py install
+	cd ..
+	deactivate
+	source ./myvenv/bin/activate
+1.2 python2.x virtual env
+	sudo apt-get install python-virtualenv
+	mkdir -p virtual_py2
+	virtualenv --python=/usr/bin/python2 virtual_py2
+	
+1.3	mkdir -p virtual_py3
+	virtualenv --python=/usr/bin/python3 virtual_py3
+	
+2.	pip install packages offline, download tarballs and its dependencies
+	(the same when replacing "Django==1.8" with "-r requirements.txt")
+	pip install Django==1.8 --download /path/to/some/directory
+	pip install Django==1.8 --no-index --find-links /path/to/some/directory
+	
+3.	install vim with python support
+	git clone https://github.com/b4winckler/vim.git vim
+	cd vim
+	./configure --enable-pythoninterp --with-python-config-dir=/usr/lib/python2.7/config-x86_64-linux-gnu
+	
+4. How to find python config dir??
+	sudo updatedb
+	locate python|grep '/config'
+	
+5.	How to install Vundle??
+	mkdir -p ~/.vim/bundle
+	git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+	
+	vim ~/.vimrc, add the following
+	set nocompatible              " be iMproved, required
+	filetype off                  " required
+	
+	" set the runtime path to include Vundle and initialize
+	set rtp+=~/.vim/bundle/Vundle.vim
+	call vundle#begin()
+	" alternatively, pass a path where Vundle should install plugins
+	"call vundle#begin('~/some/path/here')
+	
+	" let Vundle manage Vundle, required
+	Plugin 'gmarik/Vundle.vim'
+	
+	" The following are examples of different formats supported.
+	" Keep Plugin commands between vundle#begin/end.
+	" plugin on GitHub repo
+	Plugin 'tpope/vim-fugitive'
+	" plugin from http://vim-scripts.org/vim/scripts.html
+	Plugin 'L9'
+	" Git plugin not hosted on GitHub
+	Plugin 'git://git.wincent.com/command-t.git'
+	" git repos on your local machine (i.e. when working on your own plugin)
+	Plugin 'file:///home/gmarik/path/to/plugin'
+	" The sparkup vim script is in a subdirectory of this repo called vim.
+	" Pass the path to set the runtimepath properly.
+	Plugin 'rstacruz/sparkup', {'rtp': 'vim/'}
+	" Avoid a name conflict with L9
+	Plugin 'user/L9', {'name': 'newL9'}
+	
+	" All of your Plugins must be added before the following line
+	call vundle#end()            " required
+	filetype plugin indent on    " required
+	" To ignore plugin indent changes, instead use:
+	"filetype plugin on
+	"
+	" Brief help
+	" :PluginList       - lists configured plugins
+	" :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
+	" :PluginSearch foo - searches for foo; append `!` to refresh local cache
+	" :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
+	"
+	" see :h vundle for more details or wiki for FAQ
+	" Put your non-Plugin stuff after this line
+	
+	vim +PluginInstall +qall
+	vim ~/.vimrc, syntax on(add color to vim)
+	
+6.	How to install YouCompleteMe??
+	sudo apt-get install build-essential cmake
+	git clone https://github.com/Valloric/YouCompleteMe.git ~/.vim/bundle/YouCompleteMe
+	cd ~/.vim/bundle/YouCompleteMe
+	git submodule update --init --recursive
+	./install.sh --clang-completer
+	vim ~/.vimrc, Plugin 'file:///home/userName/.vim/bundle/YouCompleteMe'
+	
+	ubuntu 中文乱码
+	记住安装ssh-server,在xshell或者sevure CRT中打开,并且export LANG=zh_CN.GBK
+	
+	
+	
+-------------------------------
+Install epydoc(python class diagram)
+http://epydoc.sourceforge.net/
+-------------------------------
 
+
+-------------------------------
+Scrape webpages(using Scrapy)
+source virtual_py2/bin/active
+sudo apt-get install openssl openssl-dev libffi-dev -y(openssl/ssl.h,一般提示缺少.h文件,都要安装-dev的包)
+pip install lxml
+
+ImportError: No module named cryptography.hazmat.bindings.openssl.binding
+pip install pyOpenSSL==0.13
+
+p tempselector.xpath('/html/body/div/h2/span/a/text()').extract()
+p tempselector.xpath('//a/@href').extract()
+p tempselector.xpath('/html/body/div/h2/span/span[@class="timestamp"]/text()')
 -------------------------------
  web scraping errors
 1. sometimes works with some pages, and sometimes, it barfs by throwing a UnicodeEncodeError

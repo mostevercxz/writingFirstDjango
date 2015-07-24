@@ -1,0 +1,183 @@
+ Regular tips, 2014-11-16
+ (excellent book: Mastering regular expressions)
+ 
+ 
+Python re module (https://docs.python.org/2/library/re.html#re.S)
+------------------------
+1. Python adds an extension to Perl's extension syntax. 
+	If the first character after the question mark is 'P', it's an extension that's specific to Python.
+	---1.1 capturing group:
+		(?P<name>...) defines a named group, (?P=name) is a backreference to a named group.
+	---1.2 Non-capturing group:	
+		(?:...)Use a group to collect a part of a regular expression, but aren't interested in retrieving the group's contents.
+	test_string = '11cakes'
+	pattern = '(?P<cakeNum>[0-9]+)'
+	result = re.compile(pattern).serach(test_string)
+	result.group('cakeNum')
+	
+2. Using regex to find multiple matches and print them out
+	---2.1 re.DOTALL makes the '.' special character match any character at all, including a new line;
+		Without this flag, '.' will match anything except a newline.
+	line = 'bla bla bla<form>Form 1</form> some text...<form>Form 2</form> more text?'
+	matches = re.findall('<form>(.*?)</form>', line, re.DOTALL)
+	
+-------------------------
+	regex
+-------------------------
+1. match Chinese character [\u4e00-\u9fa5]	
+2. How to match strings between double quotes with embedded double quotes?
+	"[^\\"]*(\\"[^\\"]*)*"
+	"([^\\"]|\\\\|\\")*",matches zero or more characters that aren't slashes or quotes OR two slashes OR a slash then a quote
+	"(?:[^\\"]|\\.)*",matching strings containing escape codes such as \n.
+	(The ?: characters are there to prevent the contained expression being saved as a backreference, but they can be removed.)
+	
+3. match the string between parentheses
+	\(([^)]+)\)
+	
+4. regex between keywords and parentheses
+	http://stackoverflow.com/questions/22866252/regex-get-text-between-parentheses-and-keywords	
+	
+5. How to match alphanumeric and spaces
+	string q = "john s!";
+	string clean = Regex.Replace(q, @"([^a-zA-Z0-9]|^\s)", string.Empty);
+	// clean == "johns". I want "john s";	
+	
+	string clean = Regex.Replace(q, @"[^a-zA-Z0-9\s]", string.Empty);
+	//better use : string clean = Regex.Replace(q, @"[^\w\s]", string.Empty);
+6. validate that the characters are alpha numeric
+	add ^ and $ to verify the whole string matches and not only a part of the string:
+	^[A-Za-z0-9\s]{1,}$ or ^[\w\s]{1,}$	
+	
+7. Use C# regex to get text between nested parentheses
+(reference, http://msdn.microsoft.com/en-us/library/bs2twtah.aspx#balancing_group_definition)
+	.NET allows recursion in regular expressions
+	var input = @"add(mul(a,add(b,c)),d) + e - sub(f,g)";
+
+var regex = new Regex(@"
+    \(                    # Match (
+    (
+        [^()]+            # all chars except ()
+        | (?<Level>\()    # or if ( then Level += 1
+        | (?<-Level>\))   # or if ) then Level -= 1
+    )+                    # Repeat (to go from inside to outside)
+    (?(Level)(?!))        # zero-width negative lookahead assertion
+    \)                    # Match )",
+    RegexOptions.IgnorePatternWhitespace);
+
+foreach (Match c in regex.Matches(input))
+{
+    Console.WriteLine(c.Value.Trim('(', ')'));
+}
+Output =>
+1) mul(a,add(b,c)),d
+2) f,g
+
+(?<name>subexpression)
+
+(?<= subexpression )
+ For a match to be successful, subexpression must occur at the input string to the left of the current position, 
+ although subexpression is not included in the match result. 
+ 
+Zero-Width Negative Lookbehind Assertions, The following grouping construct defines a zero-width negative lookbehind assertion: 
+(?<! subexpression )
+For a match to be successful, subexpression must not occur at the input string to the left of the current position. 
+
+8. C# Regex.Match curly brackets- contents only, 
+If I use the Regex ({[^}]*}) my MatchCollection values includes the braces. 
+I want to match, but then only return the contents.
+	you can use "positive lookbehind" (?<=...) and "positive lookahead" (?=...) groups:, 
+	(?<=\{)[^}]*(?=\})
+	
+9. C# Replace "\r\n"
+line breaks, Regex.Replace(@"(\n|\r|\r\n)", "")
+non line breaks, Regex.Replace(@"\\r\\n", "")
+
+10.	What is the name of regular expressions characters?
+	asterisk (*),
+	plus sign (+),
+	question mark (?),
+	backslash (\),
+	period (.),
+	caret (^),
+	square brackets ([ and ]),
+	dollar sign ($),
+	ampersand (&).
+	or sign (|).
+	
+11.	A dot or period (.) matches any character except a newline character(Carriage Return Line Feed\r\n).
+	The dot matches a single character, without caring what that character is. The only exception are line break characters. 
+	In all regex flavors discussed in this tutorial, the dot does not match line breaks by default.
+	(This exception exists mostly because of historic reasons.那时一行一行读取文本,应用正则匹配,所以不存在Line break的情况)
+	When using the regex classes of the .NET framework, 
+	you activate this mode by specifying RegexOptions.Singleline, such as in Regex.Match("string", "regex", RegexOptions.Singleline).
+
+=========================
+C# character regular expressions
+using System.Text.RegularExpressions
+=========================
+1.	Character escapes
+	1.1 Special chars
+		. $ ^ { [ ( | ) * + ? \	
+	1.2 escaped chars	
+	\a,bell(alarm) char(A bell code (sometimes bell character) is a device control code originally sent to ring a small electromechanical bell on tickers and other teleprinters and teletypewriters to alert operators at the other end of the line, often of an incoming message.)
+		(In ASCII and Unicode the character with the value 7 is BEL. It can be referred to as control-G or ^G in caret notation)
+	\t,\n(\u000A)
+	\b,In a [character_group] character class, matches a backspace,\u0008
+		Outside a character class, \b is an anchor that matches a word boundary.
+	\r,match a carriage return,\u000D	
+	\v,a vertical tab
+	\f,a from feed
+	\e,an escape
+	\nnn,an ASCII characters when nnn consists of two or threee digits that represents the octal char code.
+		It is interpreted as a backreference if it only has one digit(\1, \2),or ir corresponds to the number of a capturing group.
+	\xnn,an ASCII char,where nn is two-digit hexadecimal char code.	
+	\cX,an ASCII control char, where X is the letter of the control char.(\cC is CTRL-C)
+	\unnnn,a UTF-16 code unit whose value is nnnn hexadecimal.
+	\G,begin the match where the last match ends.
+	\,When followed by a char that is not recognized as escaped chars, represents itself.(\\ is \)
+
+2.	Character classes
+	A character class defines a set of characters, any one of which can occur in an input string for a match to succeed.
+	2.1 Positive character groups: A char in input string must match one of a specified set of chars.
+		string pattern = @"gr[ae]y\s\S+?[\s\p{P}]";
+      string input = "The gray wolf jumped over the grey wall.";
+      MatchCollection matches = Regex.Matches(input, pattern);
+      foreach (Match match in matches)
+         Console.WriteLine(match.Value);
+		gray wolf 
+        grey wall.	
+	2.2 Negative char groups:A char in input string must not match one of a specified set of chars.
+		A negative group specifics a list of chars that must not appear in an input string.
+		[^aeiou]
+		[^\p{P}\d]
+		A negative character group in a larger regular expression pattern is not a zero-width assertion. 
+		That is, after evaluating the negative character group, the regular expression engine advances one character in the input string		
+		
+	2.3 Any character. The dot or period(.) in a regex is a wildcard char that matches any char except '\n'
+		The period character (.) matches any character except \n (the newline character, \u000A), with the following two qualifications:
+		1.If a regex pattern is modified by RegexOptions.Singleline option, 
+		or if the portion of the pattern that contains a dot char class is modified by the s option.
+		dot matches any char.
+		(By default, the match ends at the end of the first line; the regular expression pattern matches the carriage return character, \r or \u000D, but it does not match \n.
+		the RegexOptions.Singleline option interprets the entire input string as a single line, it matches every character in the input string, including \n.
+		)
+		2.
+	2.4 A general Unicode category or named block.
+	2.5 A negative general Unicode category or named block.
+	2.6 A word char.
+	2.7 A non-word char.
+	2.8 A white-space char.
+	2.9 A non-white-space
+	2.10 A decimal digit.
+	2.11 A non-decimal digit.
+	The .NET Framework supports character class subtraction expressions, which enables you to define a set of characters as the result of excluding one character class from another character class.
+	
+-----------------------------
+	XML tips
+-----------------------------
+1. What characters do I need to escape in XML documents?(wikipedia)
+	"   &quot;
+	'   &apos;
+	<   &lt;
+	>   &gt;
+	&   &amp;	

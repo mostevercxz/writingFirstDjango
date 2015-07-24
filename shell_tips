@@ -1,5 +1,5 @@
 # this is a new file recording shell scripting tips
-# created by cxz, 2014-11-07
+#windows, linux shell, mind file_path containing whitespace,注意路径名中带空格的,要用双引号引起来
 
 ####################
 	Linux commands comes first
@@ -20,6 +20,7 @@
 
 3. which mysql, /usr/local/mysql/bin/mysql
 4. grep -P "[\x80-\xff]" fileWithChinesesChar.cpp
+	grep recursive:	grep -r '<event' quest/ 
 	(find the Chinese characters in a file)
 
 5. get rid of xml comments in an xml file(removing single and multiple line comments)	
@@ -72,6 +73,11 @@
 	.bash_profile , export LANG=zh_CN.utf-8, export LC_ALL=zh_CN.utf-8
 	日文，中文，越南文都能显示出来
 	
+	xshell 连接 ubuntu里中文显示为乱码
+	vim ~/.bashrc中LANG=zh_CN.gb2312
+	source ~/.bashrc
+	xshell的终端 连接里面改为 "默认语言"
+	
 14.shell get nth line of stdout
 	ls -l |sed -n 2p
 	ls -l | awk 'NR==2'
@@ -81,16 +87,118 @@
 
 15. How to sed specific line?
 	sed -r '30s/origin_content/new_content/g' filename > temp	
+	
+	using sed to delete the whole line in a text file that contains a specific string
+	sed -i '/pattern to match/d' ./infile
+	
+	using sed to delete empty line
+	sed -i '/^\s*$/d' filename
 
 16. the awk command
 	awk 'NR==34 { sub("AAA", "BBB") }'
 	awk 'FNR==34 { sub("AAA", "BBB") }'	
+	awk 求和
+	awk 'BEGIN{total=0}{total+=$1}END{print total}'
+	awk the last line
+	awk -F';' '{print $NF}'
+	
+17. tar commands
+	tar -zcvf archive.tar.gz directory/ 
+This will tell tar to c (create) an archive from the files in directory (tar is recursive by default), compress it using the z (gzip) algorithm, store the output as a f (file) named archive.tar.gz, and v (verbosely) list all the files it adds to the archive.
+	tar -zxvf archive.tar.gz 
+	tar -jxvf archive.tar.gz 
+
+18.	iptables
+	iptables -I INPUT -s 180.168.197.99 -p tcp -m state --state NEW -m tcp --dport 9823 -j ACCEPT	
+	-j specifies what needs to happen to the packet that matches this firewall rule.
+	-s indicates the source of the packet. This can be ip address, or network address, or hostname
+	-p is for protocol
+19.	du -sh flodername show the entire size of the folder,查看整个文件夹大小
+20.	问题：在Xshell中设置了“自动将选中的文字复制到粘贴板”，之前一直没有问题，最近发现，
+只要选中屏幕上的文字，复制上了，但shell终端立即被中断了，即向终端发送了CTRL-C；
+原因：
+很可能是“选中文字复制”与词典软件的“划词翻译”相冲突。
+我的原因是，最近安装了必应词典，且开启了“划词翻译”功能。 
+我在网上求助时，发现也有一些朋友遇到和我一样的问题，都是由于与词典的冲突导致的，如有道词典，关掉划译功能即可。
+
+21.	Find out if running Linux kernel (OS) is 32 or 64 bit?
+uname -a 
+ getconf LONG_BIT
+ grep flags /proc/cpuinfo
+ grep -o -w 'lm' /proc/cpuinfo(lm flag means Long mode cpu - 64 bit CPU )
+
+22.	  #!/bin/bash          
+            STR="Hello World!"
+            echo $STR    
+            echo $STR    
+			
+23.	error while loading shared libraries : lib*** cannot open shared object file : No such file or directory
+	export LD_LIBRARY_PATH = path_of_lib:$LD_LIBRARY_PATH	
+	为什么是LD_LIBRARY_PATH,而不是PATH呢???
+	
+24.	search under ubuntu
+	apt-cache search gtk
+
+25.	How to install VSCode under ubuntu?
+	unzip VSCode.zip -d ~/develop/
+	cd ~/develop/
+	./Code
+	sudo ln -s ~/develop/VSCode/Code /usr/local/bin/code
+	(libgtk-x11-2.0.so.0: cannot open shared object file: No such file or directory)
+	
+26.	How to get last day of month in linux??
+	tempmonth=5
+	lastDay=`date -d "2015-${tempmonth}-01 -1 day" +%Y-%m-%d | awk -F'-' '{print $3}'`
+	
+27.	How to tar files??
+	tar -jcvf $obj_log_name $(ls /backup/log/222.255.177.*/objscene*.log.15${month}${tempDay}-*)
+	
+28.	install .deb file on ubuntu
+	dpkg -i PACKAGE.deb
+	
+29.	awk with grep
+	awk '{print $1}' input.txt | xargs -n 1 -I pattern grep -wnH pattern ScenesServer/
+	
+	awk with for loop
+	awk '{for (i=1; i <= NF; i++) total=total + $i}; END {print total}'
+	
+30.	timestamp to date
+	date -d @1267619929 +%Y-%m-%d
+	
+31. Get the dates between two dates(get days between two dates)
+	date1=2015-07-21
+	date2=2015-07-28
+	timestamp1=`date -d "$date1" +%s`
+	timestamp2=`date -d "$date2" +%s`
+	for ((start = $timestamp1; start <= $timestamp2; start = start + 86400))
+	do
+		thisDate=`date -d @$start +%Y-%m-%d`
+		echo $thisDate
+	done
+	
+32.	Get monday of current week(get monday of a specific time)
+	nowTime=2015-07-24
+	weekDay=`date -d "$nowTime" +%u`
+	monday=`date -d "$nowTime $weekDay days ago" +%Y-%m-%d`
+	echo $monday
+	
+	(GNU date)
+	(http://www.gnu.org/software/coreutils/manual/html_node/Date-input-formats.html#Date-input-formats)
+	date -dmonday +%Y-%m-%d
+	
+33.	Get week of the year
+	date +%V(show the week of the year)
+	date -d "20150723" +%V
+            
+Line 2 creates a variable called STR and assigns the string "Hello World!" to it. 
+Then the VALUE of this variable is retrieved by putting the '$' in at the beginning. 
+Please notice (try it!) that if you don't use the '$' sign, the output of the program will be different, and probably not what you want it to be. 
 
 
 1. special shell variables(http://unixhelp.ed.ac.uk/scrpt/scrpt2.2.2.html)
 
 	$# the number of positional arguments given to this invocation of the shell.
-	$? the exit status of the last command executed(given as a decimal string)
+	$? the exit status(exit code) of the last command executed(given as a decimal string)
 	$$ the process number of this shell
 	$! the process id of the last command run in the background
 	$- the current options supllied to this invocation of the shell
@@ -119,6 +227,15 @@
 	string replacement
 		${string/substring/replacement},replace first match of $substring with $replacement
 		${string//substring/replacement}, replace all matches
+		
+	-----------
+	compare two string variables
+	For string comparison, use:
+
+if [ "$s1" == "$s2" ]
+For the a contains b, use:
+
+if [[ $s1 == *"$s2"* ]]
 
 3. search keywords : 'for line in grep'
 	--how to process each line received as a result of grep command??
@@ -146,10 +263,230 @@
 	
 6.	concatenating shell variable and string literal without space
 	shellVar='/home'
-	"${shellVar}/cxz"
-	${shellVar}"/cxz"	
+	"${shellVar}/anotherString"
+	${shellVar}"/anotherString"	
+
+
+7. if usage
+	if [ ! Expr ]; then
+	
+	fi	
+
+8. How to scp without password??
+	Let me say that you want to copy file from source_host to dest_host
+	1.on source_host, ssh-keygen -t rsa(just keep pressing Enter)
+	2.copy ~/.ssh/id_rsa.pub to dest_host
+	3.log onto dest_host
+	4.cat id_rsa.pub >> ~/.ssh/authorized_keys
+	chmod 700 ~/.ssh/authorized_keys
+	
+9.	Where is svn username and password located
+	~/.subversion/auth/svn.simple/
+10.	scp no password for two or more hosts
+11.	 前景            背景             颜色
+  ---------------------------------------
+  30                40               黑色
+  31                41               紅色
+  32                42               綠色
+  33                43               黃色
+  34                44               藍色
+  35                45               紫紅色
+  36                46               青藍色
+  37                47               白色
+           1         透明色
+ 
+  代码             意义
+  -------------------------
+  0                 OFF
+  1                 高亮显示
+  4                 underline
+  5                 闪烁
+  7                 反白显示
+  8                 不可见
+颜色=\033[代码;前景;背景m
+PS1='\[\033[1;31;40m\]\u@\h:\w\$ '  
+12.	set all the files directory 777(Buy why all file executable??)
+	chmod 777 -r /tmp/dirName
+	to change all the directories 755, find /tmp/dirName -type d -exec chmod 755 {} \;({} is replaced by file path. )
+	to change all the diles to 644, find /tmp/dirName -type f -exec chmod 644 {} \;
+	(semicolon denotes the end of the command,escaped,otherwise it will be interpreted by the shell)
+	
+13.	bash ls only directory	under "/home/userName/dir1"
+	ls -d /home/userName/dir1/*/
+	
+14.	How to echo with color?(http://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux)
+	red='\033[0;31m'
+	NC='\033[0m' # No Color
+	echo -e "${red}Hello Stackoverflow${NC}"
+
+	cecho() {
+  local code="\033["
+  case "$1" in
+    black  | bk) color="${code}0;30m";;
+    red    |  r) color="${code}1;31m";;
+    green  |  g) color="${code}1;32m";;
+    yellow |  y) color="${code}1;33m";;
+    blue   |  b) color="${code}1;34m";;
+    purple |  p) color="${code}1;35m";;
+    cyan   |  c) color="${code}1;36m";;
+    gray   | gr) color="${code}0;37m";;
+    *) local text="$1"
+  esac
+  [ -z "$text" ] && local text="$color$2${code}0m"
+  echo "$text"
+}
+
+cecho "Normal"
+cecho y "Yellow!"	
+	
+	Black        0;30     Dark Gray     1;30
+	Blue         0;34     Light Blue    1;34
+	Green        0;32     Light Green   1;32
+	Cyan         0;36     Light Cyan    1;36
+	Red          0;31     Light Red     1;31
+	Purple       0;35     Light Purple  1;35
+	Brown/Orange 0;33     Yellow        1;33
+	Light Gray   0;37     White         1;37
+	
+15.	piping through less, losing color
+	alias ls='ls --color=auto', tells ls to only use colors when its output is a tty.
+	ls --color=always | less -R
+
+16.	bash print stderr in red color
+	the_name_of_the_command 2> >(while read line; do echo -e "\e[01;31m$line\e[0m" >&2; done)	
+	
+	red_stderr.sh
+	#set output file
+	temp_file=~/temp
+	#exeute the command
+	"$@" 2> >(while read line; do echo -e "\e[01;31m$line\e[0m" | tee --append $temp_file ; done)	
+	#display all errors
+	echo -e "\n\e[01;31m===errors===\e[0m"
+	cat $temp_file
+	
+17.	add and delete user
+	useradd giant
+	passwd  giant
+	su - giant
+	userdel -r giant
+	
+	add user on ubuntu 15.04
+	adduser git
+	deluser git
 	
 	
+	
+18.	Enter passphrase for key '/root/userName/id_dsa.pub':
+	This is because your private key is encrypted...remove the passphrase:
+	ssh-keygen -p -f /root/.ssh/id_dsa -N ''
+	
+	or use private key to authenticate:
+	ssh -v -i /root/.ssh/id_dsa backup@webserver.com
+	ssh-copy-id -i /root/.ssh/id_rsa.pub backup@webserver.com
+	
+19.	Add private key permanently with ssh-add on Ubuntu
+	Force the key files to be kept permanently, vim ~/.ssh/config
+	IdentityFile ~/.ssh/gitHubKey
+	IdentityFile ~/.ssh/id_rsa_buhlServer 
+	
+	If you want all users to use the key, vi /etc/ssh/ssh_config, make the folder accessible to all
+	Specific to one host:
+	vi ~/.ssh/config
+	Host github
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/githubKey
+	
+20.	Could not open termnal on ubuntu 15.04
+	export LANG="en_US.UTF-8"
+	Problem was a custom locale. Now using standard en_US.utf8 and gnome-terminal works normally.
+	
+21.	kill all apache2
+	killall -9 httpd
+	/usr/sbin/httpd -k start
+	tailf /var/www/httpd/error_log
+	
+	Alias /js /var/www/httpd/cgi-bin/js(Do not use ScriptAlias,which will treat the file as script)
+	<script src="/js/aaa.js"></script>
+	
+	write log to apache2
+	def apache_log(str):
+		print >> sys.stderr, str
+	
+	
+22.	exec of '...' failed(No such file or directory:exec of)
+	change /usr/local/bin/python --> /usr/bin/python
+	
+	vim 文件路径,发现文件存在,但是文件名后面有dos,于是在linux下重新创建了一个文件,并将之前的文件内容粘贴进去，就可以执行了.
+	
+	Script not found or unable to stat
+	check if the script exists on specific path.
+	
+23.	you must have a tty to run sudo
+	visuo /etc/sudoers
+	Comment "Defaults requiretty"
+	
+24.	no tty present and no askpass program specified(no password needed 设置为不需要密码)
+	visudo
+	apache ALL = NOPASSWD: /usr/bin/ssh
+	root ALL = NOPASSWD: /usr/bin/ssh
+	
+25.	Finding out what user Apache is running as?(apache username)
+	ps aux | egrep '(apache|httpd)'
+	
+26.	ssh id_rs.pub not working(http://unix.stackexchange.com/questions/36540/why-am-i-still-getting-a-password-prompt-with-ssh-with-public-key-authentication)
+	Why am I still getting a password prompt with ssh with public key authentication?
+	chmod o-w ~/(or the /root)
+	chmod 700 ~/.ssh
+	chmod 600 ~/.ssh/authorized_keys
+	
+	Debug ssh connections
+	
+	(server machine B)service sshd stop
+	/usr/sbin/sshd -d(local machine A, ssh root@server_ip)
+	...Debug output...
+	service sshd start
+	
+	
+	
+27.	change owner and group of a directory(http://www.thegeekstuff.com/2012/06/chown-examples/)
+	chown root /home/testUser(change owner to root)
+	chown :root /home/testUser(change group to root)
+	
+28.	What does ls -al mean??(http://unix.stackexchange.com/questions/103114/what-do-the-fields-in-ls-al-output-mean)
+	n the order of output;
+
+	-rwxrw-r--    10    root   root 2048    Jan 13 07:11 afile.exe
+	file permissions,
+	number of links,
+	owner name,
+	owner group,
+	file size,
+	time of last modification, and
+	file/directory name
+	
+29.	Xsheel 5,,No matching outgoing encryption algorithm found
+	Properties --> SSH --> Security --> Encryption(aes256-ctr) --> MAC(hmac-sha2-256)
+	
+30.	Forgot ubuntu user password
+	https://www.liberiangeek.net/2014/10/change-forgotten-password-ubuntu-14-04-servers/
+	
+	
+	
+==================
+YouCompleteMe
+==================
+Question can be turned off with options, see YCM docs
+let g:ycm_confirm_extra_conf = 0
+
+==================
+How to configure a ubuntu to accept ssh?
+==================
+sudo apt-get update
+sudo apt-get install openssh-server
+sudo ufw allow 22
+	
+		
 	
 Bash Script error catching
 --------------------------

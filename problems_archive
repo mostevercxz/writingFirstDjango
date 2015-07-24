@@ -1,3 +1,15 @@
+good open source project git address
+1. libxml2:
+git clone git://git.gnome.org/libxml2
+2. libxml2 install my version(http://xmlsoft.org/FAQ.html)
+tar -zxvf xxx.tar.gz -C /tmp/libxml2
+cd /tmp/libxml2
+mkdir -p /home/userName/develop/libxml2/
+./configure --prefix /home/userName/develop/libxml2/(安装这了三个路径/bin/, /include/, /lib/)
+export PATH=/home/userName/develop/libxml2/bin:$PATH
+export LD_LIBRARY_PATH=/home/userName/develop/libxml2/lib:$LD_LIBRARY_PATH
+
+
 before learning
 ---------------
 
