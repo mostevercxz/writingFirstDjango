@@ -1,0 +1,491 @@
+ responsive web design
+Chapter 1 : 响应式设计,创意搜集网站 http://mediaqueri.es/popular/
+<!DOCTYPE html>
+<sCript Src=js/jquery.js></script>
+<header>
+	<nav>
+		<ul>
+			<li><a href="" title="Home">Home</a></li>
+			<li><a href="" title="About">About</a></li>
+		</ul>
+	</nav>
+</header>
+纯 CSS3的 3D特效
+http://www.panic.com/
+http://demo.marcofolio.net/3d_animation_css3/
+
+Chapter 2 : 媒体查询,除scan,grid,都可以用min,max创建前缀,min-width,min-height,max-width,max-width
+width,height(视口宽度,视口高度)
+device-width,device-height(设备屏幕的宽度高度)
+aspect-ratio(16:9等)	
+
+<link rel="stylesheet" media="screen and (orentation: portrait) and (min-width:800px), projection" href="css" />
+两个媒体查询之间,用逗号分隔
+
+
+
+--------------------------
+	Html archives
+--------------------------
+1.	How to submit data to specific url ??
+	<form action="url_address" method="post">
+		<input type="text" name="type1" />
+		<input type="text" name="type2" />
+	</form>
+	
+	django side:
+	def View(request):
+		type1 = request.POST['type1']
+		type2 = request.POST['type2']
+		
+----------------------------
+	CSS archives
+----------------------------
+1.	The 30 css selectors I must memorize
+http://code.tutsplus.com/tutorials/the-30-css-selectors-you-must-memorize--net-16048	
+
+
+1.	How to get the value of checked radio?
+temp = $('input[name=fromzone]:checked').val();
+2.	How to remove style added with .css() function ?
+	$(#div.classname).css("background-color", "")
+3.	How to get the current selector name??
+	$('myselector p').selector(deprecated 1.7, removed 1.9)
+	var selector = (typeof($(this).attr('id')) !== 'undefined' || $(this).attr('id') !== null) ? '#' + $(this).attr('id') :  '.' + $(this).attr('class');
+	
+4.	div click go to url
+	$('#div').click(function(){
+		window.location = '/findacc/search_charbase';
+	});
+	
+5.	pass object as the argument to a onclick function in html
+	<input type="button" onclick="funcName(this)" />
+
+6.	jquery click not working for elements created by $("#div").html("<a class=\"abcd\" />")
+	Bind the elment's click using javascript:
+	var o=document.createElement("div");
+	o.innerHTML = '<input type="button" class="buttonclass">'
+	o.onclick = function(){
+		//do something when clicked..
+	}
+	
+7.	Get Post action url
+	$('#form').live(function(){
+		$form = $(this);
+		alert('the action is' + $form.attr('action'));
+	})
+	
+8. check checkbox status
+	$(".checkbox").change(function() {
+    if(this.checked) {
+        //Do stuff
+    }
+	});
+
+DropZone.js
+processQueue方法最终会调用xmlHttpRequest.Send()方法
+
+pymysql.connect(local_infile=True)
+pymysql支持load data local infile
+pip install offline
+chrome 的javascript console,一般一段JS代码不管用,很有可能就是有错误,要看控制台才知道..
+
+
+jquery ajax success not called（http://stackoverflow.com/questions/1969476/ajax-success-event-not-working）
+The result is probably not in JSON format, so when jQuery tries to parse it as such, it fails.I can catch the error with 
+$.ajax({error:function(error){},});
+去掉dataType:'json' row
+
+chooseFileZone的margin被我该来该去。。。
+在没想好布局之前，其实这些都不用。。
+不对，只有先布局后，我才能想到更进一步的布局
+
+7z -a -mmt=8 -ttar result.tar local_dir\*
+7z -a -mmt=8 -mx=1 -tbzip2 ubuntu.tar.bz2 result.tar
+
+=======================
+C# download file
+using System.Net;
+//...
+WebClient Client = new WebClient ();
+Client.DownloadFile("http://i.stackoverflow.com/Content/Img/stackoverflow-logo-250.png", @"C:\folder\stackoverflowlogo.png");
+
+using (var client = new WebClient())
+{
+    client.DownloadFile("http://example.com/file/song/a.mpeg", "a.mpeg");
+}
+
+========================
+pass a params list to another thread
+void Main()
+{
+    Method1("{0},{1},{2},{3}","Can","I","do","this").Dump();
+}
+
+String Method1(string format, params object[] list)
+{
+    return String.Format(format,list);
+}
+
+http://jiweiblog.blogspot.com/2015/01/openwrt-dnsmasq-pdnsd-shadowsocks.html
+https://cokebar.info/archives/948
+configure shadowsocks(https://plus.google.com/103234343779069345365/posts/Xce4EJpLGhX)
+sudo apt-get install python-pip supervisor
+pip install shadowsocks
+sudo vim /etc/shadowsocks.json
+{
+    "server":"0.0.0.0",
+    "server_port":8388,
+    "local_port":1080,
+    "password":"shadow2015",
+    "timeout":600,
+    "method":"aes-256-cfb"
+}
+
+vim /etc/supervisord.conf
+[program:shadowsocks]
+command=ssserver -c /etc/shadowsocks.json
+autostart=true
+autorestart=true
+user=root
+log_stderr=true
+logfile=/var/log/shadowsocks.log
+
+vim /etc/rc.local
+service supervisord start
+sudo ufw allow 8388
+reboot
+
+ssserver -c /etc/shadowsocks.json(foreground)
+ssserver -c /etc/shadowsocks.json  -d start
+ssserver -c /etc/shadowsocks.json -d stop
+iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 8989 -j ACCEPT
+service iptables restart
+sudo ufw allow proto tcp from 10.0.1.0/10 to 本机ip port 8388
+sudo ufw allow 8388
+sudo ufw status
+
+
+==================
+Django
+无法导入带中文文件名的.sql文件
+1.
+def user_defined_filename(instance, filename):
+    return myfilename
+	
+class SqlFile(models.Model):
+	filepath = models.FileField(upload_to = user_defined_filename, max_length=800)
+	
+
+=================
+程序作用：Excel -> ixml, ixml-> Excel
+
+对于同一张表格,可能要打2张tbl，fields可能有2个3个，我要将这2个tbl的配置用两个tabledata转到同一个ixml中
+(
+Excel变ixml工具,读取目录下的client_ixmls和server_ixmls文件,分别打表打相应的目录
+<tabledata name="name1" excelfile="excelname" sheet="sheetname" sort="字段名">
+</tabledata>
+<tabledata name="name2" excelfile="excelname">
+</tabledata>
+)
+
+1.根据<table>的配置生成select语句
+2.执行select,DataSet到
+
+如何将excel转换为ixml??
+1.读取该excel,并为该excel生成不带tabledata节点的 初始配置文件
+2.遍历每个sheet,为每个sheet生成<tabledata>节点
+2.0 生成空的tabledata节点
+2.1 通过表名,和sheet名,在配置中找到<table><field>节点
+2.2 tabledata节点append <info>节点
+2.3 从第2行开始,遍历该sheet, append <data>节点
+3. 保存ixml文件
+4. 美化ixml文件
+
+
+ixml -> Excel
+每个tabledata对应excel中一个sheet
+
+server:
+1.检查mdb文件是否存在,若不存在,则创建数据库
+2.分析<tabledata><info>节点,若表不存在,则创建该表
+3.分析<tabledata><data>节点,将数据插入到表中
+
+client:
+1.分析<tabledata><info>节点,判断是否所有的列都存在，若有不存在的,添加进表里
+2.分析<tabledata><data>节点,SELECT * FROM 表名 WHERE 列名=ixml中配置的值,若存在,执行update语句;不存在,执行Insert语句
+
+==========================
+How to create Access database??
+add reference, ADOX(Microsoft ADO Ext. 6.0 for DDL and Security)
+var cat = new ADOX.Catalog();
+OledbConnectionStringBuilder builder = new OledbConnectionStringBuilder();
+builder["Provider"] = "Microsoft.Jet.OLEDB.4.0";
+builder["Data Source"] = path_of_db;
+cat.Create(builder.connectionString);
+
+-----------------
+-----------------
+How to check if table exists in an Access Database??
+// Get the datatable information
+            DataTable dt = DbConnection.GetSchema("Tables");
+ 
+            // Loop throw the rows in the datatable
+            foreach (DataRow row in dt.Rows)
+            {
+                // If we have a table name match, make our return true
+                // and break the looop
+                if (row.ItemArray[2].ToString() == TableName)
+                {
+                    TableExists = true;
+                    break;
+                }
+            }
+			
+var schema = conn.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, new object[] { null, null, null, "TABLE" });
+if (schema.Rows
+          .OfType<DataRow>()
+          .Any(r => r.ItemArray[2].ToString().ToLower() == tablename.ToLower()))
+{
+    // table exists
+}
+foreach (var row in schema.Rows.OfType<DataRow>())
+{
+    string tableName = row.ItemArray[2].ToString();
+}
+
+-----------------
+How to create table??
+OledbConnectionStringBuilder builder = new OledbConnectionStringBuilder();
+builder["Provider"] = "Microsoft.Jet.OLEDB.4.0";
+builder["Data Source"] = path_of_db;
+System.Data.OledbConnection conn = new System.Data.OledbConnection(builder.connectionString);
+conn.Open();
+create_text = "create table [装备表] ([名称] long,[效果] text)"
+System.Data.OledbCommand cmd = new System.Data.OledbCommand(create_text, conn);
+(
+cmd.Connection = conn;
+cmd.CommandText = "create table [装备表] (";
+cmd.CommandText += "[名称] long";
+cmd.CommandText += ",[效果] text";
+cmd.CommandText += ")";
+)
+cmd.ExecuteNonQuery();
+
+-----------------
+append xml string block to existing xmlDocument
+
+XmlDocument xdoc = new XmlDocument();
+xdoc.LoadXml(@"<MyXml><Employee></Employee></MyXml>");
+XmlDocumentFragment xfrag = xdoc.CreateDocumentFragment();
+xfrag.InnerXml = @"<Demographic><Age/><DOB/></Demographic>";
+xdoc.DocumentElement.FirstChild.AppendChild(xfrag);
+
+------------------
+How to insert into a record into access?
+OleDbCommand cmd = new OleDbCommand(); 
+cmd.CommandType = CommandType.Text; 
+cmd.CommandText = "insert into Items ([Item_Name],[Item_Price]) values (?,?);
+cmd.Parameters.AddWithValue("@item", itemNameTBox.Text);
+cmd.Parameters.AddWithValue("@price", Convert.ToDouble(itemPriceTBox.Text)); 
+cmd.Connection = myCon; 
+myCon.Open(); 
+cmd.ExecuteNonQuery(); 
+   
+-----------------
+reserved words 关键词,保留字
+c# access check if table exists
+public bool check_if_exists(string tablename)
+{
+	bool exists = false;
+	DataTable dt = conn.GetSchema("Tables");
+	foreach(DataRow row in dt.Rows)
+	{
+		if(row.ItemArray[2].ToString().ToLower() == tablename.ToLower())
+		{
+			exists = true;
+		}
+	}
+	return exists;
+}	
+
+
+public static bool TableExists(this DbConnection conn, string table)
+{
+    conn.open();
+    var exists = conn.GetSchema("Tables", new string[4] { null, null, table, "TABLE" }).Rows.Count > 0;
+    conn.close();
+    return exists;
+}
+-----------------
+c# oledb check if column exists
+var schema = db.GetSchema("COLUMNS"); 
+var col = schema.Select("TABLE_NAME='" + tableName + " AND COLUMN_NAME='" + colName + "'" 
+
+if(col.Length > 0)
+   // Column exist
+else
+   // Column doesn't exist
+   
+   
+--------------------
+c# oledb  excel character limitation 255
+Excel cell-values are truncated by OLEDB-provider
+(http://stackoverflow.com/questions/898513/excel-cell-values-are-truncated-by-oledb-provider)
+(https://support.microsoft.com/en-us/kb/281517)
+HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Jet\4.0\Engines\Excel
+TypeGuessRows要修改为0,这样oledb就会读取前16384行来决定数据类型,会稍微好一点
+--------------------
+export access table to excel using c#
+string[,] data;
+将data赋值
+--------------------
+c# create excel workbook with 1 sheet by default
+app = new Application();
+ap.SheetsInNewWorkbook = 1;
+--------------------
+C#表名里面不能有 "."这个符号...要替换掉,或者用[]包围起来s 
+--------------------
+DataSet 转 Excel时候,要是为空，如何处理?
+DataSet ds = new DataSet();
+DataAdapter da = new DataAdapter();
+da.Fill(ds);
+
+int rowNum = ds.Tables[0].Rows.Count + 1;//算上表头
+int columnNum = ds.Tables[0].Columns.Count;
+var object [,] data = new object[rowNum, columnNum];
+for(int col = 0; col < columnNum; ++col)
+{
+	data[0, col] = ds.Tables[0].Columns[col].ToString();
+}
+-------------------------
+How to beautify a xml?
+static public string Beautify(ref XmlDocument doc)
+{
+    StringBuilder sb = new StringBuilder();
+    XmlWriterSettings settings = new XmlWriterSettings
+    {
+        Indent = true,
+        IndentChars = "  ",
+        NewLineChars = "\r\n",
+        NewLineHandling = NewLineHandling.Replace
+    };
+    using (XmlWriter writer = XmlWriter.Create(sb, settings)) {
+        doc.Save(writer);
+    }
+    return sb.ToString();
+}
+
+xmlDocument doc = new xmlDocument();
+doc.Load(origin_xml_file_name);
+string new_file = origin_xml_file_name + ".bak";
+System.IO.StreamWriter sw = new System.IO.StreamWriter(new_file, false, Encoding.getEncoding("gb2312"));
+sw.Write(Beautify(ref doc));
+//删除旧文件
+//新文件重命名为旧文件
+
+-------------------------
+How to select xml Nodes??
+<Names>
+    <Name>
+        <FirstName>John</FirstName>
+        <LastName>Smith</LastName>
+    </Name>
+    <Name>
+        <FirstName>James</FirstName>
+        <LastName>White</LastName>
+    </Name>
+</Names>
+XmlNodeList xnList = xml.SelectNodes("/Names/Name");
+-------------------------
+C# How to add attribute to existing XMLNodes ?
+xmlNode temp;
+XmlAttribute attr = xdoc.CreateAttribute("name");
+attr.Value = "attribute_value";
+temp.SetAttributeNode(attr);
+-------------------------
+How to get all sheet names?
+Excel.Application app = new ;
+Excel.Workbook book = app.Open(excel_file_name);
+foreach(Excel.Worksheet sheet in book.Worksheets)
+{
+	string table_name = book.Name;
+	string sheet_name = sheet.Name;
+}
+------------------------
+c# How to calculate the execution time of a method?
+using System.Diagnostics
+var watch = Stopwatch.StartNew();
+// the code that you want to measure comes here
+watch.Stop();
+var elapsedMs = watch.ElapsedMilliseconds;
+(Do not use DateTimes to measure time execution in .NET.)
+(http://stackoverflow.com/questions/28637/is-datetime-now-the-best-way-to-measure-a-functions-performance)
+------------------------
+string excelConnection = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + pathname + ";Extended Properties=\"Excel 8.0;HDR=YES;IMEX=1;\"";
+"HDR=Yes;" indicates that the first row contains columnnames, not data. "HDR=No;" indicates the opposite.
+
+Excel “External table is not in the expected format.”
+外部表不是预期的格式
+
+public static string path = @"C:\src\RedirectApplication\RedirectApplication\301s.xlsx";
+public static string connStr = "Provider=Microsoft.ACE.OLEDB.14.0;Data Source=" + path + ";Extended Properties=Excel 14.0;";
+之后,未在本地计算机上注册 Microsoft.ACE.OLEDB.14.0 提供程序
+
+
+------------------------
+------------------------
+我刚说完,你知道写出一个没有BUG的程序的成就感吗？
+结果就宕机了...
+-------------------------
+生成客户端头文件的时候,注意判断最后一个字符如果是越南文的话,要加个空格
+-----------------------
+失败得太晚了,浪费了1天的时间。
+我从存数据库的思路 得出来的结果是错的。
+应该从合并文件的思路。
+-----------------------
+但合并客户端表格文件和服务器表格文件时候，我也假设,客户端和服务器同样位置的数据是一样的.
+但是id=154的数据只有客户端有,服务器却没有,真是奇怪了
+Form1.Designer.cs
+#define DEBUG
+#if DEBUG
+	this.Controls.Add(this.button9);
+#endif
+这样就能在DEBUG和release版权衡了
+-----------------------
+System.Runtime.InteropServices.COMException: 检索 COM 类工厂中 CLSID 为 {0002E510-0000-0000-C000-000000000046} 的组件时失败，原因是出现以下错误: 80070005
+原因：excel进程太多,解决办法,每次运行完将excel进程杀死
+--------------------------
+Threading in C#
+http://www.albahari.com/threading/part2.aspx#_Signaling_with_Event_Wait_Handles
+http://stackoverflow.com/questions/8815895/why-is-thread-sleep-so-harmful
+
+--------------------------
+putty generate ppk file(https://my.bluehost.com/cgi/help/putty#puttygen)
+TonyTsang  May 23, 2014 
+========================================= 
+ssh-keygen -t rsa -b 2048 -f mykey -C [me@domain.com < your comment] 
+cat mykey.pub >> ~/.ssh/authorized_keys 
+========================================= 
+download mykey download PuTTYgen from http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html 
+start puttygen 
+go to conversion > import key 
+Change key comment to the same as "~/.ssh/authorized_keys"
+select downloaded mykey Then [Save private key], you can change key comment if needed 
+========================================= 
+Start putty Key in the host name/ip address together with port, if non standard port is used 
+Then go to [connection] > [ssh] > [auth] 
+Click [Browse] of [Private key file for authentication], choose the previous generated [mykey.ppk] 
+Go back to [Session] 
+Enter the name you want at [Saved sessions] field, then [Save] 
+After all that, hit [Open] Enter your user name when prompted, your should be logged in now 
+========================================= 
+Remeber to remove the generated key files from the server rm mykey mykey.pub 
+=========================================
+tailf /var/log/secure(SSH Authentication Refused: Bad Ownership or Modes for file ~/.ssh/authorized_keys)
+chmod 644 ~/.ssh/authorized_keys
+解决问题
+------------------------
+export putty sessions
+regedit /e "%userprofile%\desktop\putty-sessions.reg" HKEY_CURRENT_USER\Software\SimonTatham\PuTTY\Sessions
+(or regedit /e "%userprofile%\desktop\putty.reg" HKEY_CURRENT_USER\Software\SimonTatham)
