@@ -1,3 +1,147 @@
+(废弃，这种方法Mysqldb运行的时候,会报错
+python3, build Mysqldb-python from source
+wget https://pypi.python.org/packages/source/M/MySQL-python/MySQL-python-1.2.5.zip#md5=654f75b302db6ed8dc5a898c625e030c
+unzip MySQL-python-1.2.5.zip
+cd MySQL-python-1.2.5
+Replace ConfigParser by configparser in file MySQL-python-1.2.5/setup_posix.py file
+Modify line 191, except TypeError, m: to except TypeError as m: in file MySQL-python-1.2.5/build/lib.linux-x86_64-3.4/MySQLdb/cursors.py file
+Modify line 250, except TypeError, msg: to except TypeError as msg: in same cursors.py file
+Modify line 36, raise errorclass, errorvalue to raise errorclass(errorvalue) in MySQL-python-1.2.5/build/lib.linux-x86_64-3.4/MySQLdb/connections.py file
+sudo apt-get install python3.4-dev(Python.h)
+python setup.py build
+python setup.py install
+python -c "import MySQLdb"
+)
+
+(这种方法目前没报错
+pip install PyMySQL
+vim python3.4/site-packages/django/db/backends/mysql/base.py
+:%s#MySQLdb#pymysql
+python manage.py runserver 0.0.0.0:8080
+)
+
+安装Python3及以上版本
+  出错:Fatal Python error: Py_Initialize: can't initialize sys standard streams
+       LookupError: unknown encoding: GB2312
+  解决办法：export LC_CTYPE=en_US.UTF-8 后再make;make install 
+
+admin.py
+--------
+from django.contrib import admin
+from .models import Post(注意大小写啊)
+admin.site.register(Post)
+
+models.py
+---------
+from django.utils import datetime 改为-->
+from datetime import datetime
+
+<form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Save</button>
+</form>
+
+django books and tutorials:(http://www.fullstackpython.com/django.html)
+Test-Driven Development with Python, http://chimera.labs.oreilly.com/books/1234000000754/pr01.html
+The Django Girls Tutorial ,http://djangogirls.gitbooks.io/django-girls-tutorial-extensions/content/optional_postgresql_installation/README.html
+
+
+How to add findacc/static/findacc/css/js directory?
+website/settings.py
+STATICFILES_DIRS=("findacc/static",)
+{% load staticfiles %}
+a href="{% static findacc/js/jquery.js %}"
+
+vim justTest/urls.py
+from justTest import views
+
+<script src="{% static 'js/jquery.min.js' %}"></script>(注意单引号别漏掉)
+
+django file uploaders
+---------------------
+https://github.com/sigurdga/django-jquery-file-upload
+
+
+
+Django projects layout
+------------------------------------
+myproject/
+	manage.py
+	myproject/
+		__init__.py
+		urls.py
+		wsgi.py
+		setting/
+			__init__.py
+			base.py
+			dev.py
+			prod.py
+	blog/
+		__init__.py
+		models.py
+		managers.py
+		views.py
+		urls.py
+		templates/
+			blog/
+				base.html,detail.html
+		static/
+			blog/
+		tests/
+			test_models.py
+			test_managers.py
+			test_views.py
+	users/
+		the same like blog
+	static/
+		css/
+		js/
+	templates/
+		base.html,detail.html
+	requirements/
+		base.txt, dev.txt, prod.txt
+
+
+
+PREREQ_APPS = [
+   ‘django.contrib.auth’,
+   ‘django.contrib.contenttypes’,
+   …
+   ‘debug_toolbar’,
+   ‘imagekit’,
+   ‘haystack’,
+]
+
+PROJECT_APPS = [
+   ‘homepage’,
+   ‘users’,
+   ‘blog’,
+]
+
+INSTALLED_APPS = PREREQ_APPS + PROJECT_APPS
+
+
+requirements/test.txt:
+-r base.txt
+pytest==2.5.2
+coverage==3.7.1
+
+urlpatterns = patterns(‘’,
+    url(r’^$’, HomePageView.as_view(), name=‘home’),
+    url(r’^blog/‘, include(‘blog.urls’)),
+    url(r’^user/‘, include(‘user.urls’)),
+)
+
+---------------------------
+	Django FAQ
+---------------------------
+1. What is the difference between MEDIA_ROOT and MEDIA_URL
+	MEDIA_ROOT is the absolute filesystem path to the directory that will hold user-uploaded files.
+	MEDIA_URL is URL that handles the media served from MEDIA_ROOT, used for managing stored files.It must end in slash.
+2. MEDIA_ROOT and STATIC_ROOT must have different values.
+	MEDIA_URL and STATIC_URL must have different values
+
 writing your first django app, part 1
 -------------------------------------
 
@@ -5,7 +149,7 @@ writing your first django app, part 1
 	python -c "import django;  print(django.get_version())"
 2.create a project:
 	django-admin.py startproject websiteName
-	manage.py : A command-line utility that letss you interact with this DJango project
+	manage.py : A command-line utility that let you interact with this DJango project
 	settings.py : settings for this project
 	urls.py : URL declartions for this project
 	wsgi.py : An entry point for wsgi-compatible web servers to server this project
@@ -44,6 +188,12 @@ writing your first django app, part 1
 	--6.2 Tell Django the "polls" app is installed.(setting.py, INSTALL_APPS) Django apps are pluggable, they don't have to be tied to a given Django installation.
 	--6.3 python manage.py makemigrations polls. Migrations are how Django stores changes to your models(db schema)--they are files on disk.
 	--6.4 python manage.py sqlmigrate polls 0001 (sqlmigrate takes migration names and returns their SQL.)(before this ,can run 'python manage.py check')
+	remember the three-step guide to making model changes:
+		Change your models (in models.py).
+		Run python manage.py makemigrations to create migrations for those changes
+		Run python manage.py migrate to apply those changes to the database.
+	The reason there’s separate commands to make and apply migrations is because you’ll commit migrations to your version control system and ship them with your app; 
+	they not only make your development easier, they’re also useable by other developers and in production.
 
 7. Playing with the API
 	--7.1 python manage.py shell 
@@ -123,12 +273,15 @@ writing my first Django APP, part 2
 
 8.Customize the admin change list
 	--8.1 BY default, Django displays the str() of each object
-	--8.2 list_display = ('questionText','pub_date')
+	--8.2 which is a tuple of field names to display, list_display = ('questionText','pub_date')
 	--8.3 change the column header, adn the string representation:
 		( Mind the indentation!!!!)
 		def was_published_recently(self):
 			return balabala...
 		was_published_recently.admin_order_field = 'pub_date'
+		was_published_recently.boolean = True
+		was_published_recently.short_description = 'Published recently?'
+		list_filter=['pub_date']
 
 9.Cosutomize the admin look and feel(introducing the template system of Django)
 	--9.1 customizing my project's templates
@@ -148,8 +301,17 @@ writing my first Django APP, part 2
 		python -c "import sys; sys.path = sys.path[1:]; import django;print(django.__path__)"
 	--9.3 Customizing my application's templates
 		How django find the template files???
+		By default, django uses a filesystem-based template loader
+		Some of these other loaders are disabled by default, but you can edit TEMPLATE_LOADERS setting.
+		The TEMPLATE_LOADERS should be a tuple of strings, where each string represents a template class.
+		django.template.loaders.filesystem.Loader
+		django.template.loaders.app_directories.Loader
+		django.template.loaders.eggs.Loader
+		django.template.loaders.cached.Loader
 		1. filesystem.loader, Loads templates from the filesystem, according to TEMPLATE_DIRS
-		2. app_directories.Loader, Loads templates from Django apps on the filesystem. For each app in INSTALL_APPS, the loader looks for a template subdirectory.(The order of INSTALLED_APPS is significant! It will use the one it first finds. This explains why 'go fuck' appears after deleting 'my first django')
+		2. app_directories.Loader, Loads templates from Django apps on the filesystem. 
+		For each app in INSTALL_APPS, the loader looks for a template subdirectory.
+		(The order of INSTALLED_APPS is significant! It will use the one it first finds. This explains why 'go fuck' appears after deleting 'my first django')
 
 
 Writing my first Django app, part 3(creating views and template language)
@@ -185,12 +347,18 @@ Writing my first Django app, part 3(creating views and template language)
 	--3.1 Edit polls/views.py & polls/urls.py(referenced by name regex, views with arguments)
 
 4. Write views that actually do something
-	--4.1 All Django wants is HttpResponse.
+	Each view is responsible for doing one of two things :
+	returning an HttpResponse object containing the content for the requested page;
+	raising an exception such as Http404
+	
+	--4.1 All Django wants is HttpResponse.But your views can do anything.
 	--4.2 Why use get_obj_or_404() other than try, catch??
 		Because that would couple the model layer to the view layer
 
 5. Use the template system
 	--5.1 The template sys uses dot-syntax to access variable attributes.
+	polls/templates/polls/index.html
+	if another directory ,index.html. this may be confused.
 
 6. Removing hard-coded URLs in templates
 	{% url %} template tag
@@ -201,6 +369,15 @@ Writing my first Django app, part 3(creating views and template language)
 7. Namespacing URL names
 	url(r'^polls/', include('polls.urls', namespace="polls"))
 	{% url 'polls:detail' %}
+	
+render(request, 'polls/index.html', context)
+get_obj_or_404(pk=1)
+mysite/urls.py
+url(r'^polls/', include('polls.urls', namespace="polls"))	
+polls/urls.py
+django.conf.urls.urlpatterns=('', url(r'^(?P<qid>\d+)/$', views.detail, name='detail'), )
+polls/templates/polls/index.html
+<a href="{% url 'polls:detail' question.id %}">{{question.question_text}}</a>
 
 
 Writing my first Django app, part 4
@@ -229,13 +406,136 @@ Writing my first Django app, part 5(writing testing)
 
 3. Test a view
 	--3.1 The Django test client, simulate a user interacting with the code at the view level
+	
+--- How to Use django-debug-toolbar ---
+# debug_toolbar settings
+if DEBUG:
+    INTERNAL_IPS = ('127.0.0.1','192.168.122.254')
+	# Be careful the order
+    MIDDLEWARE_CLASSES += (
+        'debug_toolbar.middleware.DebugToolbarMiddleware',
+    )
+
+    INSTALLED_APPS += (
+        'debug_toolbar',
+    )
+
+    DEBUG_TOOLBAR_PANELS = (
+        'debug_toolbar.panels.version.VersionDebugPanel',
+        'debug_toolbar.panels.timer.TimerDebugPanel',
+        'debug_toolbar.panels.settings_vars.SettingsVarsDebugPanel',
+        'debug_toolbar.panels.headers.HeaderDebugPanel',
+        #'debug_toolbar.panels.profiling.ProfilingDebugPanel',
+        'debug_toolbar.panels.request_vars.RequestVarsDebugPanel',
+        'debug_toolbar.panels.sql.SQLDebugPanel',
+        'debug_toolbar.panels.template.TemplateDebugPanel',
+        'debug_toolbar.panels.cache.CacheDebugPanel',
+        'debug_toolbar.panels.signals.SignalDebugPanel',
+        'debug_toolbar.panels.logger.LoggingPanel',
+    )
+
+    DEBUG_TOOLBAR_CONFIG = {
+        'INTERCEPT_REDIRECTS': False,
+    }
+
+
+Deploy django using gunicorn:
+--------------------------------
+1.DEBUG=False
+2.ALLOWED_HOSTS=['*'](ALLOWED_HOSTS=['192.168.111.222'],ALLOWED_HOSTS=['example.com'])
+3.gunicorn --worker-connections 10 --max-requests 10 -w 2 norepeat.wsgi:application --bind 0.0.0.0:8080
+(-w 2 means handling two requests simultaneously simultaneous
+If I want to handle 10 simultaneous connections, gunicorn --worker-connections 10 -w 10)
+但是若是3个连接同时请求http://192.168.204.132:8080/db
+结果还是单线程的,这个待解决.
+--------------------------------
+	
+	
+Deploy django using mod_wsgi:(暂时停止研究)
+-----------------------------
+1.	Install mod_wsgi from source code.
+	1.Apache2 requirements
+		Apache 2.2 and the corresponding Apache Runtime must have been compiled with support for threading.
+		(if install from package, the dev package must be also installed. some systems, apache2-prefork-dev, apache2-worker-dev)
+	2.Python requirements
+		Python must be compiled with support for threading.
+		Python should preferably be available as a shared library.(If not, runtime memory usage of mod_wsgi will be greater )
+		(cd Python-2.7.3
+		PREFIX=$HOME/local/python-2.7.3
+		export LD_RUN_PATH=$PREFIX/lib
+		./configure --prefix=$PREFIX --enable-shared
+		make
+		make install
+		)
+	3.Unpacking source code
+		./configure --with-apxs=/usr/local/apache/bin/apxs \
+		--with-python=/home/userName/virtual3/bin/python
+		make 
+		sudo make install
+	4.Loading module into Apache2
+	
+1.How to verify the version of Apache??(http://stackoverflow.com/questions/166607/how-do-i-find-the-version-of-apache-running-without-access-to-the-command-line)
+2.mod_wsgi installation guide(https://code.google.com/p/modwsgi/wiki/QuickInstallationGuide)
+  mod_wsgi github(https://github.com/GrahamDumpleton/mod_wsgi)
+3.Integration with Django(https://code.google.com/p/modwsgi/wiki/IntegrationWithDjango)
+
+--------------------------	
+
+http status
+403 forbidden, no permission
+500 A generic error message, given when an unexpected condition was encountered and no more specific message is suitable.
+
+为解决父亲div没有width和height的问题,搜索
+float div parent height,(http://stackoverflow.com/questions/218760/how-do-you-keep-parents-of-floated-elements-from-collapsing)
+<div style="overflow: auto;">
+    <div style="float: left;">Div 1</div>
+    <div style="float: left;">Div 2</div>        
+</div>
+
+为解决$(".getacc").click(function(){alert("hello")}); 不弹出hello world的问题
+搜索jquery click not working,(http://stackoverflow.com/questions/18602331/why-is-this-jquery-click-function-not-working)
+You are supposed to add the javascript code in a 
+$(document).ready(function() {
+}); 
+block.
+
+django csrf_token another file
+how to pass csrf_token to javascript file in django?
+use cookie Plugin(http://stackoverflow.com/questions/1599287/create-read-and-erase-cookies-with-jquery)
+$.cookie("csrftoken")
+
+jquery $.cookie is not a function
+(http://stackoverflow.com/questions/18024539/jquery-cookie-is-not-a-function)
+When including the cookie script, make sure to include jQuery FIRST, then the cookie plugin.
+The cookie plugin was not downloaded. $.cookie is not a standard jQuery function and the plugin needs to be downloaded here. Make sure to include the appropriate <script> tag where necessary (see next).
+
+Get the value in an input text box(http://stackoverflow.com/questions/4088467/get-the-value-in-an-input-text-box)
+//Get
+var bla = $('#txt_name').val();
+//Set
+$('#txt_name').val('bla');
+
+
+
+jquery change content of div?
+$('.click').click(function() {
+    // get the contents of the link that was clicked
+    var linkText = $(this).text();
+
+    // replace the contents of the div with the link text
+    $('#content-container').html(linkText);
+
+    // cancel the default action of the link by returning false
+    return false;
+});
+	
 
 create git repository and upload to github
 ------------------------------------------
 (reference:http://sirupsen.com/starting-with-git/)
 1.create ssh key, provide ssh key to git, introduce ourselves to git(https://help.github.com/articles/generating-ssh-keys/#platform-linux)
 	ls -al ~/.ssh
-	ssh-keygen -t rsa -C "mostevercxz@gmail.com" (passphrase必须要输入,Creates a new ssh key, using the provided email as a label)
+	ssh-keygen -t rsa -C "@gmail.com" (passphrase必须要输入,Creates a new ssh key, using the provided email as a label)
 	eval "$(ssh-agent -s)"
 	ssh-add ~/.ssh/id_rsa
 	xclip -i < ~/.ssh/id_rsa.pub
@@ -246,8 +546,9 @@ create git repository and upload to github
 	git add .
 	git commit . -m"first app"
 	(git log, git status, clone)
-	git remote add origin git@github.com:mostevercxz/writingFirstDjango.git(must use the word "origin"!! not "firstDjangoApp")
+	git remote add origin git@github.com:/writingFirstDjango.git(must use the word "origin"!! not "firstDjangoApp")
 	git push -u origin master 
+	https://github.com//django-blog-zinnia.git
 3. cancel last commit
 	git reset --soft HEAD~1
 	eidt
@@ -255,6 +556,111 @@ create git repository and upload to github
 	git commit -c ORIG_HEAD
 	(use git commit -a -m"revision:10 balabala", if you use <git commit . -m"bala">, it will not commit the parent directory!! Fuck!!!)
 4.conflicts when using git
+5.	djangocms -p . mywebsite老是提示Timeout: (<urllib3.connectionpool.VerifiedHTTPSConnection instance at 0xb6811d0c>, 'Connection to github.com timed out
+	sudo pip install https://github.com/divio/djangocms-admin-style/archive/master.zip?1426925640.98和上面的提示一模一样
+	于是找了一个公共的repos,git pull,提示Failed to connect to github.com port 443: Connection refused
+	google这个提示，按照官方提示，重新输入passphase即可成功连接。(官方连接：https://help.github.com/articles/using-ssh-over-the-https-port/)
+6.	git客户端,输入密码之后一直无法提交,于是就用了git bash,在shell里面输入用户名和密码,就可以了.	
+
+7. set up a git serve and log on to it
+	7.1 ON VPS,add user git first
+	(ubuntu 15.04)
+	adduser git(deluser --remove-home git)
+	
+	7.2 ON VPS,create .ssh directory
+	su - git
+	cd
+	mkdir .ssh && chmod 700 .ssh
+	touch .ssh/authorized_keys && chmod 600 .ssh/authorized_keys
+	
+	7.3 ON LOCAL, create id_rsa.pub
+	ssh-keygen -t rsa(几下passphase)
+	
+	7.4 ON LOCAL, copy id_rsa to VPS
+	scp ~/.ssh/id_rsa.pub git@server:/home/git/
+	
+	7.5 ON VPS, init git repository
+	mkdir project.git
+	cd project.git
+	git init --bare
+	
+	7.6 ON LOCAL, first commit
+	cd local_project_dir
+	git init
+	git add .
+	git commit -m 'initial commit'
+	git remote add origin git@server:/opt/git/project.git(git remote remove origin, git remote --help)
+	git push -u origin master
+	
+	7.7 ON LOCAL, let git save your password and passphrase(https://help.github.com/articles/working-with-ssh-key-passphrases/)
+	vim ~/.bashrc
+	# Note: ~/.ssh/environment should not be used, as it
+	#       already has a different purpose in SSH.
+	
+	env=~/.ssh/agent.env
+	
+	# Note: Don't bother checking SSH_AGENT_PID. It's not used
+	#       by SSH itself, and it might even be incorrect
+	#       (for example, when using agent-forwarding over SSH).
+	
+	agent_is_running() {
+		if [ "$SSH_AUTH_SOCK" ]; then
+			# ssh-add returns:
+			#   0 = agent running, has keys
+			#   1 = agent running, no keys
+			#   2 = agent not running
+			ssh-add -l >/dev/null 2>&1 || [ $? -eq 1 ]
+		else
+			false
+		fi
+	}
+	
+	agent_has_keys() {
+		ssh-add -l >/dev/null 2>&1
+	}
+	
+	agent_load_env() {
+		. "$env" >/dev/null
+	}
+	
+	agent_start() {
+		(umask 077; ssh-agent >"$env")
+		. "$env" >/dev/null
+	}
+	
+	if ! agent_is_running; then
+		agent_load_env
+	fi
+	
+	# if your keys are not stored in ~/.ssh/id_rsa or ~/.ssh/id_dsa, you'll need
+	# to paste the proper path after ssh-add
+	if ! agent_is_running; then
+		agent_start
+		ssh-add
+	elif ! agent_has_keys; then
+		ssh-add
+	fi
+	
+	unset env
+	
+	(If your private keys are not stored in ~/.ssh/id_rsa or ~/.ssh/id_dsa, you must add their paths with the ssh-add command so that your SSH authentication agent knows where to find them. For example:
+	
+	ssh-add ~/.my_other_ssh/id_rsa)
+	
+	7.8 ON LOCAL, test if git works
+	ssh -T git@server
+	
+8.	git push asking for username and password
+	A common mistake is cloning using the default (HTTPS) instead of SSH,clone use https, change clone to ssh
+	goto the github page, then change https to ssh.
+	git remote set-url origin git@github.com:/django-blog-zinnia.git	
+	
+9.	How to git clone , then commit?
+	1.git clone web_address	
+	2.change the https to ssh method
+	3.git show-ref(refs/heads/develop)
+	4.change some files, and git commit -m"add file"
+	5.git push -u origin develop
 
 
 
@@ -282,6 +688,14 @@ git Howtos, 2014-11-03
 		git fetch --depth=N
 		git fetch --unshallow
 	2.Ask someone to prepare a bundle, then download the bundle!!				
+7.	How to diff between current revision and last revision
+	git diff HEAD^ HEAD
+	
+8.	show this commit changed files
+git diff-tree --no-commit-id --name-only -r bd61ad98
+index.html
+javascript/application.js
+javascript/ie6.js	
 	
 Svn tips
 ------------------------------
@@ -296,6 +710,9 @@ Svn tips
 3. svn tricks website
 	https://gcc.gnu.org/wiki/SvnTricks
 	
+4. SVN get commits since a certain date(get commits after date)
+   svn log -r{2015-07-01}:{2015-07-24}
+	
 
 website archives
 -----------------------------
@@ -309,6 +726,10 @@ string query = "select * from TRANSLATE";
 accdb --> mdb的转化，直接“文件”，“保存并发布”
 
 try, catch, finally
+try
+{}
+catch(Exception err)
+{}
 
 access select where not equal
 
@@ -548,6 +969,29 @@ using(OleDbConnection connection = new OleDbConnection(con))
 }
 	(高版本Microsoft.ACE.OLEDB.12.0;)
 	
+	using System.Microsoft.Office.Interop.Excel as Excel
+	class ReadExcel{
+		public Excel.Application app;
+		public Excel.Workbook workbook;
+		public Excel.Worksheet worksheet;
+		public int rowNum;
+		public int columnNum;
+		public object [,] values;//这样能提高效率,不需要单个读取excel
+		
+		public ReadExcel(string excel_name)
+		{
+			app = new Excel.Application();
+			workbook = app.Workbooks.Open(excel_name, 0, true);
+			worksheet = (Excel.Worksheet)workbook.Worksheets.get_Item(1);
+			Excel.Range range = worksheet.UsedRange;
+			rowNum = range.Rows.Count;
+			columnNum = range.Columns.Count;
+			
+			Excel.Range valueRange = worksheet.get_Range("A1", worksheet.Cells.SpecialCells(Microsoft.Office.Interop.Excel.XlCellType.xlCellTypeLastCell));
+			values = (object[,]) valueRange.Value2;
+		}
+	}
+	
 19. Unicode & Vietnamese character encoding
 	The most excat range : 
 	(http://blog.int3ractive.com/2010/06/optimal-unicode-range-for-vietnamese.html)
@@ -653,9 +1097,188 @@ Using this library is the preferred solution to the problem (and I would imagine
 To enable c-ares support, first build and install the library, then pass the --enable-ares flag to curl's configure script before you build.
 (http://curl.haxx.se/dev/readme-ares.html)
 
+30.	Copy data to clipboard C#
+	using System.Windows.Forms
+	using System.Windows.Forms
+	Clipboard.SetText("Hello, clipboard");
+31.	Position the Cursor at the Beginning or End of Text in a TextBox Control
+	tbPositionCursor.Select(tbPositionCursor.Text.Length, 0);
+	tbPositionCursor.Select(0, 0);
+32.	How to read xml?
+	XmlDocument doc = new XmlDocument();
+	doc.Load("c:\\temp.xml");
+	foreach(XmlNode node in doc.DocumentElement.ChildNodes){
+		string text = node.outerText; //or loop through its children as well
+		//remember to check for null 
+		string attr = node.Attributes["theattributename"].InnerText
+	}
+	
+	// Loading from a file, you can also load from a stream
+	var xml = XDocument.Load(@"C:\contacts.xml");
+	
+	
+	// Query the data and write out a subset of contacts
+	var query = from c in xml.Root.Descendants("contact")
+				where (int)c.Attribute("id") < 4
+				select c.Element("firstName").Value + " " +
+					c.Element("lastName").Value;
+	
+	
+	foreach (string name in query)
+	{
+		Console.WriteLine("Contact's Full Name: {0}", name);
+	}
+
+33.	How to get the handle of current window?
+	IntPtr myHandle = this.Handle;	
+	
+34.	get sheet by name
+	Excel.Application excelApp = new Excel.Application();
+	excelApp.Visible = true;
+	Excel.workbook workbook = excelApp.Workbooks.Open(excel_name);
+	var worksheet = workbook.Sheets["Sheet2"]; 
+	
+35.	How to set environment variable???
+	if (Environment.GetEnvironmentVariable(envName) == null)
+	{
+		Environment.SetEnvironmentVariable(envName, envValue);
+	}
+	
+36.	How to get the application run path??(http://stackoverflow.com/questions/6041332/best-way-to-get-application-folder-path)
+	string loc = System.Reflection.Assembly.GetExecutingAssembly().Location
+	string loc = System.Reflection.Assembly.GetExecutingAssembly().CodeBase
+	System.IO.Path.GetDirectoryName(loc)
+
+37.	C# execute python script
+	Process p = new Process(); // create process (i.e., the python program
+    p.StartInfo.FileName = "python.exe";    
+    p.StartInfo.UseShellExecute = true; // make sure we can read the output from stdout
+    p.StartInfo.Arguments = String.Format("\"{0}\"", "c:\\kudos\\test2.py "); // start the python program with two parameters
+    p.Start(); // start the process (the python program)
+    StreamReader s = p.StandardOutput; 
+    String output = s.ReadToEnd();
+    string []r = output.Split(new char[]{' '}); // get the parameter
+    Console.WriteLine(r[0]);
+    p.WaitForExit();	
+	
+	执行python script的时候,闪退
+	于是将执行的命令拷贝出来,直接在cmd里面运行,结果也不行
+	最后发现是路径名里面带上了空格,于是将路径名用双引号引起来,就OK了
+	
+38. How to create a folder by date "yyyyMMddHHmmss"
+	public static string GetTimestamp()
+	{
+		DateTime now = DateTime.Now;
+		return now.ToString("yyyyMMddHHmmssfff");
+	}
+	
+39.	How to start python windows and run inside??
+	var startInfo = new ProcessStartInfo
+                    {
+                        FileName = "python.exe",                        
+                        UseShellExecute = true,
+                        WorkingDirectory = @"The\Process\Working\Directory"
+                    };
+
+	var process = new Process {StartInfo = startInfo};
+	
+	process.Start();
+	process.WaitForExit();
+	
+	get the debug path(working directory)
+	ref to Question 36 : How to get the application run path??	
+
 MAX.	
+
+ipconfig/all
+ipconfig/flushdns,连接不上VPN的时候可以用哦
+
+//2015-04-06 郁闷,纠结云服务器厂商,纠结了一晚上,想想我根本不需要的.
+为什么我要用？我现在只是学习技术。。
 	
 	
 	strncpy没用sizeof的不能通过
 	直接用常量的不让通过
-	发现内网少了很多道具，直接问发哥了，应该看看丢失哪些道具，是不是因为道具有时效		
+	
+	
+	
+	
+
+
+------------------------------
+		What is the full use of VIM??(http://stackoverflow.com/questions/4237817/help-with-configuring-vim-for-c)
+------------------------------
+1.	Real time syntax checking : Syntastic(https://github.com/scrooloose/syntastic)
+2.	Auto complete : You complete Me(https://github.com/Valloric/YouCompleteMe#the-gotodefinitionelsedeclaration-subcommand)
+3.	Go to defination : ctags(badbad), You complete Me subcommands.
+4.	code snippets : Snipmate(http://www.vim.org/scripts/script.php?script_id=2540)
+
+如何让ubuntu或虚拟机被其他人访问？ping ssh
+ifconfig查看虚拟机网址 192.168.192.200
+其他机器ping 网址,看下能否ping通
+若不能Ping通,虚拟机网络改成 桥接Bridge模式,再Ping下.应该就OK了。
+
+yum install git
+Loaded plugins: amazon-id, product-id, rhui-lb, security, subscription-manager
+Updating certificate-based repositories.
+Unable to read consumer identity
+----------------------------------
+vi /etc/yum/pluginconf.d/product-id.conf
+/etc/yum/pluginconf.d/subscription-manager.conf
+[main] 
+enabled=0
+
+rm -rfv /var/cache/yum/*
+yum clean all 
+
+
+---------------------------
+using yum variables
+---------------------------
+You can use and reference the following built-in variables in yum commands and in all Yum configuration files (that is, /etc/yum.conf and all .repo files in the /etc/yum.repos.d/ directory):
+$releasever
+You can use this variable to reference the release version of Fedora. Yum obtains the value of $releasever from the distroverpkg=value line in the /etc/yum.conf configuration file. If there is no such line in /etc/yum.conf, then yum infers the correct value by deriving the version number from the redhat-release package.
+$arch
+You can use this variable to refer to the system's CPU architecture as returned 
+when calling Python's os.uname() function. Valid values for $arch include: i586, i686 and x86_64.
+$basearch
+You can use $basearch to reference the base architecture of the system. 
+For example, i686 and i586 machines both have a base architecture of i386, and AMD64 and Intel64 machines have a base architecture of x86_64.
+$YUM0-9
+These ten variables are each replaced with the value of any shell environment variables with the same name. If one of these variables is referenced (in /etc/yum.conf for example) and a shell environment variable with the same name does not exist, then the configuration file variable is not replaced.
+To define a custom variable or to override the value of an existing one, create a file with the same name as the variable (without the “$” sign) in the /etc/yum/vars/ directory, and add the desired value on its first line.
+For example, repository descriptions often include the operating system name. To define a new variable called $osname, create a new file with “Fedora” on the first line and save it as /etc/yum/vars/osname:
+
+添加EPEL Repository
+rpm -Uvh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+rpm -Uvh ftp://ftp.muug.mb.ca/mirror/redhat/redhat/linux/6.2/en/os/i386/RedHat/RPMS/rpmfind-1.4-3.i386.rpm
+yum install http://dl.iuscommunity.org/pub/ius/stable/CentOS/6/x86_64/ius-release-1.0-11.ius.centos6.noarch.rpm(https://iuscommunity.org/pages/Repos.html#release-packages)
+yum -y update
+Error: Cannot retrieve repository metadata (repomd.xml) for repository: epel. Please verify its path and try again
+sed -i 's/https/http/g' /etc/yum.repos.d/epel.repo
+
+ruby ruby-devel lua lua-devel luajit \
+    luajit-devel ctags mercurial python python-devel \
+    python3 python3-devel tcl-devel \
+    perl perl-devel perl-ExtUtils-ParseXS \
+    perl-ExtUtils-XSpp perl-ExtUtils-CBuilder \
+    perl-ExtUtils-Embed
+
+
+./configure --with-features=huge \
+            --enable-multibyte \
+            --enable-rubyinterp \
+            --enable-pythoninterp \
+            --with-python-config-dir=/usr/lib64/python2.6/config \
+            --enable-perlinterp \
+            --enable-luainterp \
+            --enable-gui=gtk2 --enable-cscope --prefix=/usr --with-tlib=tinfo
+			
+			
+error1:	checking for linking with yes library... configure error failed
+		yum install ncurses-devel		
+error2:	undefined reference to `ospeed'
+		--with-tlib=tinfo
+
+yum --nogpgcheck localinstall http://pkgs.repoforge.org/subversion/subversion-devel-1.7.1-0.1.el6.rfx.i686.rpm		
+ftp://fr2.rpmfind.net/linux/opensuse/distribution/13.2/repo/oss/suse/x86_64

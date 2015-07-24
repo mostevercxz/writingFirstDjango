@@ -21,22 +21,31 @@ CLR是什么
 	the \ character is used by the LIKE operator itself
 
 ======= advanced commands
-1. backup mysql databases
+1. backup mysql database
 	mysqldump -u... -p... mydb t1 t2 t3 > mydb_tables.sql
 	mysqldump databaseName > bak.sql
-	mysqldump -A -ucxz -p123456 databaseName > bak.sql
-	mysqldump --opt -d databaseName -h192.168.0.0 -ucxz -p > bak.sql(only table structure, no data)
-	mysqldump -t databaseName -ucxz -p > bak.sql
+	mysqldump -A -uuserName -p123456 databaseName > bak.sql
+	mysqldump --opt -d databaseName -h192.168.0.0 -uuserName -p > bak.sql(only table structure, no data)
+	mysqldump -t databaseName -uuserName -p > bak.sql
+	
+	backup all databases on an IP address
+	
 2.recover a database
-	mysql -h192... -ucxz -p123456 databaseName < /home/cxz/dbBak/bak.sql
+	mysql -h192... -uuserName -p123456 databaseName < /home/userName/dbBak/bak.sql
 
 3. mysql user management
 	###########
-	create user 'cxz'@'192.0.0.1' identified by 'password 123456';
-	set password for 'cxz'@'192.0.0.1' = password('newpass');
-	rename user 'cxz'@'192.0.0.1' to 'chen'@'localhost'
-	drop user 'cxz'@'localhost'
-
+	create user 'userName'@'192.0.0.1' identified by 'password 123456';
+	CREATE USER 'monty'@'localhost' IDENTIFIED BY 'some_pass';
+		Why ?? using root, ERROR 1396 (HY000): Operation CREATE USER failed for 'jack'@'localhost'
+		run "flush privileges;", then it is OK!
+	set password for 'userName'@'192.0.0.1' = password('newpass');
+	rename user 'userName'@'192.0.0.1' to 'chen'@'localhost'
+	drop user 'userName'@'localhost'
+	
+	'zyw'这个用户有权限但是连接不上,drop user,delete from mysql.user where user='zyw' 后要重启服务器
+	
+	
 4. Mysql user privileges management
 	(################# must run 'flush privileges' after change privileges)
 
@@ -59,19 +68,19 @@ CLR是什么
 
 	all privileges
 
-	grant all on *.* to userName@'%'
+	grant all on *.* to userName@'%'(还是不能访问,于是grant all on *.* to userName@'%' identified by '123456')
 	grant select(id, name, score) on students.scores to userName@'%'
 	grant execute on procedure testdb.procedure_add to ...
 	grant execute on function testdb.fun_add to ...
 
-	show grants for cxz@localhost;
+	show grants for userName@localhost;
 
 5. MYsql revoke privileges
-	revoke all on *.* from cxz@'%'
+	revoke all on *.* from userName@'%'
 
-6. ''@'localhost' will be matched first than 'cxz'@'localhost'
+6. ''@'localhost' will be matched first than 'userName'@'localhost'
 
-7. mysql -ucxz -p123456 testdb -e "show tables"
+7. mysql -uuserName -p123456 testdb -e "show tables"
 
 8. mysqladmin shutdown
 	mysqld_safe
@@ -111,6 +120,10 @@ CLR是什么
 
 4.	number functions, max(id)
 insert into tableName(path, configname, id) select "C:\\windows\\", "config.xml", max(id)+1 from tableName where id > 10000	
+5.	show current user
+	select user();
+	select database();
+6.	
 	
 
 ========= basic commands
@@ -133,6 +146,9 @@ insert into tableName(path, configname, id) select "C:\\windows\\", "config.xml"
 	select distinct tableName, indexName from infomation_schema.statistics where table_schema = 'my_schema'
 	(show the column names of a table with a simple sql query)
 	select column_name from information_schema.columns where table_name='table'
+
+7.	load data in file "~/tmp/bak.sql" into table tableName
+	load data local in file "E:\bak.sql" into table tableName
 	
 ======== interact with shell, files
 1. 	output to a file
@@ -195,9 +211,9 @@ insert into tableName(path, configname, id) select "C:\\windows\\", "config.xml"
 	rename TABLE old_db.table1 to new_db.table2	
 	---------------------
 	using shell script:
-	for eachtable in `mysql -ucxz -p123456 -h0.0.0.0 --skip-column-names -e "show tables from old_db"`
+	for eachtable in `mysql -uuserName -p123456 -h0.0.0.0 --skip-column-names -e "show tables from old_db"`
 	do
-		mysql -ucxz -p123456 -h0.0.0.0 -e "rename table old_db.$eachtable to new_db.$eachtable"
+		mysql -uuserName -p123456 -h0.0.0.0 -e "rename table old_db.$eachtable to new_db.$eachtable"
 	done
 	
 8. (performance)select data from a table, where a specific field has the min value
@@ -224,6 +240,15 @@ insert into tableName(path, configname, id) select "C:\\windows\\", "config.xml"
 12.	How to convert latin1_swedish_ci data into utf8_general_ci?
 	alter database dbName DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
 	alter table table_name CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci		
+
+13.	How to install mySQL-python
+	pip install mysql-python fails with EnvironmentError: mysql_config not found
+	sudo apt-get install libmysqlclient-dev
+	
+14.	How to select into outfile client side??
+	经测试mysql dbName -e "select * from CHARBASE" > temp.sql,temp.sql中的数据被损坏了..还是用scp的方法吧
+	mysql dbName -e "select * from CHARBASE into outfile \"/tmp/abcd.sql\""
+	scp userName@host:/tmp/abcd.sql /destination
 
 ========= confused mysql conceptions
 1.	What's the difference, @variable vs variable??加@和不加有什么区别？
@@ -274,11 +299,16 @@ insert into tableName(path, configname, id) select "C:\\windows\\", "config.xml"
 2.	Multiple Indexes vs Multi-Column Indexes
 	(http://stackoverflow.com/questions/179085/multiple-indexes-vs-multi-column-indexes)			
 	
+3.	grant all on *.* to userName@'%';然后执行create database没权限
+	grant all on *.* to userName@'localhost';就有权限了
+	django 123456
+		
+	
 
 #####################################
 access 
 #####################################
-0.1. 使用Access是必须避免的特殊字符，http://support.microsoft.com/kb/826763)
+0.1. 使用Access是必须避免的特殊字符，http://support.microsoft.com/kb/826763
 
 :(  Access is not written as a multiple CPU app even though parts of it have multiple threads of execution.
 :)  Use Access 查询设计视图来检测自己的语法是否正确
@@ -316,7 +346,11 @@ access
 
 6. How to do INSERT into a table records extracted from another table
 	INSERT INTO Table2(LongIntColumn2, CurrencyColumn2)
-	SELECT LongIntColumn1, Avg(CurrencyColumn) as CurrencyColumn1 FROM Table1 GROUP BY LongIntColumn1;
+	SELECT LongIntColumn1, Avg(CurrencyColumn) as CurrencyColumn1 FROM Table1 GROUP BY LongIntColumn1
+7.	access insert string的时候,string中如果包含",要将其替换为""
+	包含-,替换为_
+	create table [tablename]([column1] int, [column2] text)
+	用[]包含表名,列名,这样表名列名中有关键词reserved words(比如'(',或者'-')的时候,也不会报错
 
 
 #####################################

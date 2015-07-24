@@ -1,5 +1,382 @@
 #this file is used to record some problems solved during using c++
+memory corruption
+----------------------------
+	printf format strings
+----------------------------
+d,i 	integer
+u		unsigned int
+f		float, double
+e		double value in standard form, 1.5e002
+g		use %e or %f, which one is shorter
+G		use %E or %F, which one is shorter
+x		hexadecimal
+o		unsigned int in octal
+s		null-terminated string
+c		char
+%%		a percentage sign
+
+
 c++ tricks
 ---------------------------
-1. remove comments from c++ code(http://stackoverflow.com/questions/2394017/remove-comments-from-c-c-code)
-	gcc -fpreprocessed -dD -E test.c
+	
+1. No newsline at end of file
+	According to the ANSI standard the #include of a file at the beginning,
+inserts the file exactly as it is to the front of the file and ,
+does not insert the new line after the "#include " after the contents of the file.
+	So if you include a file with no newline at the end to the parser,
+it will be viewed as if the last line of foo.h is on the same line as the first line of foo.cpp. 
+What if the last line of foo.h was a comment without a new line? Now the first line of foo.cpp is commented out
+
+	The above is still correct for C, 
+while the new C++ standard (C++11) has been changed so that this warning should no longer be issued if using C++ and a C++11 conformant compiler.
+
+
+----------------------------
+	C++ questions
+----------------------------
+1. What is constexpr function??
+2. Why do we use volatile keyword in C++??
+
+int some_int = 100;
+while(some_int == 100)
+{
+   //your code
+}
+When this program gets compiled, the compiler may optimize this code, 
+if it finds that the program never ever makes any attempt to change the value of some_int, 
+so it may be tempted to optimize the while loop by changing it from while(some_int == 100) to simply while(true) so that the execution could be fast.
+
+Volatile is a hint to the implementation to avoid aggressive optimization involving the object because the value of the object might be changed by means undetectable by an implementation.
+
+
+3.	reverse_iterator
+#include <vector>
+#include <iostream>
+#include <algorithm>
+
+int main() {
+  typedef std::vector<int> intVec;
+  intVec vec;
+  for(int i = 0; i < 20; ++i) vec.push_back(i);
+
+  for(intVec::reverse_iterator it(std::find(vec.begin(), vec.end(), 10));
+      it != vec.rend(); it++)
+    std::cout << *it;
+}
+
+4. stringstream ignore whitespace
+std::stringstream ss;
+ss << 1 << "a b c";
+std::string result;
+ss >> result;
+std::cout << result << std::endl;
+I see "1a" instead of "1a b c".
+
+std::getline(ss, result);
+result = ss.str();
+
+5.	How to use stringsteam to seperate comma seperated strings
+std::string input = "abc,def,ghi";
+string::istringstream iss(input);
+std::string token;
+while(std::getline(iss, token, ',')){
+	std::cout << token << '\n';
+}
+
+
+
+
+
+-------------------------------
+install boost
+--------------------------------
+sudo apt-get install libboost-all-dev
+
+1. compile error
+g++ -lboost_system hello.cpp -o hello
+/tmp/cc1cTrpK.o: In function `__static_initialization_and_destruction_0':
+/usr/include/boost/system/error_code.hpp:222: undefined reference to `boost::system::generic_category()'
+/usr/include/boost/system/error_code.hpp:223: undefined reference to `boost::system::generic_category()'
+/usr/include/boost/system/error_code.hpp:224: undefined reference to `boost::system::system_category()'
+/tmp/cc1cTrpK.o: In function `boost::system::error_code::error_code()':
+/usr/include/boost/system/error_code.hpp:323: undefined reference to `boost::system::system_category()'
+/tmp/cc1cTrpK.o: In function `boost::asio::error::get_system_category()':
+/usr/include/boost/asio/error.hpp:216: undefined reference to `boost::system::system_category()'
+collect2: error: ld returned 1 exit status
+
+g++ hello.cpp -o hello -lboost_system解决问题
+
+The asio library provides a guarantee that callback handlers will only be called from threads that are currently calling io_service::run()
+Therefore unless the io_service::run() function is called the callback for the asynchronous wait completion will never be invoked.
+
+The io_service::run() function will also continue to run while there is still "work" to do. 
+In this example, the work is the asynchronous wait on the timer, 
+so the call will not return until the timer has expired and the callback has completed.
+
+It is important to remember to give the io_service some work to do before calling io_service::run()
+io_service::run() would have returned immediately.
+
+--------------------------
+boost::asio
+--------------------------
+tcp::resolver::query query(argv[1], "daytime");
+这里的daytime,其实代表了端口13啊！！(http://stackoverflow.com/questions/22749847/boost-asio-some-questions-about-the-tutorial-a-synchronous-daytime-server-clie)
+
+The steps involved in establishing a socket on the client side are as follows:
+
+Create a socket with the socket() system call
+Connect the socket to the address of the server using the connect() system call
+Send and receive data. There are a number of ways to do this, but the simplest is to use the read() and write() system calls.
+The steps involved in establishing a socket on the server side are as follows:
+
+Create a socket with the socket() system call
+Bind the socket to an address using the bind() system call. For a server socket on the Internet, an address consists of a port number on the host machine.
+Listen for connections with the listen() system call
+Accept a connection with the accept() system call. This call typically blocks until a client connects with the server.
+Send and receive data
+
+
+--------------------------
+socket development
+--------------------------
+1. int getpeername(int socketfd, struct sockaddr *address,socklen_t *address_len);(sys/socket.h)
+	getpeername() returns the address of the peer connected to the socket sockfd, in the buffer pointed to by address, stores the length of this address in the object pointed to by the address_len argument.
+	If the actual length of the address is greater than the length of the supplied sockaddr structure, the stored address will be truncated.
+	If the protocol permits connections by unbound clients, and the peer is not bound, then the value stored in the object pointed to by address is unspecified.
+	return 0 if success, otherwise -1.
+	
+2. #include <sys/socket.h>
+	int getsockname(int sockfd, struct sockaddr *addr, socklen_t *addrlen);	
+	getsockname() returns the current address to which the socket sockfd
+    is bound, in the buffer pointed to by addr.  The addrlen argument
+    should be initialized to indicate the amount of space (in bytes)
+    pointed to by addr.  On return it contains the actual size of the
+    socket address.
+
+    The returned address is truncated if the buffer provided is too
+    small; in this case, addrlen will return a value greater than was
+    supplied to the call
+	
+3. #include <unistd.h>
+	#include <fcntl.h>
+	int fcntl(int fd, int cmd, ... /* arg */ );
+the types of cmd:
+	FD_CLOEXEC, the close-on-exec flag. 
+	If the FD_CLOEXEC bit is 0, the file descriptor will remain open across an execve(2), otherwise it will be closed.
+	F_GETFD (void)
+	Read the file descriptor flags; arg is ignored.
+	F_SETFD (int)
+	Set the file descriptor flags to the value specified by arg.
+	
+4. #include <sys/types.h>          /* See NOTES */
+	#include <sys/socket.h>
+	int getsockopt(int sockfd, int level, int optname, void *optval, socklen_t *optlen);
+	int setsockopt(int sockfd, int level, int optname,const void *optval, socklen_t optlen);	
+	
+	int flag = 1;
+	int result = setsockopt(sock,            /* socket affected */
+                                 IPPROTO_TCP,     /* set option at TCP level */
+                                 TCP_NODELAY,     /* name of option */
+                                 (char *) &flag,  /* the cast is historical cruft */
+                                 sizeof(int));    /* length of option value */
+	Most socket-level options utilize an int argument for optval. 
+	For setsockopt(), the argument should be nonzero to enable a boolean option, or zero if the option is to be disabled.
+	
+SO_BINDTODEVICE
+Bind this socket to a symbolic device name like eth0 instead of using bind() to bind it to an IP address. 
+Type the command ifconfig under Unix to see the device names.
+
+SO_REUSEADDR
+Allows other sockets to bind() to this port, unless there is an active listening socket bound to the port already. 
+This enables you to get around those "Address already in use" error messages when you try to restart your server after a crash.
+
+SO_BROADCAST
+Allows UDP datagram (SOCK_DGRAM) sockets to send and receive packets sent to and from the broadcast address.
+Does nothing—NOTHING!!—to TCP stream sockets! Hahaha!
+	
+5. sockaddr 类型的指针,可以被转为sockaddr_in和sockaddr_in6类型的指针
+ /* Structure describing an Internet socket address.  */
+struct sockaddr_in
+  {
+    __SOCKADDR_COMMON (sin_);
+    in_port_t sin_port;			/* Port number.  */
+    struct in_addr sin_addr;		/* Internet address.  */
+
+    /* Pad to size of `struct sockaddr'.  */
+    unsigned char sin_zero[sizeof (struct sockaddr) -
+			   __SOCKADDR_COMMON_SIZE -
+			   sizeof (in_port_t) -
+			   sizeof (struct in_addr)];
+  };
+
+/* Ditto, for IPv6.  */
+struct sockaddr_in6
+  {
+    __SOCKADDR_COMMON (sin6_);
+    in_port_t sin6_port;	/* Transport layer port # */
+    uint32_t sin6_flowinfo;	/* IPv6 flow information */
+    struct in6_addr sin6_addr;	/* IPv6 address */
+    uint32_t sin6_scope_id;	/* IPv6 scope-id */
+  };	
+  
+  (http://www.qnx.com/developers/docs/6.5.0/index.jsp?topic=%2Fcom.qnx.doc.neutrino_lib_ref%2Fa%2Faddrinfo.html)
+ struct addrinfo {
+    int ai_flags;
+    int ai_family;
+    int ai_socktype;
+    int ai_protocol;
+    size_t ai_addrlen;
+    char * ai_canonname;
+    struct sockaddr * ai_addr;
+    struct addrinfo * ai_next
+};
+  
+ 6. 在main函数里面的用到inet_ptoa的地方，才加上#include <arpa/inet.h>，结果会报错
+ 后来把#include <aspa/inet.h>移动到文件开头，就再也没有错误了
+ 
+ 7. perror()
+ Since so many functions return -1 on error and set the value of the variable errno to be some number, it would sure be nice if you could easily print that in a form that made sense to you.
+Mercifully, perror() does that. If you want more description to be printed before the error, you can point the parameter s to it (or you can leave s as NULL and nothing additional will be printed.)
+In a nutshell, this function takes errno values, like ECONNRESET, and prints them nicely, like "Connection reset by peer."
+
+8. #include <sys/types.h>
+#include <sys/socket.h>
+
+ssize_t recv(int s, void *buf, size_t len, int flags);
+ssize_t recvfrom(int s, void *buf, size_t len, int flags,
+                 struct sockaddr *from, socklen_t *fromlen);
+ 
+ 
+9. 
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+
+int getaddrinfo(const char *nodename, const char *servname,
+                const struct addrinfo *hints, struct addrinfo **res);
+
+void freeaddrinfo(struct addrinfo *ai);
+
+const char *gai_strerror(int ecode); 
+
+10.
+#include <sys/socket.h>
+#include <netdb.h>
+
+int getnameinfo(const struct sockaddr *sa, socklen_t salen,
+                char *host, size_t hostlen,
+                char *serv, size_t servlen, int flags);
+				
+11. Check if sockets descriptors are ready to read/write
+#include <sys/select.h>
+int select(int n, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
+           struct timeval *timeout);
+
+FD_SET(int fd, fd_set *set);//Add fd to the set.
+FD_CLR(int fd, fd_set *set);//Remove fd from the set.
+FD_ISSET(int fd, fd_set *set);//Return true if fd is in the set.
+FD_ZERO(fd_set *set);//Clear all entries from the set.			
+
+12.Convert IP addresses to human-readable form and back.
+#include <arpa/inet.h>
+
+const char *inet_ntop(int af, const void *src,
+                      char *dst, socklen_t size);
+
+int inet_pton(int af, const char *src, void *dst);
+
+13.
+#include <sys/types.h>
+#include <sys/socket.h>
+
+int socket(int domain, int type, int protocol);
+domain describes what kind of socket you're interested in. This can, believe me, be a wide variety of things, 
+but since this is a socket guide, it's going to be PF_INET for IPv4, and PF_INET6 for IPv6.
+
+14.
+In some documentation, you'll see mention of a mystical "PF_INET". 
+This is a weird etherial beast that is rarely seen in nature, but I might as well clarify it a bit here. 
+Once a long time ago, it was thought that maybe a address family (what the "AF" in "AF_INET" stands for) might support several protocols that were referenced by their protocol family (what the "PF" in "PF_INET" stands for).
+That didn't happen. Oh well. So the correct thing to do is to use AF_INET in your struct sockaddr_in and PF_INET in your call to socket(). But practically speaking, you can use AF_INET everywhere. And, since that's what W. Richard Stevens does in his book, that's what I'll do here.
+
+15.
+#include <stdio.h>
+#include <string.h>   // for strerror()
+
+void perror(const char *s);
+char *strerror(int errnum);
+
+16.
+#include <sys/types.h>
+#include <sys/socket.h>
+
+ssize_t send(int s, const void *buf, size_t len, int flags);
+ssize_t sendto(int s, const void *buf, size_t len,
+               int flags, const struct sockaddr *to,
+               socklen_t tolen);
+
+Set flags to zero if you want it to be "normal" data. 
+Here are some of the commonly used flags, but check your local send() man pages for more details:			   
+MSG_OOB
+Send as "out of band" data. 
+TCP supports this, and it's a way to tell the receiving system that this data has a higher priority than the normal data. 
+The receiver will receive the signal SIGURG and it can then receive this data without first receiving all the rest of the normal data in the queue.
+
+MSG_DONTROUTE
+Don't send this data over a router, just keep it local.
+
+MSG_DONTWAIT
+If send() would block because outbound traffic is clogged, have it return EAGAIN. 
+This is like a "enable non-blocking just for this send." See the section on blocking for more details.
+
+MSG_NOSIGNAL
+If you send() to a remote host which is no longer recv()ing, you'll typically get the signal SIGPIPE. 
+Adding this flag prevents that signal from being raised.
+
+17.
+#include <sys/socket.h>
+int shutdown(int s, int how);
+
+As for parameters, s is obviously the socket you want to perform this action on, and what action that is can be specified with the how parameter. 
+How can be SHUT_RD to prevent further recv()s, SHUT_WR to prohibit further send()s, or SHUT_RDWR to do both.
+
+18.
+#include <pthread.h>
+int  pthread_rwlock_rdlock(pthread_rwlock_t *rwlock );
+
+19.
+ar rcs libutil.a algorithm.o converter.o processor.o
+The most common options to ar are r, c and s:
+r,Add the object files to the library, r replace any already existing object file with the same name.
+c,Create the library if it doesn't already exist.
+s,Maintain the table mapping symbol names to object file names.
+20.
+#include <iostream>
+using namespace std;
+int main()
+{
+    int array[2];
+    array[0] = 1;
+    array[1] = 2;
+    array[3] = 3;
+    array[4] = 4;
+    cout << array[3] << endl;
+    cout << array[4] << endl;
+    return 0;
+}
+
+Welcome to every C/C++ programmers bestest friend: Undefined Behavior.
+
+There is a lot that is not specified by the language standard, for a variety of reasons. This is one of them.
+
+In general, whenever you encounter undefined behavior, anything might happen. The application may crash, it may freeze, it may eject your CD-ROM drive or make demons come out of your nose. It may format your harddrive or email all your porn to your grandmother.
+
+It may even, if you are really unlucky, appear to work correctly.
+
+The language simply says what should happen if you access the elements within the bounds of an array. It is left undefined what happens if you go out of bounds. It might seem to work today, on your compiler, but it is not legal C or C++, and there is no guarantee that it'll still work the next time you run the program. Or that it hasn't overwritten essential data even now, and you just haven't encountered the problems that is going to cause yet.
+
+As for why there is no bounds checking, there are a couple aspects to the answer:
+
+An array is a leftover from C. C arrays are about as primitive as you can get. Just a sequence of elements with contiguous addresses. There is no bounds checking because it is simply exposing raw memory. Implementing a robust bounds-checking mechanism would have been almost impossible in C.
+In C++, bounds-checking is possible on class types. But an array is still the plain old C-compatible one. it is not a class. Further, C++ is also built on another rule which makes bounds-checking non-ideal. The C++ guiding principle is "you don't pay for what you don't use". If your code is correct, you don't need bounds-checking, and you shouldn't be forced to pay for the overhead of runtime bounds-checking.
+So C++ offers the std::vector class template, which allows both. operator[] is designed to be efficient. The language standard does not require that it performs bounds checking (although it does not forbid it either). A vector also has the at() member function which is guaranteed to perform bounds-checking. So in C++, you get the best of both worlds if you use a vector. You get array-like performance without bounds-checking, and you get the ability to use bounds-checked access when you want it.
