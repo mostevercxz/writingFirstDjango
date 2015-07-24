@@ -248,6 +248,12 @@ How to build qt5 with visual studio 2013??
 	2.4 nmake install
 	
 3.	How to fix errors?
+	3.0 控制面板,区域和语言,管理,非Unicode程序的语言,选择"英语(美国)"
+		You can do this by Control Panel - Regions - Administrative - Language for non-Unicode programs.
+		
+		Warning C4819: The file contains a character that cannot be represented in the current code page (932). Save the file in Unicode format to prevent data loss
+		When you see this message, you may use Chinese, Japanese or Korean Windows, and uses DBCS code page.
+		To avoid this warning, you need to change your Windows system code page to English or another SBCS code page. 
 	3.1 (Download VS2013.Update.4.exe, and update VS2013)
 	error C2059: syntax error : '<fake-expression>'
         f:\myworkspace\chromium\chromium\src\gin\function_template.h(152) : while compiling class template member function 'gin::internal::Invoker<Indices,>::Invoker(gin::Arguments *,int)'
