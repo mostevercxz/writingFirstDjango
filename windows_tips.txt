@@ -9,6 +9,12 @@ How to view chrome saved passwords??
 -------------------------------------
 chorme://settings/passwords
 
+How to uninstall Visual Studio 2015??
+Find the mount iso, or vs_ultimate.exe
+shift + Right Click, OPEN prompt
+D:\vs_community.exe /uninstall /force 
+wmic product where "name like 'microsoft visual%'" call uninstall /nointeractive
+
 
 
 Batch scripting

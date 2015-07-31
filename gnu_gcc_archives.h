@@ -116,6 +116,11 @@ strings /usr/lib64/libstdc++.so.6| grep -i glibc
 	movw %dx, (%eax)
 	movb $0xF, (%bl) ?? Address is a double word, bl is a byte.
 	
+19. /usr/bin/ld: cannot find : No such file or directory
+	g++ -g a.o b.o c.o -Wl, -bdynamic
+	comma should not have space between the content after it.(冒号后面不加空格)
+	g++ -g a.o b.o c.o -Wl,-bdynamic(OK)
+	
 	
 //gdb debugging tips
 ------------------------
@@ -307,7 +312,7 @@ $argc,$arg0,$arg1,$arg2
 	During the execution of a command file, or use-defined commands, normal gdb output is suppressed.
 	The only output that appears is what is explicitly printed by the commands in the definition.
 	3 commands to generate output:
-	echo _text_(print _text_ including ant nonprintable character escaped in a C-style string, echo "abc\tdef\n")
+	echo _text_(print _text_ including any nonprintable character escaped in a C-style string, echo "abc\tdef\n")
 	output _expression_(nothing but the value of the _expression_)
 	printf _string_, _expressions_(this prints the values pof the _expressions_ under the control of the format string _string_)
 	(printf "level=%d",GetLevel())

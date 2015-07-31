@@ -438,6 +438,34 @@ if DEBUG:
         'INTERCEPT_REDIRECTS': False,
     }
 
+--- How to debug Django template ---
+1. Add file named debug.py in templatetags/
+
+from django.template import Library, Node
+register = Library()
+
+try:
+    import ipdb as pdb
+except ImportError:   
+    import pdb
+
+class PdbNode(Node):
+    def render(self, context):
+        pdb.set_trace()
+        return ''
+@register.tag
+def pdb_debug(parser, token):
+    return PdbNode()
+	
+2. Then in templates/aaa.html, add 
+{% load debug %}
+{% pdb_debug %}
+
+3. In debug console:
+	for i in dir(context); print i
+	for d in context.dicts; print d.keys()
+	for i in context["filed"].__dict__.items(); print i
+
 
 Deploy django using gunicorn:
 --------------------------------

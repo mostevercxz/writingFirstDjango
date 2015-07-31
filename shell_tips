@@ -189,6 +189,20 @@ uname -a
 33.	Get week of the year
 	date +%V(show the week of the year)
 	date -d "20150723" +%V
+	
+34.	When does daily cron.daily run??
+	cat /etc/crontab
+	
+35.	add crontab event(daily, weekly)
+	* * * * * command to be executed
+	- - - - -
+	| | | | |
+	| | | | ----- Day of week (0 - 7) (Sunday=0 or 7)
+	| | | ------- Month (1 - 12)
+	| | --------- Day of month (1 - 31)
+	| ----------- Hour (0 - 23)
+	------------- Minute (0 - 59)
+	0 0 * * * /home/userName/run.sh
             
 Line 2 creates a variable called STR and assigns the string "Hello World!" to it. 
 Then the VALUE of this variable is retrieved by putting the '$' in at the beginning. 
@@ -423,8 +437,8 @@ cecho y "Yellow!"
 	check if the script exists on specific path.
 	
 23.	you must have a tty to run sudo
-	visuo /etc/sudoers
-	Comment "Defaults requiretty"
+	visudo /etc/sudoers
+	Comment "Defaults requiretty"注释掉
 	
 24.	no tty present and no askpass program specified(no password needed 设置为不需要密码)
 	visudo
@@ -470,6 +484,12 @@ cecho y "Yellow!"
 	
 30.	Forgot ubuntu user password
 	https://www.liberiangeek.net/2014/10/change-forgotten-password-ubuntu-14-04-servers/
+	
+31.	# Check if running as root
+if [ "$(id -u)" != "0" ]; then
+        echo "You must run this script as root"
+        exit 1
+fi
 	
 	
 	

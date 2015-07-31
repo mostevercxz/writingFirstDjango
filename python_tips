@@ -225,6 +225,15 @@ def query_yes_no(question, default="yes"):
 		os.rmdir(dir_name)
 		# delete a directory and all its contents
 		shutil.rmtree(dir_name)
+		
+20.	在TableMake 目录下添加了debug.py代码如下
+	def debug_line(*objs):
+		with open('temp_debug_log', 'a') as f:
+			f.write(str(objs))
+	发现python 没有输出到文件，但是单个测试就会输出文件
+	在TableMake目录下test.py中添加debug_line函数， python test.py 可以输出temp_bug_log文件
+	在/home/userName 目录下 python tools/TableMake/command.py 发现 TableMake 目录下没有temp_bug_log文件，其实是在/home/userName 目录
+	总结：以后输出到文件，思考用绝对路径，还是相对路径
 
 --------------------------	
 	python errors handle
@@ -387,8 +396,21 @@ errors met when using python mysql connector
 14.	os.mkdir(path[,mode])#default mode is 0o777
 	os.makedirs(path[,model])#default mode is Oo777
 	
-15.	python print sys.stderr
+15.	python2 print sys.stderr
 	print >> sys.stderr, 'entering function'
+	sys.stderr.write('spam\n')
+	
+16. python2 and python3 print stderr
+	from __future__ import print_function
+	def warning(*objs):
+		print("WARNING: ", *objs, file=sys.stderr)
+		
+17.	Parent module '' not loaded, cannot perform relative import
+	__init__.py
+	file1.py
+	file2.py
+	
+	from .file1 import func1(Do not need dot, from file1 import func1)
 	
 		
 -------------------------------
@@ -426,6 +448,12 @@ when the argument is a unicode object; or the value of the byte when the argumen
 	
 1.3	mkdir -p virtual_py3
 	virtualenv --python=/usr/bin/python3 virtual_py3
+
+1.4 userNameXXX is not in the sudoers file.  This incident will be reported.
+	Open root Terminal, ssh root@xxx.xxx.xxx.xxx
+	visudo /etc/sudoers
+	under the line "root ALL=(ALL) ALL", add "userNameXXX ALL=(ALL) ALL"
+	CTRL + X to Exit and Save the file.
 	
 2.	pip install packages offline, download tarballs and its dependencies
 	(the same when replacing "Django==1.8" with "-r requirements.txt")
