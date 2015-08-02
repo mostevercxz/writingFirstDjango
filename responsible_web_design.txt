@@ -142,9 +142,9 @@ sudo vim /etc/shadowsocks.json
     "method":"aes-256-cfb"
 }
 
-vim /etc/supervisord.conf
+sudo vim /etc/supervisord.conf
 [program:shadowsocks]
-command=ssserver -c /etc/shadowsocks.json
+command=sudo ssserver -c /etc/shadowsocks.json
 autostart=true
 autorestart=true
 user=root
@@ -163,7 +163,8 @@ iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 8989 -j ACCEPT
 service iptables restart
 sudo ufw allow proto tcp from 10.0.1.0/10 to 本机ip port 8388
 sudo ufw allow 8388
-sudo ufw status
+sudo ufw status(Status: inactive, need use "sudo ufw enable")
+(You need to start the ssserver first, then "telnet ip:8388")
 
 
 ==================

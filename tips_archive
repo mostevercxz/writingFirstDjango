@@ -569,6 +569,12 @@ create git repository and upload to github
 	xclip -i < ~/.ssh/id_rsa.pub
 	(copy the content to github page, settings, ssh keys, add ssh key)
 	ssh -T git@github.com(test connection, Attempts to ssh to GitHub)
+	( ------- Updated 2015-07-29 --------- )
+	ssh-keygen -t rsa -b 4096
+	eval "$(ssh-agent -s)"
+	ssh-add ~/.ssh/id_rsa
+	cat ~/.ssh/id_rsa.pub
+	( ------- Updated 2015-07-29 --------- )
 2.create git repository
 	git init
 	git add .
