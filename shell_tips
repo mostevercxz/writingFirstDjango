@@ -498,6 +498,9 @@ fi
 	if [ $result -gt 0 ]; then
 		echo 'num2 > num1'
 	fi
+
+33. find file name contains(with name)
+find . -iname "*string*" -maxdepth 1 -print
 	
 	
 	
