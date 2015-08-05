@@ -730,6 +730,9 @@ git diff-tree --no-commit-id --name-only -r bd61ad98
 index.html
 javascript/application.js
 javascript/ie6.js	
+
+9. git  svn info(git info)
+git remote -v
 	
 Svn tips
 ------------------------------
