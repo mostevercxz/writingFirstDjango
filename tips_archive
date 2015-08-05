@@ -1316,3 +1316,10 @@ error2:	undefined reference to `ospeed'
 
 yum --nogpgcheck localinstall http://pkgs.repoforge.org/subversion/subversion-devel-1.7.1-0.1.el6.rfx.i686.rpm		
 ftp://fr2.rpmfind.net/linux/opensuse/distribution/13.2/repo/oss/suse/x86_64
+
+AppServer 让我trust一个IP 123.30.106.192
+我在权限xml里面加了一个<set ip="123.30.106.192">"showallsepts", "giveallreward", "getCharidName", "getRoleMessage"</set>
+但是发现，加了就是没用。。找了半天，还断点，就是没有找到原因。
+最后发现，是配置文件的最下面还有一行，覆盖掉之前我写的
+<set ip="123.30.106.192">getAllZone,getRoleMessage,getRolename,getAccountRole,getRoleFriend,getActState,getSeptInfo,getUnionInfo,sendObjToUser,getCharidName</set>
+

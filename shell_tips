@@ -490,6 +490,14 @@ if [ "$(id -u)" != "0" ]; then
         echo "You must run this script as root"
         exit 1
 fi
+
+32. bash comparing float number
+	num1=1.59
+	num2=1.6
+	result=`echo $num1'>'$num2 | bc -l`
+	if [ $result -gt 0 ]; then
+		echo 'num2 > num1'
+	fi
 	
 	
 	

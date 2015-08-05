@@ -412,6 +412,31 @@ errors met when using python mysql connector
 	
 	from .file1 import func1(Do not need dot, from file1 import func1)
 	
+18. Using requests login to website return 403
+client = requests.session()
+
+# Retrieve the CSRF token first
+client.get(URL)  # sets the cookie
+csrftoken = client.cookies['csrftoken']
+
+login_data = dict(username=EMAIL, password=PASSWORD, csrfmiddlewaretoken=csrftoken)
+r = client.post(URL, data=login_data, headers={"Referer": "foo"})
+
+19. How to get the home directory in Python??
+	from os.path import expanduser
+	home=expanduser("~")
+	
+20. open file with encoding
+def log(*objs):
+	with open('aa.txt', 'r', encoding='utf-8') as f:
+		print(" ", *objs, file=f)
+		
+21. How to print bytes in python ?
+	b'150601-00:00:00 WS[31] DEBUG: 9710963822678457872,0,Kim Phi\xe1\xba\xbfu,10,10,1,0,-,14220941,mtk22,M\xe1\xbb\xa5c ti\xc3\xaau th\xc6\xb0\xe1\xbb\x9fng Kim Phi\xe1\xba\xbfu,79\n'
+	def print_byte(content):
+		for x in content:
+			print(x)
+	
 		
 -------------------------------
 	Python Built-in functions

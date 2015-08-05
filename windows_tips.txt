@@ -309,3 +309,11 @@ thread
 socket
 thread pool
 epoll
+
+---------------
+Enterprise Architect
+1. How to set the default class language to C++ ??
+2. How to draw association(Uni-directional,bi-directional association) ?
+ Choose association, mouse left button down, drag from the source class to the target class , left button up.
+3. How to add properties and methos to a class ?
+	At "Project Browser" Window, select the class, Right click, Attributes , operations.
