@@ -436,6 +436,10 @@ def log(*objs):
 	def print_byte(content):
 		for x in content:
 			print(x)
+
+22. get current file directory Python
+	import os
+	os.path.dirname(os.path.abspath(__file__))
 	
 		
 -------------------------------
