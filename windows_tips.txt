@@ -309,11 +309,37 @@ thread
 socket
 thread pool
 epoll
+---------------
+aws 
+1. putty connect EC2
+打开puttyGen,点击Load, 选择.pem文件，点击Save Private Key保存.ppk文件
+在 Connection --> SSH --> Auth 里面Browse，选择.ppk文件
+
 
 ---------------
 Enterprise Architect
 1. How to set the default class language to C++ ??
 2. How to draw association(Uni-directional,bi-directional association) ?
  Choose association, mouse left button down, drag from the source class to the target class , left button up.
-3. How to add properties and methos to a class ?
+3. How to add properties and methods to a class ?
 	At "Project Browser" Window, select the class, Right click, Attributes , operations.
+4. How to change class to interface ??
+   Select the class,
+   look at Element Properties View
+   The Properties window has three branches: Class Settings (or Interface, etc), Project, and Advanced
+   look under Class Settings, there's a field called Type with an ellipsis button
+   Be aware that you may need to double-check the element properties once you've changed the type. For instance, changing a simple Class to an Interface is pretty straightforward. If on the other hand you change an Interface to a Class, the class will be abstract (because an Interface is) and retain the "interface" stereotype.
+5. basic
+   1.	File  New Project, choose directory and filename
+	2.	Select UML Structural  Class
+	3.	Delete the example classes and diagram
+	4.	Drag a class to the canvas
+	5.	Right click, add attributes and options to the class
+	Email String
+	numOfEmail int
+	6.	Add a association Relationship : Select the associate in Toolbox’s Class Relationships
+	Click on class A, and drag to class B, left button up.
+	Right click the line between class A and B, choose Source Role and Target Role
+	Choose Direction
+	7.	Drag Enumeration class to the canvas
+

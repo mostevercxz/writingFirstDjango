@@ -15,6 +15,14 @@ Python PEPs
 	https://www.python.org/dev/peps/pep-0318/
 2.
 
+
+install python from source code
+wget http://python.org/ftp/python/3.4.1/Python-3.4.1.tar.xz
+tar xvf Python-3.4.1.tar.xz
+cd Python-3.4.1
+sudo ./configure --prefix=/usr/local --enable-shared LDFLAGS="-Wl,-rpath /usr/local/lib"
+sudo make
+sudo make altinstall
 ===============================================
 Problems when learning Django Blog Zinnia
 ===============================================
@@ -119,6 +127,14 @@ pyCon many python tips
 	'llo pytho'
 5. reverse a string 
 	some_string[::-1](the third parameter to an array slice is a step)	
+	
+	reverse a list(逆序，翻转list)
+	>>>list = [1,2,3,4]
+	>>>list[::-1]
+	
+	for i in reversed(list):
+		print i
+	list(reversed(list))
 	
 6. Permanently add a directory to PYTHONPATH
 	确保该目录下有_init.py文件
@@ -440,6 +456,27 @@ def log(*objs):
 22. get current file directory Python
 	import os
 	os.path.dirname(os.path.abspath(__file__))
+	
+23. Print all day-dates between two dates
+	from datetime import date, timedelta as td
+	d1=date(2008,1,1)
+	d2=date(2010,1,1)
+	delta = d2-d1
+	for i in range(delta.days + 1):
+		print d1 + td(days=i)
+		
+24. python print date format
+	>>>d1=datetime.date(2015,6,1)
+	>>>print(d1)
+	2015-06-01
+	>>> print(d1.strftime("%y%m%d"))
+	150601
+	>>>print "We are the {:%d, %b %Y}".format(today)
+	'We are the 01, 06 2008'
+	(Since PEP3101, every object can have its own format used automatically by the method format of any string. In the case of the datetime, the format is the same used in strftime. So you can do the same as above like this:)
+	
+25. How to make a Python program running as a daemon??
+	
 	
 		
 -------------------------------

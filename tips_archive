@@ -833,6 +833,23 @@ mv temp file_name
 	{
 		console.Write(match.Value + match.Index)
 	}
+	
+	Regex to match numbers c#?
+	regex = new Regex("^[0-9]+$");
+	Regex regex = new Regex(@"^\d$");//"\d" will match [0-9] and other digit characters like the Eastern Arabic numerals ٠١٢٣٤٥٦٧٨٩
+	
+	Check if a string contains an IP address c#?
+	(verify ip address using regex
+	http://www.regular-expressions.info/examples.html
+	\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.
+	(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.
+	(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.
+	(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b
+	)
+	using System.Text.RegularExpressions;
+	var sourceString = "put your ip string here";
+	var match = Regex.Match(sourceString, @"\b(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\b");
+	if(matches.Success) Console.WriteLine(match.Captures[0]);
 
 3. Convert string to int
 	int a = Convert.ToInt32(string)	
@@ -1208,6 +1225,23 @@ To enable c-ares support, first build and install the library, then pass the --e
 		DateTime now = DateTime.Now;
 		return now.ToString("yyyyMMddHHmmssfff");
 	}
+	
+	Convert string to datetime c#?
+	Convert datetime to timestamp c#?(Int32 unixTimestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;)	
+	private static readonly DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+    private static long ConvertToTimestamp(DateTime value)
+    {
+            TimeSpan elapsedTime = value - Epoch;
+            return (long)elapsedTime.TotalSeconds;
+    }
+	
+	private long GetTimeStamp(string timeStr)
+    {
+            DateTime date = DateTime.ParseExact(timeStr, "yyMMdd-HH:mm:ss", System.Globalization.CultureInfo.CurrentCulture);//string to datetime
+            return ConvertToTimestamp(date) - 28800;
+    }
+	
 	
 39.	How to start python windows and run inside??
 	var startInfo = new ProcessStartInfo
