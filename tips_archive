@@ -1261,6 +1261,10 @@ To enable c-ares support, first build and install the library, then pass the --e
 
 MAX.	
 
+40. get most starred,forks github repos
+    type 'stars:>1' in the search box
+	Sort : 'most stars'
+
 ipconfig/all
 ipconfig/flushdns,连接不上VPN的时候可以用哦
 

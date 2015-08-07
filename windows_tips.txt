@@ -343,3 +343,8 @@ Enterprise Architect
 	Choose Direction
 	7.	Drag Enumeration class to the canvas
 
+6.  enterprise architect save diagram as image
+	CTRL + T
+	short keys(http://www.sparxsystems.com/enterprise_architect_user_guide/9.3/getting_started/keyboardshortcuts.html)
+	enterprise architect add attribute shortkey
+	CTRL + SHIFT + F9

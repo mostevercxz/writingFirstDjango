@@ -477,6 +477,11 @@ def log(*objs):
 	
 25. How to make a Python program running as a daemon??
 	
+26. How to define enum in Python?
+	class LogfileType(object):
+		error = 1
+		process = 2
+		result = 3
 	
 		
 -------------------------------

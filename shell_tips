@@ -207,6 +207,9 @@ uname -a
 	| ----------- Hour (0 - 23)
 	------------- Minute (0 - 59)
 	0 0 * * * /home/userName/run.sh
+	
+36. Uninstall a sudo apt-get install(http://askubuntu.com/questions/187888/what-is-the-correct-way-to-completely-remove-an-application)
+	sudo apt-get remove npm
             
 Line 2 creates a variable called STR and assigns the string "Hello World!" to it. 
 Then the VALUE of this variable is retrieved by putting the '$' in at the beginning. 
@@ -505,6 +508,7 @@ fi
 
 33. find file name contains(with name)
 find . -iname "*string*" -maxdepth 1 -print
+
 	
 	
 	
@@ -521,7 +525,18 @@ sudo apt-get update
 sudo apt-get install openssh-server
 sudo ufw allow 22
 	
-		
+==================
+How to install nodejs on ubuntu 14.04??
+==================		
+sudo apt-get update
+sudo apt-get install nodejs
+sudo apt-get install npm
+
+install nodejs trash
+sudo npm install --save fs-extra
+sudo npm install --global trash
+--- fs-extra contains methods that aren't included in the vanilla Node.js fs package. Such as mkdir
+sudo npm install fs-extra
 	
 Bash Script error catching
 --------------------------
