@@ -150,6 +150,9 @@ insert into tableName(path, configname, id) select "C:\\windows\\", "config.xml"
 7.	load data in file "~/tmp/bak.sql" into table tableName
 	load data local in file "E:\bak.sql" into table tableName
 	
+8. change the data type of one column
+	alter table tableName modify columnName float
+	
 ======== interact with shell, files
 1. 	output to a file
 	select column1, column2 from tableName into outfile "c:/users/file.csv" fields terminated by ',' enclosed by '"' lines terminated by "\n"
@@ -249,6 +252,11 @@ insert into tableName(path, configname, id) select "C:\\windows\\", "config.xml"
 	经测试mysql dbName -e "select * from CHARBASE" > temp.sql,temp.sql中的数据被损坏了..还是用scp的方法吧
 	mysql dbName -e "select * from CHARBASE into outfile \"/tmp/abcd.sql\""
 	scp userName@host:/tmp/abcd.sql /destination
+	
+15. 1040 too many connections mysql
+vim /etc/my.cnf
+set-variable=max_connections=1000
+show processlist
 
 ========= confused mysql conceptions
 1.	What's the difference, @variable vs variable??加@和不加有什么区别？

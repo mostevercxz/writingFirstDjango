@@ -508,6 +508,10 @@ Deploy django using mod_wsgi:(暂时停止研究)
 3.Integration with Django(https://code.google.com/p/modwsgi/wiki/IntegrationWithDjango)
 
 --------------------------	
+django bugs handled records
+django 403(django website 403, vim django/core/handlers/wsgi.py,WSGIHandler __call__)
+chrome no cookie(chrome did not receive cookies)
+If A has a cookie, B do not have, copy the chrome cookie file from location of A -> B.
 
 http status
 403 forbidden, no permission
@@ -733,6 +737,10 @@ javascript/ie6.js
 
 9. git  svn info(git info)
 git remote -v
+
+10. git revert a file
+git checkout file_name
+git checkout -- file_name
 	
 Svn tips
 ------------------------------
@@ -1364,3 +1372,12 @@ AppServer 让我trust一个IP 123.30.106.192
 最后发现，是配置文件的最下面还有一行，覆盖掉之前我写的
 <set ip="123.30.106.192">getAllZone,getRoleMessage,getRolename,getAccountRole,getRoleFriend,getActState,getSeptInfo,getUnionInfo,sendObjToUser,getCharidName</set>
 
+
+---
+boost basic library(mandatory boost knowledge)
+Boost.Assign
+Boost.Bind
+Boost.Foreach
+Boost.Member Function
+Boost.Smart Pointers
+Boost Conversion Library

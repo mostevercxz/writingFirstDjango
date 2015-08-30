@@ -30,6 +30,25 @@ What if the last line of foo.h was a comment without a new line? Now the first l
 	The above is still correct for C, 
 while the new C++ standard (C++11) has been changed so that this warning should no longer be issued if using C++ and a C++11 conformant compiler.
 
+---
+C+11
+for(Element& e : collection)
+{
+   foo(e);
+}
+
+---
+standard library
+std::for_each()
+class Sum{
+	int m_result;
+	bool operator() (int add){m_result += add;}
+	Sum(const int i = 0):m_result(i){}
+};
+
+std::vector<int> nums{2,3,4,5};
+std::for_each(nums.begin(), nums.end(), Sum);
+
 
 ----------------------------
 	C++ questions

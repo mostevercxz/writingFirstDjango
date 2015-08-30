@@ -218,6 +218,17 @@ A: Unlike most other DOS Make programs which accept any whitespace character at 
 Beginning with version 3.78, GNU Make prints a message that hints at a possible SPACEs-vs-TAB problem, like this:
 *** missing separator (did you mean TAB instead of 8 spaces?).  Stop.
 
+===
+VS 多行注释
+CTRL +K, CTRL + C
+CTRL + E,CTRL + U,取消注释
+编辑 --> 高级 里面可以设置
+
+===
+Game making viedos
+游戏名 + Making of / Behind the scenes / Bonus / Feature / Development 
+游戏名 +花絮 / 幕后 / 特典 / 访谈
+
 
 
 ============================
@@ -309,14 +320,20 @@ thread
 socket
 thread pool
 epoll
----------------
+---
 aws 
 1. putty connect EC2
 打开puttyGen,点击Load, 选择.pem文件，点击Save Private Key保存.ppk文件
 在 Connection --> SSH --> Auth 里面Browse，选择.ppk文件
 
+---
+Chrome
+Where is cookies data stored??
+C:\Users\your_username\AppData\Local\Google\Chrome\User Data\Default\
+C:\Users\Your User Name\AppData\Local\Google\Chrome\User Data\Default\Local Storage
 
----------------
+
+---
 Enterprise Architect
 1. How to set the default class language to C++ ??
 2. How to draw association(Uni-directional,bi-directional association) ?
@@ -348,3 +365,16 @@ Enterprise Architect
 	short keys(http://www.sparxsystems.com/enterprise_architect_user_guide/9.3/getting_started/keyboardshortcuts.html)
 	enterprise architect add attribute shortkey
 	CTRL + SHIFT + F9
+	
+7. enterprise architect copy between models(http://www.sparxsystems.com/enterprise_architect_user_guide/9.0/modeling_basics/duplicateadiagram.html)
+	Add a package
+	Right Click --> Copy Diagram --> go to another package, Right Click --> Paste Diagram --> Smart Paste
+	
+8. how to draw c++ template class diagram (Enterprise Architect, right click class ,choose templates, add parameters)
+           .......               
+___________:  T  :
+|          :.....:
+|              |
+|  ClassName   |
+|              |
+|______________|
