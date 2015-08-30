@@ -634,3 +634,8 @@ p tempselector.xpath('/html/body/div/h2/span/span[@class="timestamp"]/text()')
 	
 	stop using str to convert from unicode to encoded text / bytes
 	p.agent_info = u' '.join((agent_contact, agent_telno)).encode('utf-8').strip()
+	
+---
+mysql connector errors
+after install mysql conector, run examples/inserts.py ImportError: cannot import name 'warn'
+	sudo examples/inserts.py
