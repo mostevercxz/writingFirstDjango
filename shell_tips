@@ -554,6 +554,43 @@ contains() {
 	ln -s bar temp
 	rm temp
 	
+38. sudo without password
+ sudo visudo
+ userName ALL=(ALL) NOPASSWD: ALL
+  man sudoers
+   NOPASSWD and PASSWD
+
+   By default, sudo requires that a user authenticate him or herself
+   before running a command.  This behavior can be modified via the
+   NOPASSWD tag.  Like a Runas_Spec, the NOPASSWD tag sets a default for
+   the commands that follow it in the Cmnd_Spec_List.  Conversely, the
+   PASSWD tag can be used to reverse things.  For example:
+
+    ray  rushmore = NOPASSWD: /bin/kill, /bin/ls, /usr/bin/lprm
+
+   would allow the user ray to run /bin/kill, /bin/ls, and /usr/bin/lprm
+   as root on the machine rushmore without authenticating himself.
+   
+39. set ssh can not login as root
+	adduser superuser
+	passwd superuser
+	echo 'superuser ALL=(ALL) ALL' >> /etc/sudoers
+	su -(input the root password to verify can login as root)
+	sudo vi /etc/ssh/sshd_config
+	PermitRootLogin no
+	sudo /etc/init.d/ssh restart
+	
+40. Change ssh port to a non-standard port(2015 for example)
+	open port 2015 in amazon aws control center
+	sudo vi /etc/ssh/sshd_config
+	port=2015
+	sudo /etc/init.d/ssh restart
+	ssh -p 2015 user@ip_address
+	scp -P 2015 user@ip_address /tmp/
+	
+41. /var/log/auth.log is empty
+	sudo chown syslog /var/log/auth.log
+	
 	
 
 	

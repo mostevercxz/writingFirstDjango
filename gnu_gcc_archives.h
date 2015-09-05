@@ -1,5 +1,12 @@
 // for the sake of remembering some gnu common options
 
+//What does the FD_CLOEXEC fcntl() flag do?
+if (fcntl(fd, F_SETFD, FD_CLOEXEC) == -1) {
+}
+It sets the close-on-exec flag for the file descriptor, which causes the file descriptor to be automatically (and atomically) closed when any of the exec-family functions succeed.
+
+It also tests the return value to see if the operation failed, which is rather useless if the file descriptor is valid, since there is no condition under which this operation should fail on a valid file descriptor.
+
 //gcc compile part
 1. remove comments from c++ code(http://stackoverflow.com/questions/2394017/remove-comments-from-c-c-code)
 	gcc -fpreprocessed -dD -E test.c
