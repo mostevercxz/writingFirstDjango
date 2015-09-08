@@ -591,6 +591,12 @@ contains() {
 41. /var/log/auth.log is empty
 	sudo chown syslog /var/log/auth.log
 	
+42. change aws ssh port to 80 : 
+	log onto amazon 
+	starting Amazon EC2 instance via Web Management Console with following 'user data':
+	控制台,选择EC2,第一排"启动实例""连接"的右边有个"操作" --> "实例设置" --> "查看更改用户数据"
+	https://alestic.com/2010/12/ec2-ssh-port-80/
+	
 	
 
 	
@@ -620,6 +626,7 @@ How to configure a ubuntu to accept ssh?
 sudo apt-get update
 sudo apt-get install openssh-server
 sudo ufw allow 22
+sudo ufw deny from 1.2.3.4 to any
 	
 ==================
 How to install nodejs on ubuntu 14.04??
@@ -675,6 +682,15 @@ man vsftpd.conf
 ll /var/ftp/pub
 User Name : ftp
 Password : no password..
+
+---
+putty Network Error: Software caused connection abort
+xshell connection closed by foreign host
+Putty -> Connection -> 
+Sending of null packets to keep session active
+Set Seconds between keepalive 30
+30 is 30 seconds
+---
 
 	
 Bash Script error catching
