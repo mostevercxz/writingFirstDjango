@@ -12,6 +12,76 @@ CLR是什么
 2.当srting里面有database的特殊字符时，如何select?
 (使用Access是必须避免的特殊字符，http://support.microsoft.com/kb/826763)
 (mysql special characters in string literals, )
+---
+cmake install prefix mysql(-DCMAKE_INSTALL_PREFIX=../mysql_install)
+vim CMakeLists.txt
+vim cmake/build_configurations/compiler_options.cmake
+
+install mysql from source code
+1.mkdir mysql_self && cd mysql_self
+2.wget http://cdn.mysql.com/Downloads/MySQL-5.6/mysql-5.6.10.tar.gz
+3.tar -xvf mysql-5.6.10.tar.gz
+4.cd mysql-5.6.10
+5.mkdir ../mysql_install
+6.cmake -DCMAKE_INSTALL_PREFIX=../mysql_install -DWITH_INNOBASE_STORAGE_ENGINE=1 -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci
+7.make
+8.make install
+9.cd ../mysql_instal
+10. mkdir mysql(this dir is used to store mysql database data)
+11. 
+echo "character-set-server = utf8" >> /etc/my.cnf
+echo "collation-server = utf8_general_ci" >> /etc/my.cnf
+12. scripts/mysql_install_db --user=mysql --defaults-file=./my.cnf --ldata=./mysql
+13. bin/mysqladmin -u root password 123456
+
+errors
+1.MySQL Error on Startup: ambiguous option '--log=/var/log/mysqld.log'
+./bin/mysqld --defaults-file=/path/to/my.cnf
+
+2.can't open the mysql.plugin table 
+./bin/mysqld Table 'mysql.plugin' doesn't exist
+This means that datadir is not right. 
+Change it to the directory contains file ibdata1 and directory mysql/
+vim my.cnf, datadir=/path/to/ibdata1/../
+
+3.[Warning] IP address could not be resolved : Temporary failure in name resolution.
+(http://serverfault.com/questions/341290/mysql-warning-ip-address-could-not-be-resolved)
+Add following lines to /etc/my.cnf, then restart mysqld
+[mysqld]
+skip-host-cache
+skip-name-resolve
+
+4.host is not allowed to connect to this mysql server
+delete user, restart mysql, create use again, then everything is OK.
+---
+
+5.enable query log my.cnf
+[mysqld]
+general_log = on
+general_log_file=/path/to/query.log
+
+//查一个pymysql导致查询中文失败的问题
+根据日志判断,navicat发过去的是 %潇洒%,而pymysql发过去的是 乱码,所以想断点看下两者不同之处
+1.对比法,navicat里面查询 select accid, name from CHARBASE WHERE NAME LIKE "%潇洒%"可以查出来
+而pymysql却查询不出来
+2.下载mysql源代码，捣鼓了3个小时将其编译通过并以bin/mysqld运行，将原来的数据库全部拷贝过去,新建mysql用户
+3.ls sql/|grep log，找到打日志的文件,和函数,gdb -p 给函数设置断点
+4.查看堆栈,找到上层的dispath_command函数
+5.直接断dispatch_command,将收到的packet按字节打印,发现 潇洒 两个字,pymysql是str.encode('utf-8')发过去的,而navicat是 'gbk'编码 (e4ec c8f7)发过去的
+6.将pymysql的 Connection 类里面的self.encoding直接赋值为'gbk'
+7.重试,发现还是不行。现在问题变成了：两条查询在/tmp/mysql_execute.log显示出的日志都是一模一样,一个有结果,一个没结果
+8.分析,mysql在进行字符串比较的时候用的是 character_set_connection, 于是就想对比下pymysql和navicat执行结果
+9.p cursor.execute('show variables like "%char%"')
+p cursor.fetchall() 发现pymysql character_set_connection等一系列变量(除了database创建时候是latin1)都是utf8
+navicat里直接执行show variables like "%char%" 发现 character_set_connection等是latin1
+10.同时也尝试了用mysql databaseName -e "select accid, name from CHARBASE WHERE NAME LIKE \"%潇洒%\"" 也没得到结果
+11.在pymysql de cursor.execute()前加了一句 cursor.execute('set names "latin1"'), cursor.fetchall(), 测试OK
+12.shell终端下mysql的执行语句前也加上一句 set names 'latin1'即可
+
+总结：
+1. mysql是按照 charset_set_client的编码 去解析收到的字符串,所以出现日志乱码,
+第一反映是去show variables like "%char%"， show variables like "%coll%"
+2. charset_set_connection和database保持一致, database是latin1的,那么set names 'latin1'
 
 ======== questions
 2. press HOME keyborad, just print "~"
@@ -103,6 +173,27 @@ CLR是什么
 	"not found" sounds like a permission problem, chmod g+w /usr/local/mysql/log/. Solved!!!
 	
 12. 加@和不加有什么区别吗,@是session变量,不加是局部变量。
+
+13.
+The server character set and collation are used as default values 
+if the database character set and collation are not specified in CREATE DATABASE statements. They have no other purpose.
+
+The database character set and collation affect these aspects of server operation:
+
+For CREATE TABLE statements, the database character set and collation are used as default values for table definitions if the table character set and collation are not specified. To override this, provide explicit CHARACTER SET and COLLATE table options.
+
+For LOAD DATA statements that include no CHARACTER SET clause, the server uses the character set indicated by the character_set_database system variable to interpret the information in the file. To override this, provide an explicit CHARACTER SET clause.
+
+For stored routines (procedures and functions), the database character set and collation in effect at routine creation time are used as the character set and collation of character data parameters for which the declaration includes no CHARACTER SET attribute. To override this, provide an explicit CHARACTER SET attribute.
+
+What character set is the statement in when it leaves the client?
+The server takes the character_set_client system variable to be the character set in which statements are sent by the client.
+
+What character set should the server translate a statement to after receiving it?
+For this, the server uses the character_set_connection and collation_connection system variables. It converts statements sent by the client from character_set_client to character_set_connection (except for string literals that have an introducer such as _latin1 or _utf8). collation_connection is important for comparisons of literal strings. For comparisons of strings with column values, collation_connection does not matter because columns have their own collation, which has a higher collation precedence.
+
+What character set should the server translate to before shipping result sets back to the client?
+The character_set_results system variable indicates the character set in which the server returns query results to the client. This includes result data such as column values, and result metadata such as column names.
 
 ========= mysql functions
 1. mysql list built-in functions(not found yet), help + command

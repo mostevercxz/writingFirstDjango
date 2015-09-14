@@ -18,6 +18,13 @@ It also tests the return value to see if the operation failed, which is rather u
 4.	How to translate assembly to binary??(http://stackoverflow.com/questions/3826692/how-do-i-translate-assembly-to-binary)
 	learn CPU instructions
 	
+---
+waf notes
+1. process flow
+./waf
+waf_entry_point(current_dir, version, wafdir)
+
+---
 ------------------------
 	dynamic librarys
 ------------------------	
@@ -347,7 +354,7 @@ $argc,$arg0,$arg1,$arg2
 	echo _text_(print _text_ including any nonprintable character escaped in a C-style string, echo "abc\tdef\n")
 	output _expression_(nothing but the value of the _expression_)
 	printf _string_, _expressions_(this prints the values pof the _expressions_ under the control of the format string _string_)
-	(printf "level=%d",GetLevel())
+	printf "level=%d",GetLevel()
 5.	Invoking the shell
 	shell ~/script.sh	
 6.	Prompt look

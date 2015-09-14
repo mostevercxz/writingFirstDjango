@@ -49,6 +49,26 @@ class Sum{
 std::vector<int> nums{2,3,4,5};
 std::for_each(nums.begin(), nums.end(), Sum);
 
+---
+c++ basic
+1. decalare a constructor with a default value
+//declaration:
+MyConstuctor(int inDenominator, int inNumerator, int inWholeNumber = 0); 
+
+//definition:
+MyConstuctor::MyConstuctor(int inDenominator,int inNumerator,int inWholeNumber) 
+{   
+    mNum = inNumerator;   
+    mDen = inDenominator;   
+    mWhole = inWholeNumber;   
+}
+2.What does __attribute__ ((format,2,3))
+The keyword __attribute__ allows you to specify special attributes when making a declaration. 
+This keyword is followed by an attribute specification inside double parentheses. 
+The following attributes are currently defined for functions on all targets: 
+noreturn, noinline, always_inline, pure, const, format, format_arg, 
+no_instrument_function, section, constructor, destructor, used, unused, deprecated, weak, malloc, and alias
+---
 
 ----------------------------
 	C++ questions
@@ -101,7 +121,23 @@ std::string token;
 while(std::getline(iss, token, ',')){
 	std::cout << token << '\n';
 }
+6.What is the effect of extern "C" in C++??
+(http://stackoverflow.com/questions/1041866/in-c-source-what-is-the-effect-of-extern-c)
+extern "C" makes a function-name in C++ have 'C' linkage (compiler does not mangle the name)
+so that client C code can link to (i.e use) your function using a 'C' compatible header file
+that contains just the declaration of your function. 
+Your function definition is contained in a binary format (that was compiled by your C++ compiler)
+that the client 'C' linker will then link to using the 'C' name.
+Test:
+g++ -c test.cpp
+readelf -s test.o
+c++filt the_mangled_function_name
 
+7. include inside extern c
+extern "C"{
+#include <argp.h>
+}
+all the functions in argp.h do not use name mangling
 
 
 

@@ -223,6 +223,21 @@ uname -a
 	
 39. How to make ssh quiet ?
 	ssh -f root@192.1.1.1 "echo background"
+	
+40. putty login without password
+	(https://www.digitalocean.com/community/tutorials/how-to-create-ssh-keys-with-putty-to-connect-to-a-vps)
+	(https://www.digitalocean.com/community/tutorials/how-to-use-ssh-keys-with-putty-on-digitalocean-droplets-windows-users)
+	1. puttygen generate a public key,  Save private key, without a passphrase.
+	(Click on both the Save public key button and the Save private key button and select a secure location to keep them:)
+	2. Right click Key panel, copy all
+	3. vi ~/.ssh/authorized_keys, paste
+	4. check the file mode chmod 600 ~/.ssh/authorized_keys
+	
+	putty errors:
+	unable to use key file (not a private key)
+	(save as private key, not Public key)
+	
+	
             
 Line 2 creates a variable called STR and assigns the string "Hello World!" to it. 
 Then the VALUE of this variable is retrieved by putting the '$' in at the beginning. 
@@ -437,6 +452,7 @@ cecho y "Yellow!"
 	Problem was a custom locale. Now using standard en_US.utf8 and gnome-terminal works normally.
 	
 21.	kill all apache2
+	kill -hup pid(reload data)
 	killall -9 httpd
 	/usr/sbin/httpd -k start
 	tailf /var/www/httpd/error_log
@@ -597,7 +613,12 @@ contains() {
 	控制台,选择EC2,第一排"启动实例""连接"的右边有个"操作" --> "实例设置" --> "查看更改用户数据"
 	https://alestic.com/2010/12/ec2-ssh-port-80/
 	
-	
+43. check status of last command
+res=`echo $?`
+if [ $res -eq 0 ]; then
+echo "ok"
+else
+fi
 
 	
 	
@@ -690,6 +711,28 @@ Putty -> Connection ->
 Sending of null packets to keep session active
 Set Seconds between keepalive 30
 30 is 30 seconds
+---
+---
+What you need when you buy a VPS
+1. How to make fail2ban bans persistent(fail2ban blacklist)
+sudo touch /etc/fail2ban/ip.blacklist
+make a copy of /etc/fail2ban/action.d/iptables-multiport.conf
+sudo vim /etc/fail2ban/action.d/iptables-multiport.conf
+actionban = iptables -I f2b-<name> 1 -s <ip> -j DROP
+            echo <ip> >> /etc/fail2ban/ip.blacklist
+actionstart = iptables -N f2b-<name>
+              iptables -A f2b-<name> -j RETURN
+              iptables -I INPUT -p <protocol> -m multiport --dports <port> -j f2b-<name>
+              cat /etc/fail2ban/ip.blacklist | while read IP; do iptables -I f2b-<name> 1 -s $IP -j DROP; done
+			  
+If you want to unban the IP when fail2ban unbans the IP(not recommanded):
+actionunban = iptables -D fail2ban-<name> -s <ip> -j DROP
+              sed -i /<ip>/d ip.blacklist
+---
+---
+What is the difference between man and info??
+(http://askubuntu.com/questions/9325/what-is-the-difference-between-man-and-info-documentation)
+There are actually other documentation systems in use, beside man and info, Gnome and KDE.
 ---
 
 	

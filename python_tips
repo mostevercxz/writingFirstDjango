@@ -18,6 +18,7 @@ Python PEPs
 
 install python from source code
 wget http://python.org/ftp/python/3.4.1/Python-3.4.1.tar.xz
+https://www.python.org/ftp/python/3.4.3/Python-3.4.3.tar.xz
 tar xvf Python-3.4.1.tar.xz
 cd Python-3.4.1
 sudo ./configure --prefix=/usr/local --enable-shared LDFLAGS="-Wl,-rpath /usr/local/lib"
@@ -482,7 +483,9 @@ def log(*objs):
 		error = 1
 		process = 2
 		result = 3
-	
+27. python debugging show attributes's values
+	(pdb) import sys
+	(pdb) p sys.__dict__
 		
 -------------------------------
 	Python Built-in functions
