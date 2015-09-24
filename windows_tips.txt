@@ -378,3 +378,40 @@ ___________:  T  :
 |  ClassName   |
 |              |
 |______________|
+
+---
+Debug TortoiseSVN
+Create registry DWORD value
+HKEY Current User\Software\TortoiseSVN\Debug
+set its value = 1
+
+Excel diff
+(http://stackoverflow.com/questions/114698/how-do-i-create-a-proper-diff-of-two-spreadsheets-when-i-perform-a-version-contr)
+https://github.com/na-ka-na/ExcelCompare
+---
+
+---
+Variadic Function, 可变参函数
+a={}
+a["x"] = 10
+print(a["x"]) --> 10
+print(a["y"]) --> nil
+Table fields evaluate to nil when not initialized.
+To represent a conventional array or a list, you simply use a table with integer keys.
+It is customary in Lua to start arrays with one and several facilities in Lua stick to this convention.
+Often, the length is implicit. Remember that any non-initialized index results in nil. sentinel.
+A list without nil elements inside it is a sequence.
+For sequences, Lua offer '#', it returns the last index, or the length of the sequence.
+http://www.lua.org/manual/5.2/manual.html#3.4.6
+Unless a __len metamethod is given, the length of a table t is only defined if the table is a sequence, that is, the set of its positive numeric keys is equal to {1..n} for some non-negative integer n.In that case, n is its length.
+Note that a table like
+     {10, 20, nil, 40}
+is not a sequence, because it has the key 4 but does not have the key 3.
+Note, however, that non-numeric keys do not interfere with whether a table is a sequence.
+
+table.unpack receives an array and returns as results all elements from the array, starting from index 1.
+unpack uses the length operator to know how mant elements to return. So it works  on proper sequences.
+
+table.pack receives any number of arguments and returns a new table with all its arguments, just like {...}
+But this table has also an extra field "n", with the total number of args.
+---

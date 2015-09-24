@@ -47,6 +47,8 @@ http://code.tutsplus.com/tutorials/the-30-css-selectors-you-must-memorize--net-1
 
 1.	How to get the value of checked radio?
 temp = $('input[name=fromzone]:checked').val();
+get attribute of a selector?
+$(this).attr('id')
 2.	How to remove style added with .css() function ?
 	$(#div.classname).css("background-color", "")
 3.	How to get the current selector name??

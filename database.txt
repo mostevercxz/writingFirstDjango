@@ -29,6 +29,14 @@ install mysql from source code
 9.cd ../mysql_instal
 10. mkdir mysql(this dir is used to store mysql database data)
 11. 
+log-bin=/tmp/mysqlbin.log
+general_log=on
+general_log_file=/tmp/mysql_execute.log
+datadir=/home/myUserName/learn/mysql_install/mysql
+socket = /tmp/mysql.sock
+user = mysql
+skip-host-cache
+skip-name-resolve
 echo "character-set-server = utf8" >> /etc/my.cnf
 echo "collation-server = utf8_general_ci" >> /etc/my.cnf
 12. scripts/mysql_install_db --user=mysql --defaults-file=./my.cnf --ldata=./mysql
@@ -243,6 +251,27 @@ insert into tableName(path, configname, id) select "C:\\windows\\", "config.xml"
 	
 8. change the data type of one column
 	alter table tableName modify columnName float
+	
+9. mysql order by two columns
+	select * from table_name order by level desc, type desc, `name` desc;
+	
+10. mysql join usage
+	(http://stackoverflow.com/questions/2183373/mysql-group-by-two-columns)
+	mysql> create table client(client_id integer not null primary key auto_increment, name varchar(64));
+	mysql> create table portfolio (portfolio_id integer not null primary key auto_increment, client_id integer references client.id, cash decimal(10,2), stocks decimal(10,2));
+	mysql> insert into client (name) values ('account1', 'account2')
+	mysql> insert into portfolio (client_id, cash, stocks) values (1, 11.11, 22.22), (1, 10.11, 21.22), (2, 30.33, 40.40), (2, 40.44, 50.55);
+	mysql> select * from portfolio join (select client_id, max(cash + stocks) as max
+total from portfolio group by client_id) as maxima using(client_id) where cash +
+ stocks = maxtotal;
++-----------+--------------+-------+--------+----------+
+| client_id | portfolio_id | cash  | stocks | maxtotal |
++-----------+--------------+-------+--------+----------+
+|         1 |            1 | 11.11 |  22.22 |    33.33 |
+|         2 |            4 | 40.44 |  50.55 |    90.99 |
++-----------+--------------+-------+--------+----------+
+2 rows in set (0.00 sec)
+	
 	
 ======== interact with shell, files
 1. 	output to a file

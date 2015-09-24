@@ -439,7 +439,14 @@ if DEBUG:
     }
 
 --- How to debug Django template ---
-1. Add file named debug.py in templatetags/
+polls/
+    __init__.py
+    models.py
+    templatetags/
+        __init__.py
+        poll_extras.py
+    views.py
+1. Add file named debug.py in templatetags/(like polls/)
 
 from django.template import Library, Node
 register = Library()
@@ -477,6 +484,23 @@ If I want to handle 10 simultaneous connections, gunicorn --worker-connections 1
 但是若是3个连接同时请求http://192.168.204.132:8080/db
 结果还是单线程的,这个待解决.
 --------------------------------
+
+---
+(django template dictionary value)
+Django template how to lookup a dictionary value with a variable
+
+vim templatetags/aaa.py
+from django.template.defaulttags import register
+...
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)
+	
+in template.html
+{% for item in dictionary %}
+{{ mydict | get_item:item }}
+{% endfor %}
+---
 	
 	
 Deploy django using mod_wsgi:(暂时停止研究)

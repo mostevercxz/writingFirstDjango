@@ -17,6 +17,7 @@ Python PEPs
 
 
 install python from source code
+(http://g0o0o0gle.com/install-python-3-4-1-centos-6/)
 wget http://python.org/ftp/python/3.4.1/Python-3.4.1.tar.xz
 https://www.python.org/ftp/python/3.4.3/Python-3.4.3.tar.xz
 tar xvf Python-3.4.1.tar.xz
@@ -24,6 +25,15 @@ cd Python-3.4.1
 sudo ./configure --prefix=/usr/local --enable-shared LDFLAGS="-Wl,-rpath /usr/local/lib"
 sudo make
 sudo make altinstall
+
+3.Centos 
+tar (child): xz: Cannot exec: No such file or directory
+tar (child): Error is not recoverable: exiting now
+tar: Child returned status 2
+tar: Error is not recoverable: exiting now
+Install xz, sudo yum install xz
+
+
 ===============================================
 Problems when learning Django Blog Zinnia
 ===============================================
@@ -409,6 +419,19 @@ errors met when using python mysql connector
 	
 	string to bytes
 	bytearray(str, encoding="utf-8")
+	
+	Convert hex string to bytes str:
+	>>> a = 'e4ec8f7c'
+	>>> a_array = [ e4 ec 8f 7c]
+	>>> bytes(a_array)
+	>>> bytes([255])
+	b'\xff'
+	
+	hexadecimal string to byte array
+	python3
+	>>>bytearray.fromhex("de ad be ef 00")
+	python2
+	>>> hex_data = hex_string.decode("hex")
 
 14.	os.mkdir(path[,mode])#default mode is 0o777
 	os.makedirs(path[,model])#default mode is Oo777

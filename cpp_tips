@@ -50,6 +50,10 @@ std::vector<int> nums{2,3,4,5};
 std::for_each(nums.begin(), nums.end(), Sum);
 
 ---
+---
+C++ with lua
+passing structures from c to lua
+---
 c++ basic
 1. decalare a constructor with a default value
 //declaration:
@@ -68,7 +72,41 @@ This keyword is followed by an attribute specification inside double parentheses
 The following attributes are currently defined for functions on all targets: 
 noreturn, noinline, always_inline, pure, const, format, format_arg, 
 no_instrument_function, section, constructor, destructor, used, unused, deprecated, weak, malloc, and alias
+3.What are POD types in C++?
+POD stands for Plain Old Data - that is, 
+a class (whether defined with the keyword struct or the keyword class) without constructors, destructors and virtual members functions. 
+
+Wikipedias article on POD goes into a bit more detail and defines it as:
+A Plain Old Data Structure in C++ is an aggregate class that contains only PODS as members, has no user-defined destructor, no user-defined copy assignment operator, and no nonstatic members of pointer-to-member type.
 ---
+Terminate_Method
+{
+no,
+passive,
+active
+}
+TCPState_state
+{
+notuse,
+verify,
+sync,
+ok,
+recycle
+}
+DWORD taskType;
+bool buffered;
+socket;
+TCPState_state state;
+tcptaskpoll *Pool;
+Terminate_Method terminate;
+bool terminate_wait;
+bool hasAddedEpoll;
+zRTime lefttime;
+bool uniqueVerified;
+bool need_checkSignal;
+Timer tick_timer;
+bool tick_sent;
+
 
 ----------------------------
 	C++ questions

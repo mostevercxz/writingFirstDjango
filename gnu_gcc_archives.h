@@ -25,6 +25,43 @@ waf notes
 waf_entry_point(current_dir, version, wafdir)
 
 ---
+---
+TCP_NODELAY and small buffer Writes
+(https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_MRG/1.2/html/Realtime_Tuning_Guide/sect-Realtime_Tuning_Guide-Application_Tuning_and_Deployment-TCP_NODELAY_and_Small_Buffer_Writes.html)
+As discussed briefly in Transmission Control Protocol (TCP), 
+by default TCP uses Nagle's algorithm to collect small outgoing packets to send all at once. 
+This can have a detrimental effect on latency.
+Applications that require lower latency on every packet sent should be run on sockets with TCP_NODELAY enabled. It can be enabled through the setsockopt command with the sockets API:
+int one = 1;
+setsockopt(descriptor, SOL_TCP, TCP_NODELAY, &one, sizeof(one));
+
+TCP_NODELAY has nothing to do with O_NDELAY;
+TCP_NODELAY disables the Nagle algorithm, while O_NDELAY puts the file descriptor into "no delay" mode.
+
+Non-blocking io mode:
+int flags = fcntl(fd, F_GETFL, 0);
+fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+The O_NONBLOCK doesn't provide any notification to the user process that a fd is ready for read(2) or write(2) -- 
+instead, it changes the behavior of read(2) and write(2) and similar calls to return immediately if the file descriptor isn't ready for reading or writing. 
+O_NONBLOCK is typically used in conjunction with select(2) or poll(2) or similar calls to guarantee that the main loop of a client or server won't block on one specific peer, and thus starve all its peers.
+
+The O_NDELAY flag tells UNIX that this program doesn't care what state the DCD signal line is in - 
+whether the other end of the port is up and running. 
+If you do not specify this flag, your process will be put to sleep until the DCD signal line is the space voltage.
+---
+
+---
+Basic thread management
+1.thread creation
+Any thread can create child thread at any time.
+2.thread termination
+If the parent thread terminates, all of its child threads terminate as well.
+3.thread join
+A thread can execute a thread join to wait until the other thread terminates. Thread join is for a parent to join with one of its child threads.
+4.thread yield
+When a thread executes a thread yield, the executing thread is suspended and the CPU is given to some other runnable thread.
+---
+
 ------------------------
 	dynamic librarys
 ------------------------	
