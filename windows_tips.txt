@@ -391,6 +391,8 @@ https://github.com/na-ka-na/ExcelCompare
 ---
 
 ---
+errata for the PIL
+Programming in Lua, error pages.(http://www.lua.org/pil/errata.html#3ed)
 Variadic Function, 可变参函数
 a={}
 a["x"] = 10
@@ -414,4 +416,105 @@ unpack uses the length operator to know how mant elements to return. So it works
 
 table.pack receives any number of arguments and returns a new table with all its arguments, just like {...}
 But this table has also an extra field "n", with the total number of args.
+
+Chapter 6
+A closure is a function plus all it needs to access non-local variable directly.
+What is a value in Lua is the closure, not the function.
+
+o:foo(x) <--> o.foo(o, x)
+
+Chapter 7
+Generic for, Step 1:
+The first thing the for does is to evaluate the expressions after the keyword <<in>>.
+These expressions should result in the three values kept by the for :
+the iterator function, 
+the invariant state, and 
+the initial value for the control variable.
+Step 2:
+calls the iterator function with two arguments : the invariant state and the control variable.
+Step 3:
+assigns the values returned by the iterator function to the vars decalred by its variable list.
+Step 4:
+If the first value returned is nil, the loop terminates. Or, the for executes its body and call the iteration function again.
+
+for var1, var2, ..., varn in <explist> do <block> end
+
+do
+	local _f, _s, _var = <explist>
+	while true do
+		local var1, var2,...,varn = _f(_s, _var)
+		_var = var1
+		if _var == nil then break end
+		<block>
+	end
+end
+
+Chapter 8 -- Compilation Execution and Erros
+The distinguishing feature of interpreted languages is that it's possible(and easy) to execute code generated on the fly.
+-- 8.1 Compilation --
+dofile() run chunks of Lua code.
+loadfile() loads a Lua chunk from file, but it does not run the chunk. It compiles the chunk and return the compiled chunk as a func.
+loadfile() does not raise errors. 
+a,b = loadfile('error_file.lua')
+In case of error, a is nil, b is error message(Not necessarily a string, maybe a table).
+
+load() is similar to loadfile() except that it reads its chunk from a string.
+assert(load(str))() can generate clear error messages
+load() does not compile with lexical scoping. load() always compiles its chunk in the global environment.
+load() calls the reader func successively until it returns nil.
+f = load(io.lines(filename, "*L"))
+f = load(io.lines(filename, 1024)) is more efficient.
+
+f = load("i=i+1")
+f = function () i = i + 1 end
+The seoncd line is much faster, because Lua compiles the func together with its enclosing chunk.
+The first line load() involves a separate compilation.
+
+Lua treats any independent chunk as the body of an anonymous func with a variable number of args.
+load("a=1")
+function(...) a = 1 end
+A common mistake is to assume that loading a chunk deifines functions.
+In Lua, function definitions are assignments, they happen at runtime, not compile time.
+-- file 'foo.lua'
+function foo(x)
+  print(x)
+end
+
+f = loadfile('foo.lua')
+foo is compiled but not defined yet.
+print(foo) --> nil
+f()        --> defines foo()
+foo("ok")  --> "ok"
+
+-- 8.2 Precompiled code --
+How to produce a binary chunk ? luac -o prog.lc prog.lua
+loadfile() and load() accept precompiled code.
+string.dump() receives a Lua function and returns its precompiled code as a string.
+Google "lua opcode". Gain some knowledge about precompiled form Lua code.
+
+--8.3 C code --
+local path = "/usr/local/lib/lua/5.1/socket.so"
+local f = package.loadlib(path, "luaopen_socket")
+loadlib() does not call the given function. It returns the C function as a Lua function.
+On error, it returns nil + error message.
+More often than not, we load C libraries using require().
+
+-- 8.4 Errors --
+Errare humanum est.(to err is human)
+Whenever an error occurs, Lua ends the current chunk and returns to the application.
+Explicitly raise an error calling the error("You are error!!")
+assert(io.read("*n"), "invalid input")
+An exception that is easily avoided should raise an error, otherwise it should return an error code.
+file = assert(io.open("file_name", "r"))
+
+-- 8.5 Error handling and Exceptions --
+If you need to handle errors in Lua, you must use the pcall() function to encapsulate your code.
+pcall() calls its first arg in protected mode, so that it catches any errors while the function is running.
+If no errors, return true + any values returned by the call.
+Otherwise, return false + error message.
+The error message does not have to be a string, pcall() will return any Lua value that you passed to error() function.
+
+-- 8.6 Erorr messages and Tracebacks --
+Whenever the error message is a string, Lua tries to add some info(file name, and line number) about the error happened.
+xcall(), debug.debug, debug.traceback
 ---
