@@ -622,7 +622,7 @@ when the argument is a unicode object; or the value of the byte when the argumen
 	git clone https://github.com/Valloric/YouCompleteMe.git ~/.vim/bundle/YouCompleteMe
 	cd ~/.vim/bundle/YouCompleteMe
 	git submodule update --init --recursive
-	./install.sh --clang-completer
+	./install.py --clang-completer --gocode-completer
 	vim ~/.vimrc, Plugin 'file:///home/userName/.vim/bundle/YouCompleteMe'
 	
 	ubuntu 中文乱码

@@ -517,4 +517,31 @@ The error message does not have to be a string, pcall() will return any Lua valu
 -- 8.6 Erorr messages and Tracebacks --
 Whenever the error message is a string, Lua tries to add some info(file name, and line number) about the error happened.
 xcall(), debug.debug, debug.traceback
+
+-- Chapter 9, Coroutine --
+-- 9.1 Coroutine basics --
+Coroutines, on the other hand, are collaborative:
+At any given time, a program with coroutines is running only one of its coroutines,
+and this running coroutine suspends its execution only when it explicitly requests to be suspended.
+
+A coroutine can be in one of four states : suspended, running, dead, and normal.
+The real power of coroutines steams from the yield function, 
+which allows a running coroutine to suspend its own execution so that it can be resumed later.
+
+coroutine.resume() runs in protected mode. If there is any error inside a coroutine, 
+Lua will not show  the error message, but instead return it to the resume call.
+
+Pair resume-yield can exchange data.
+yield() returns any extra arguments passed to the corresponding resume().
+When a coroutine ends, any value returned by its main function go to the corresponding resume().
+
+-- 9.2 Pipes and Filters --
+
+get benchmark
+os.clock()
+
+---
+Github follow an organization
+(Following an organization wouldn't get you anything since they don't do anything. (People who belong to organizations do things).)
+$.post('https://github.com/users/follow?target=org_name')
 ---

@@ -765,6 +765,15 @@ git remote -v
 10. git revert a file
 git checkout file_name
 git checkout -- file_name
+
+11. git clone, speed is too slow
+git config --global http.proxy http://proxyuser:proxypwd@proxy.server.com:8080
+git config --global http.proxy ss://aes-256-cfb:proxypwd@proxy.server.com:8080
+git config --global https.proxy https://proxyuser:proxypwd@proxy.server.com:8080
+git config --global --get http.proxy
+git config --global --get https.proxy
+$ git config --global --unset http.proxy
+$ git config --global --unset https.proxy
 	
 Svn tips
 ------------------------------

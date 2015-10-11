@@ -217,6 +217,11 @@ uname -a
 36. Uninstall a sudo apt-get install(http://askubuntu.com/questions/187888/what-is-the-correct-way-to-completely-remove-an-application)
 	sudo apt-get remove npm
 	
+	Ubuntu show install packages?
+	dpkg --get-selections | grep -v deinstall
+	dpkg -l
+	apt --installed list
+	
 37. awk conflict with shell arguments
 	using single quotes, not double quotes.
 	Shell will expand the value of $1 in double quotes using shell argument.
@@ -424,7 +429,7 @@ cecho y "Yellow!"
 	su - giant
 	userdel -r giant
 	
-	add user on ubuntu 15.04
+	add user on ubuntu 15.04, Ubuntu 14.04.2 LTS
 	adduser git
 	deluser git
 	
@@ -641,7 +646,21 @@ CentOS : yum install mlocate
 
 46. Diagnose network problems using mtr
 mtr -rw 123.123.123.123
+
+47. How to export putty sessions ?
+regedit /e "%userprofile%\desktop\putty-sessions.reg" HKEY_CURRENT_USER\Software\SimonTatham\PuTTY\Sessions
+
+48. How to kill all connections that occupy the specific port number?
+For example, kill all connections that occupy port=38035?
+  port = 38035
+  netstat -np |grep $port
+  lsof -np $pid |grep $port
+  gdb -p $pid
+  close(number)
+  quit
 	
+49. wget rename file
+  wget --content-disposition  https://www.abc.com/def/a/file_name.java
 	
 	
 ==================

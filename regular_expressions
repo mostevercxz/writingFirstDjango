@@ -181,3 +181,10 @@ using System.Text.RegularExpressions
 	<   &lt;
 	>   &gt;
 	&   &amp;	
+	
+---
+Perl
+1. How to get length a string in Perl?
+perldoc -f length
+print $str =~ y===c
+---

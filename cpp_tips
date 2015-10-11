@@ -37,6 +37,9 @@ for(Element& e : collection)
    foo(e);
 }
 
+show clang options :
+clang -### -c hello.c
+
 ---
 standard library
 std::for_each()
