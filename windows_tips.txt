@@ -545,3 +545,8 @@ Github follow an organization
 (Following an organization wouldn't get you anything since they don't do anything. (People who belong to organizations do things).)
 $.post('https://github.com/users/follow?target=org_name')
 ---
+
+Show a path:
+C:>path
+C:>echo %path%
+C:>set path

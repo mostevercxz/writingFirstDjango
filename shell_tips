@@ -42,6 +42,7 @@
 	before:
 	find . -iname \.*h -exec grep -nH keyword {} \;
 	find . -iname \.*cpp -exec grep -nH keyword {} \;
+	find . -iname \.*cpp -exec ls -alh $1 {} \;
 	
 	after:
 	
@@ -245,6 +246,17 @@ uname -a
 	putty errors:
 	unable to use key file (not a private key)
 	(save as private key, not Public key)
+	
+41. Bitbucket add ssh keys(https://confluence.atlassian.com/bitbucket/set-up-ssh-for-git-728138079.html)
+    1. From Bitbucket Cloud, choose avatar > Manage account from the application menu. 
+	2.Click SSH keys.
+	3.Back in your terminal window, copy the contents of your public key file.
+	4.Click Clone button, change clone method from https --> ssh.
+	5. git clone git@bitbucket.org<accountname>/<reponame>.git
+	
+42. git repository change
+    git clone --bare git://github.com/username/project.git
+	git push --mirror git@gitcafe.com/username/newproject.git
 	
 	
             
@@ -661,6 +673,18 @@ For example, kill all connections that occupy port=38035?
 	
 49. wget rename file
   wget --content-disposition  https://www.abc.com/def/a/file_name.java
+  
+50. How to extract files to another directory using tar?
+	tar extract multiple files
+    tar -xf archive.tar -C /target/directory
+	ls /all_files/*.tar.gz | xargs -i tar -zxf {} -C /target/directory
+	
+51. svn, how to rollback commited changes ?
+    svn log
+	svn diff -r28:25
+	svn merge -r28:25
+	svn diff -r28:25
+	svn commit -m"rollback"
 	
 	
 ==================

@@ -618,7 +618,7 @@ when the argument is a unicode object; or the value of the byte when the argumen
 	vim ~/.vimrc, syntax on(add color to vim)
 	
 6.	How to install YouCompleteMe??
-	sudo apt-get install build-essential cmake
+	sudo apt-get install build-essential cmake golang
 	git clone https://github.com/Valloric/YouCompleteMe.git ~/.vim/bundle/YouCompleteMe
 	cd ~/.vim/bundle/YouCompleteMe
 	git submodule update --init --recursive

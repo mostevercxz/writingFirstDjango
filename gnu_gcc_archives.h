@@ -172,6 +172,10 @@ strings /usr/lib64/libstdc++.so.6| grep -i glibc
 	comma should not have space between the content after it.(冒号后面不加空格)
 	g++ -g a.o b.o c.o -Wl,-bdynamic(OK)
 	
+20. The -Wl,xxx option for gcc passes a comma-separated list of tokens as a space-separated list of arguments to the linker.
+    gcc -Wl,aaa,bbb,ccc will be 
+	ld aaa bbb ccc
+	
 	
 //gdb debugging tips
 ------------------------
