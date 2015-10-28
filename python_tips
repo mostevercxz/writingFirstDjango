@@ -102,8 +102,14 @@ pyCon many python tips
 --------------------------
 	Python basic
 --------------------------
-1. How to raise an exception in python?
+1. How to raise an exception in python?(http://stackoverflow.com/questions/2052390/manually-raising-throwing-an-exception-in-python)
 	raise Exception("I know python!!")
+	
+	Use the most specific Exception constructor that semantically fits your issue. Be specific in your message.
+    raise ValueError('A very specific bad thing happened')
+	
+	Avoid raising a generic Exception, to catch it, you'll have to catch all other more specific exceptions that subclass it:
+    raise Exception('I know Python!') # don't, if you catch, likely to hide bugs.
 
 2. matches = re.findall(r'balabala', text)
 	",".join(matches)
@@ -261,6 +267,46 @@ def query_yes_no(question, default="yes"):
 	在TableMake目录下test.py中添加debug_line函数， python test.py 可以输出temp_bug_log文件
 	在/home/userName 目录下 python tools/TableMake/command.py 发现 TableMake 目录下没有temp_bug_log文件，其实是在/home/userName 目录
 	总结：以后输出到文件，思考用绝对路径，还是相对路径
+	
+21. python conditional breakpoints
+    pdb filename.py
+	b 9
+	Breakpoint 2 at ...
+	ignore 1 1000
+	Will ignore next 1000 crossings of breakpoint 1.
+	c
+	
+	======
+	break 9, j > 0
+	break
+	Num Type         Disp Enb   Where
+	1   breakpoint   keep yes   at .../pdb_break.py:9
+			stop only if j>0
+			
+	======
+	b 9
+	Breakpoint 1 at .../pdb_break.py:9
+	condition 1 j > 0
+
+22. python3 print encoding
+    An alternative solution to those already suggested is to set the PYTHONIOENCODING environment variable before Python starts, 
+	for my use - this is less trouble then swapping sys.stdout after Python is initialized:
+    PYTHONIOENCODING=utf-8:surrogateescape python3 somescript.py
+	
+	===
+	set sys.stdout encoding in Python2
+	sys.stdout = codecs.getwriter("utf-8")(sys.stdout)
+	
+23. python requests get raw content
+    r = requests.get('http://aaa.com', stream = True)
+	r.raw.read(10)
+	#Get the whole raw data
+	r.raw.data
+	
+24. python BeautifulSoup encodings
+    http://www.crummy.com/software/BeautifulSoup/bs4/doc/
+    Unicode, Dammit guesses correctly most of the time, but sometimes it makes mistakes. Sometimes it guesses correctly, but only after a byte-by-byte search of the document that takes a very long time. If you happen to know a document’s encoding ahead of time, you can avoid mistakes and delays by passing it to the BeautifulSoup constructor as from_encoding.
+	soup = BeautifulSoup(request.raw.data, 'html.parser', from_encoding='windows-1252')
 
 --------------------------	
 	python errors handle
@@ -509,6 +555,10 @@ def log(*objs):
 27. python debugging show attributes's values
 	(pdb) import sys
 	(pdb) p sys.__dict__
+	
+28. check if a key is in a dict
+    key in dict
+	dict.has_key(key)
 		
 -------------------------------
 	Python Built-in functions

@@ -222,7 +222,27 @@ insert into tableName(path, configname, id) select "C:\\windows\\", "config.xml"
 5.	show current user
 	select user();
 	select database();
-6.	
+6.	mysql select binary data(select binary as hex)
+    mysql> CREATE TABLE t (c BINARY(3));
+	Query OK, 0 rows affected (0.01 sec)
+	
+	mysql> INSERT INTO t SET c = 'a';
+	Query OK, 1 row affected (0.01 sec)
+	
+	mysql> SELECT HEX(c), c = 'a', c = 'a\0\0' from t;
+	+--------+---------+-------------+
+	| HEX(c) | c = 'a' | c = 'a\0\0' |
+	+--------+---------+-------------+
+	| 610000 |       0 |           1 |
+	+--------+---------+-------------+
+	1 row in set (0.09 sec)
+	
+	To escape binary values, MySQL supports the following formats: X'val', x'val', or 0xval. The former is SQL standard, the latter is ODBC standard.
+	Examples:
+	mysql> SELECT x'4D7953514C';
+	-> 'MySQL'
+	mysql> SELECT 0x4D7953514C;
+	-> 'MySQL'
 	
 
 ========= basic commands

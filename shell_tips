@@ -258,6 +258,9 @@ uname -a
     git clone --bare git://github.com/username/project.git
 	git push --mirror git@gitcafe.com/username/newproject.git
 	
+43. grep two or more patterns
+    grep -E 'foo|bar' *.txt
+	
 	
             
 Line 2 creates a variable called STR and assigns the string "Hello World!" to it. 
@@ -685,6 +688,13 @@ For example, kill all connections that occupy port=38035?
 	svn merge -r28:25
 	svn diff -r28:25
 	svn commit -m"rollback"
+	
+52. svn how to rollback delete files?(if not commited, svn revert foo.txt)
+    svn rm foo.txt
+    svn ci foo.txt -m "removed file"
+    (now at r5 as an example)
+    svn cp url/to/removed/foo.txt@4 -r4 foo.txt
+    svn ci foo.txt -m "got file back"
 	
 	
 ==================

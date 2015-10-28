@@ -540,6 +540,10 @@ When a coroutine ends, any value returned by its main function go to the corresp
 get benchmark
 os.clock()
 
+How to list all functions in lua file?
+(http://stackoverflow.com/questions/17294323/list-lua-functions-in-a-file)
+luac -o temp script.lua
+
 ---
 Github follow an organization
 (Following an organization wouldn't get you anything since they don't do anything. (People who belong to organizations do things).)

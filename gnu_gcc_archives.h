@@ -176,6 +176,63 @@ strings /usr/lib64/libstdc++.so.6| grep -i glibc
     gcc -Wl,aaa,bbb,ccc will be 
 	ld aaa bbb ccc
 	
+21. What does _GLIBCXX_VISIBILITY mean?(http://stackoverflow.com/questions/29270208/what-is-glibcxx-visibility)
+	It's a preprocessor macro. And is defined as:
+	
+	#if _GLIBCXX_HAVE_ATTRIBUTE_VISIBILITY
+	#define _GLIBCXX_VISIBILITY(V) __attribute__ ((__visibility__ (#V)))
+	#else
+	#define _GLIBCXX_VISIBILITY(V) 
+	#endif
+	So if _GLIBCXX_HAVE_ATTRIBUTE_VISIBILITY is true then in your case it will expand to:
+	
+	__attribute__ (( __visibility__ ("default")))
+	else if _GLIBCXX_HAVE_ATTRIBUTE_VISIBILITY is false it will do nothing.
+	
+	The __visibility__ attribute is used for defining the visibility of the symbols in a DSO file. Using "hidden" instead of "default" can be used to hide symbols from things outside the DSO.
+	
+	For example:
+	
+	__attribute__ ((__visibility__("default"))) void foo();
+	__attribute__ ((__visibility__("hidden"))) void bar();
+	The function foo() would be useable from outside the DSO whereas bar() is basically private and can only be used inside the DSO.
+	
+	You can read a bit more about the __visibility__ attribute here: https://gcc.gnu.org/wiki/Visibility
+	
+22. g++ dump class layouts and vtables?(http://stackoverflow.com/questions/2123823/dump-class-struct-member-variables-in-g)
+    (gcc Debug options, https://gcc.gnu.org/onlinedocs/gcc/Debugging-Options.html#Debugging-Options)
+    g++ -fdump-class-hierarchy -c source_file.cpp
+	Use the right tool for the right job. g++ isn't much of a hierarchy viewing tool.
+    You can always use a external tool like doxygen, that can dump graphviz diagrams.
+    For power-solutions there is gcc-xml, that can dump your whole program into an xml file that you can parse at will.
+	
+23. hash is not a member of std
+    C++ 11：
+	#include <functional>
+	using std::hash;
+	
+	C++ 03:
+	#include <tr1/functional>
+	using std::tr1::hash;
+	
+24. reuse std::ostringstream oss;
+    oss.clear();
+	oss.str("");
+	
+	oss.clear();
+	oss.seekp(0);
+	//this is for istringstream oss.seekg(0);
+	
+25. overload pointer operator c++(http://stackoverflow.com/questions/8777845/overloading-member-access-operators-c)
+    "It has additional, atypical constraints: It must return an object (or reference to an object) that also has a pointer dereference operator, or it must return a pointer that can be used to select what the pointer dereference operator arrow is pointing at."
+	Operator -> is sepecial.
+	
+26. Build mysql connector C from Unix Source
+    tar -zxvf xxx.tar.gz
+    cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=~/bin/mysql_connector
+	make
+	make install
+
 	
 //gdb debugging tips
 ------------------------
