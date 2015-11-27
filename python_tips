@@ -307,6 +307,89 @@ def query_yes_no(question, default="yes"):
     http://www.crummy.com/software/BeautifulSoup/bs4/doc/
     Unicode, Dammit guesses correctly most of the time, but sometimes it makes mistakes. Sometimes it guesses correctly, but only after a byte-by-byte search of the document that takes a very long time. If you happen to know a document’s encoding ahead of time, you can avoid mistakes and delays by passing it to the BeautifulSoup constructor as from_encoding.
 	soup = BeautifulSoup(request.raw.data, 'html.parser', from_encoding='windows-1252')
+	
+25. python url encode
+    import urllib.parse
+	d = {'page' : '10', 'name' : '七彩'}
+	urllib.parse.urlencode(d)
+	page=10&name=%C6%DF%B2%CA
+	
+	中日韩汉字Unicode编码表
+	http://www.chi2ko.com/tool/CJK.htm
+	
+    地址栏 带中文的网址显示百分号
+	www.baidu.com/q=%C6%DF%B2%CA
+	其实去掉百分号,从左到右,两两组成十六进制数,通常是 utf-8 编码(2,3,4个十六进制数)或者 GB2312 编码(2个十六进制数)
+	python3 -c "import urllib.request;print(urllib.request.quote('七彩', encoding='gb2312'))"
+	urllib.request.unquote('七彩', encoding='gb2312')
+	
+26. python downlaod file to disk
+    url = urllib.request.URLopener()
+	url.retrieve('http://randomsite.com/file.gz',  'file.gz')
+	
+27. python requests urlencode (do not encode Chinese characters)
+    There are many times that you want to send data that is not form-encoded. If you pass in a string instead of a dict, that data will be posted directly.
+	
+28. How to parse XML with encoding 
+    >>>import xml.etree.ElementTree as ET
+	>>>f = open('a.xml','r')
+	>>>ef = ET.fromstring(f.read())
+	
+	import xml.etree.ElementTree as ET
+    xmlp = ET.XMLParser(encoding="utf-8")
+    f = ET.parse('a.xml',parser=xmlp)
+	
+29. requests ssl certificate_verify_failed
+    add 'verify = False' to post method
+    r = login_session.post(login_url, data = login_str, headers=login_header)
+	
+30. python set a custom boundary requests
+    # dict,(key, value) 分别是form.submit()时候提交的<input>节点的(name, value)
+def make_content_with_boundary(dict):
+    boundary = '---------------------------2328902828628'
+    CRLF = '\r\n'
+    l = []
+    for (k, v) in dict:
+        l.append('--' + boundary)
+        l.append('Content-Disposition: form-data; name="%s"' % k)
+        l.append('')
+        l.append(v)
+    l.append('--' + boundary + '--')
+    content = CRLF.join(l)
+    return content
+	
+31. python json serialize
+    (http://kaira.sgo.fi/2014/05/saving-and-loading-data-in-python-with.html)
+	
+32. Constantly print subprocess stdout to screen(python subprocess stdout to screen)
+    proc = subprocess.Popen(cmd, shell=True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+	
+	# Method 1
+	lines_iterator = iter(proc.stdout.readline, '')
+	for line in lines_iterator:
+	  sys.stdout.write(line)
+	  sys.stdout.flush()
+	  
+	# Method 2
+	while True:
+	  nextline = proc.stdout.readline()
+	  if nextline == '' and proc.poll() != None:
+	    break
+	  sys.stdout.write(line)
+	  sys.stdout.flush()
+	  
+33. Intercepting stdout of a subprocess while it is running
+
+    class FlushFile(object):
+    """Write-only flushing wrapper for file-type objects."""
+    def __init__(self, f):
+        self.f = f
+    def write(self, x):
+        self.f.write(x)
+        self.f.flush()
+
+	# Replace stdout with an automatically flushing version
+	sys.stdout = FlushFile(sys.__stdout__)
 
 --------------------------	
 	python errors handle

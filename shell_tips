@@ -62,6 +62,26 @@
 		done
 	}
 	grepDirs $1
+	
+	grep do not grep specific directories
+	grep pattern -r --include=\*.{cpp,h} rootdir
+	grep pattern -r --include="*.{cpp,h}" --exclude="*\.svn" --exclude-dir="*\.svn" rootdir
+	
+	python subprocess grep color
+	command = 'grep --color=always aaa file1.txt file2.txt' 
+	proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	ok, err=proc.communicate()
+	print(ok)
+	
+	grep exclude binary files
+	grep -I keyword -rnH directory/
+	
+	Why doesn't grep ignore binary files by default ?(http://unix.stackexchange.com/questions/70438/why-doesnt-grep-ignore-binary-files-by-default)
+	Not everything that grep thinks is a binary file, is actually a binary file. e.g. puppet's logs have ansi color coding in them, which makes grep think they're binary. I'd still want to search them if I'm grepping through /var/log though
+	
+	find exclude path
+	find . -type f -name "*_peaks.bed" ! -path "./tmp/*" ! -path "./scripts/*"
+	! -path "./tmp/*" - Exclude all results whose path starts with ./tmp/
 
 11. run script in current shell without dot before command( ./script_name.sh)
 	alias script_name.sh='. ./script_name.sh'
@@ -94,6 +114,26 @@
 	
 	using sed to delete empty line
 	sed -i '/^\s*$/d' filename
+	
+	sed groups
+	sed "s/\(taskbase.[a-zA-Z]*\)/c_sysDebug('\1' .. \1)"
+	cat aaa.txt | sed "s/aaa/ab = '\\\n' .. cd/"
+	
+	在每行开头和结尾加引号
+	add quote at the beginning and the end of one line
+	:%s#^\(.*\)#'\1'#
+	
+	replace tabs to spaces(two spaces) in all files
+	1.  get all files needed :
+	    find . ! -path "*svn-base*" ! -path "*\.svn*" -type f 
+	2.1 sed -i 's/\t/  /g'  (DO NOT USE SED! If there's an embedded tab in a string, you may end up mangling your code. This is what expand command was meant to handle. Use expand)
+	                         If there are "extra" spaces between the tabs they will still be there after substitution, so the margins will be ragged. Tabs expanded in the middle of lines will also not work correctly
+	2.2 find . -name '*.cpp' ! -type d -exec bash -c 'expand -t 2 "$0" > /tmp/e && mv /tmp/e "$0"' {} \;
+	    (The expand utility shall write files or the standard input to the standard output with <tab>s replaced with one or more <space>s needed to pad to the next tab stop. 
+		Any <backspace>s shall be copied to the output and cause the column position count for tab stop calculations to be decremented; 
+		the column position count shall not be decremented below zero.)
+	    Remember to backup before doing domething like this.
+	
 
 16. the awk command
 	awk 'NR==34 { sub("AAA", "BBB") }'
@@ -103,11 +143,37 @@
 	awk the last line
 	awk -F';' '{print $NF}'
 	
+	awk concatenate
+	awk '{b=$1"<=>"$2; print b}' file
+	
+	awk format string (https://www.gnu.org/software/gawk/manual/html_node/Format-Modifiers.html#Format-Modifiers)
+	awk BEGIN meaning
+	num=1
+	echo $num | awk '{printf("%02d", $0)}'
+	01
+	echo $num | awk 'BEGIN{printf("%02d", $0)}'
+	00
+	
+	awk BEGIN meaning:(https://www.gnu.org/software/gawk/manual/html_node/Using-BEGIN_002fEND.html)
+	(https://www.gnu.org/software/gawk/manual/html_node/index.html#SEC_Contents)
+	A BEGIN rule is executed once only, before the first input record is read. Likewise, an END rule is executed once only, after all the input is read.
+	awk 'BEGIN {printf("%s %8s %8s %8s \n" ,"field1", "field2", "field3", "field4")}
+	{printf("%6.2f %8.2f %8.2f %8.2f\n", $1, $2, $3, $4)}' input
+	
+	field1   field2   field3   field4 
+	11.79     7.87    11.79    68.00
+	11.79     7.87    11.79    68.00
+	11.79     7.87    11.79    68.00
+	11.79     7.87    11.79    68.00
+	
 17. tar commands
 	tar -zcvf archive.tar.gz directory/ 
 This will tell tar to c (create) an archive from the files in directory (tar is recursive by default), compress it using the z (gzip) algorithm, store the output as a f (file) named archive.tar.gz, and v (verbosely) list all the files it adds to the archive.
 	tar -zxvf archive.tar.gz 
 	tar -jxvf archive.tar.gz 
+	
+	tar uncompress xz file
+	tar xf archive.tar.xz
 
 18.	iptables
 	iptables -I INPUT -s 180.168.197.99 -p tcp -m state --state NEW -m tcp --dport 9823 -j ACCEPT	
@@ -261,6 +327,12 @@ uname -a
 43. grep two or more patterns
     grep -E 'foo|bar' *.txt
 	
+44. How to convert multiline data to one line ?
+	(http://stackoverflow.com/questions/2764051/how-to-join-multiple-lines-of-file-names-into-one-with-custom-delimiter)
+	ls -1 | tr '\n' ','
+	paste -d, -s file
+	cat file | xargs
+	
 	
             
 Line 2 creates a variable called STR and assigns the string "Hello World!" to it. 
@@ -341,10 +413,15 @@ if [[ $s1 == *${s2}* ]]
 	${shellVar}"/anotherString"	
 
 
-7. if usage
+7. if usage (You can see all the option meaning at : man bash, conditional expressions)
 	if [ ! Expr ]; then
-	
 	fi	
+	
+	# -z string
+    # True if the length of string is zero.
+	if [ ! -z $2 ]; then
+	fi
+	
 
 8. How to scp without password??
 	Let me say that you want to copy file from source_host to dest_host
@@ -562,6 +639,21 @@ fi
 
 33. find file name contains(with name)
 find . -iname "*string*" -maxdepth 1 -print
+How to limit depth for recursive file list??(print all the directories)
+find . -maxdepth 1 -type d -print
+
+find file newer than a day 
+find . -mtime -1 -print
+find . -mtime +3 -print
+
+finding files newer than another file
+find . -mindepth 3 -maxdepth 3 -type d -exec sh -c '
+  for dir do
+    find "$dir" -type f -newer "$dir"/MarkSheet*
+  done' sh {} +
+  
+  find usage:
+  http://mywiki.wooledge.org/UsingFind
 
 34. How to set DNS on Ubuntu 14.04?(http://unix.stackexchange.com/questions/128220/how-do-i-set-my-dns-on-ubuntu-14-04)
 	ubuntu show the current DNS,show DNS ipv4(nmcli dev show eth0)
@@ -689,6 +781,15 @@ For example, kill all connections that occupy port=38035?
 	svn diff -r28:25
 	svn commit -m"rollback"
 	
+	Let current revision be 729:
+	svn up -r 728
+	svn merge --dry-run -r729:728 .
+	svn merge -r729:728 .
+	svn ci * -m"rollback changes"
+	
+	svn, cancel add before commit
+	svn revert --recursive folder_name
+	
 52. svn how to rollback delete files?(if not commited, svn revert foo.txt)
     svn rm foo.txt
     svn ci foo.txt -m "removed file"
@@ -696,6 +797,107 @@ For example, kill all connections that occupy port=38035?
     svn cp url/to/removed/foo.txt@4 -r4 foo.txt
     svn ci foo.txt -m "got file back"
 	
+	svn how to rename a directory ?
+	svn mv dir1 dir2
+	svn ci * -m"rename dir"
+	
+	svn how to ignore a directory and file ?
+	$> ls *
+	foo.txt bat.txt 3Party/1.txt 3Party/2.txt 3Party/directoryName/1.txt
+	$> echo "foo.txt" > .svnignore
+	$> svn propset svn:ignore -F .svnignore .
+	$> cd 3Party
+	$> echo -e "foo.txt\ndirectoryName" > .svnignore
+	$> svn propset svn:ignore -F .svnignore .
+	
+	svn revert all changes in a repository
+	svn revert -R .
+	svn status --no-ignore | grep -E '(^\?)|(^\I)' | sed -e 's/^. *//' | sed -e 's/\(.*\)/"\1"/' | xargs rm -rf
+	svn update --force
+	
+53. setup svn server ubuntu(http://odyniec.net/articles/ubuntu-subversion-server/)
+    sudo mkdir /usr/local/svn 
+	sudo mkdir /usr/local/svn/repos
+	sudo groupadd svn
+	sudo chgrp svn /usr/local/svn/repos
+	sudo chmod g+w /usr/local/svn/repos
+	sudo chmod g+s /usr/local/svn/repos(Additionally, you need to make sure that all new files and directories created in the repos directory (in other words, anything committed to the repositories) will also be owned by the group. To accomplish this, use chmod again to set the set-group-ID bit on the directory, which causes any file created inside it to have the same group ownership as the directory itself)
+	umask 002
+	This command sets the new file mode creation mask which controls the default permissions of any new file that you create. The default value is 022 and it corresponds to read/write permissions for the file owner, and read permissions for the group and others. The new value, 002, also gives write permissions to the group, which is just what you need.
+	svnadmin create /usr/local/svn/repos/test
+	umask 022
+	
+	sudo vim /usr/local/svn/passwd-team
+	[users]
+	michal = somepassword
+	jimmy = anotherpassword
+	craig = yetanotherpassword
+	sudo chmod 600 /usr/local/svn/passwd-team
+	vim /usr/local/svn/repos/test/conf/svnserve.conf
+	There's probably some default configuration in the file, but you can just remove everything and enter this:
+	[general]
+	anon-access = none
+	password-db = /usr/local/svn/passwd-team
+	realm = Team
+	
+	sudo svnserve -d --foreground -r /usr/local/svn/repos
+
+54. set a custom boundary form submit
+    http://code.activestate.com/recipes/146306-http-client-to-post-using-multipartform-data/
+	
+55. What is the differnce between "Request Payload" and "Form Data"?
+    http://stackoverflow.com/questions/23118249/whats-the-difference-between-request-payload-vs-form-data-as-seen-in-chrome
+	http://stackoverflow.com/questions/10494574/what-is-the-difference-between-form-data-and-request-payload
+	
+56. How to send a “multipart/form-data” with requests in python?
+    http://stackoverflow.com/questions/12385179/how-to-send-a-multipart-form-data-with-requests-in-python
+	
+57. How to know what errno means?
+    #include <errno.h>
+	#include <string.h>
+	#include <stdlib.h>
+	int main(int argc, char **argv)
+	{
+		printf(strerror(atoi(argv[1]));
+	}
+	
+58. svn edit commit message
+    (http://stackoverflow.com/questions/304383/how-do-i-edit-a-log-message-that-i-already-committed-in-subversion)
+    svn propedit svn:log --revprop -r NNN
+	svn propedit -r N --revprop svn:log URL 
+    svn propset -r N --revprop svn:log "new log message" URL 
+	
+59. Linux source code location
+    ls /usr/src/linux
+	
+60. ctags exclude
+    ctags --exclude="*\.svn*" --exclude="*3Party*" -R -h"*cpp*h" -o tags
+	
+61. How to remove carriage return in Unix?
+I'm going to assume you mean carriage returns ("\r", 0x0d) at the ends of lines rather than just blindly within a file.
+$ cat infile | od -c
+0000000   h   e   l   l   o  \r  \n   g   o   o   d   b   y   e  \n
+0000017
+$ cat infile | dos2unix -U | od -c
+0000000   h   e   l   l   o  \n   g   o   o   d   b   y   e  \n
+0000016
+$ cat infile | sed 's/\r$//' | od -c
+0000000   h   e   l   l   o  \n   g   o   o   d   b   y   e  \n
+0000016
+
+62. How to convert files to UTF-8 without BOM?
+BOMflag=`cat filename.txt | od -N 3 -t x`
+if [ -z $BOMflag ]; then
+  echo "no bom"
+else
+  echo "this is with bom"
+  tail --bytes=+4 filename.txt
+fi
+    
+awk '{if(NR==1)sub(/^\xef\xbb\xbf/,"");print}' filename.txt
+
+63. redirect output to two files
+$ date | tee file1 > file2
 	
 ==================
 YouCompleteMe
@@ -714,6 +916,14 @@ set expandtab
 
 vim  replace all the tabs with spaces
 :%retab
+
+jump to the start and end of a code block?
+[{, jump to the start
+]}, jump to the end
+[(
+])
+[m
+]m
 
 ==================
 How to configure a ubuntu to accept ssh?

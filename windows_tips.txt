@@ -15,6 +15,10 @@ shift + Right Click, OPEN prompt
 D:\vs_community.exe /uninstall /force 
 wmic product where "name like 'microsoft visual%'" call uninstall /nointeractive
 
+---
+How to force a blue screen in windows?
+http://www.wikihow.com/Force-a-Blue-Screen-in-Windows
+
 
 
 Batch scripting
@@ -22,6 +26,9 @@ Batch scripting
 http://ss64.com/nt/
 1. What does the %~dp0 mean??
 The driver letter and path of that batch file.
+
+2. batch script kill processes?
+taskkill /f /im EXCEL*
 
 
 VC .NET 2003中
@@ -135,6 +142,10 @@ SET date=%mm%%dd%%yyyy%
 
 13.	SecureCRT 将标签栏 设置为 不包含 路径
 	选项 -> 全局设置 -> General -> Default Session -> Edit Default Settings -> terminal -> emulation -> advanced -> ignore window title change requests即可，这样session名字就永远不会变了。
+	
+14. 如何读取到Chrome的历史记录？
+   C:\Users\UserName\AppData\Local\Google\Chrome\User Data\Default (on Windows 7).
+   Install ODBC server for sqllite3.
 
 中英文术语对照表
 空格 whitespace
@@ -253,6 +264,7 @@ How to build qt5 with visual studio 2013??
 	1.7 Uninstall Avast
 2.	cd E:\
 	git clone https://gitorious.org/qt/qt5.git qt5
+	(How to cd another directory vs2013 Command Prompt?)
 	Visual studio 2013 tools, VS2013 x86 Native Tools Command Prompt, copy to E:\, right click, Properties, Start Position.
 	(VS2013 tools, 选择VS2013 x86 Native Tools Command Prompt, 打开目录,拷贝到E盘,右键,属性,起始位置改为E:\qt5)
 	双击VS2013 x86 Native Tools Command Prompt
@@ -544,6 +556,60 @@ How to list all functions in lua file?
 (http://stackoverflow.com/questions/17294323/list-lua-functions-in-a-file)
 luac -o temp script.lua
 
+
+===
+Install luarocks
+wget http://keplerproject.github.io/luarocks/releases/luarocks-2.2.2.tar.gz
+tar -zxf luarocks-2.2.2.tar.gz
+cd luarocks-2.2.2/
+export PATH=/home/giant/bin/lua/include:/home/giant/bin/lua/bin:$PATH
+./configure --prefix=/home/giant/bin/lua
+make build
+make install
+===
+Install luasocket using luarocks:
+sudo apt-get update
+sudo apt-get install unzip
+luarocks install luasocket-3.0rc1-2.src.rock
+
+lua
+> require("socket")
+table:0x12345678
+
+export LUA_PATH="/home/giant/bin/lua/share/lua/5.3/?.lua;?.lua"
+export LUA_CPATH="/home/giant/bin/lua/lib/lua/5.3/?.so;?.so"
+---
+Print lua stack 
+print(debug.traceback())
+---
+lua 5.1 -> 5.2 error
+LUA_HOOKTAILRET  --> LUA_HOOKTAILCALL 
+lua_getfenv --> lua_getenv
+lua_objlen --> lua_rawlen 
+
+How to compile dynamic lua library file?
+(http://stackoverflow.com/questions/20848275/compiling-lua-create-so-files)
+vim src/Makefile
+CFLAGS= -O2 -Wall -DLUA_COMPAT_ALL $(SYSCFLAGS) $(MYCFLAGS) -fPIC
+LUA_A = liblua.so
+
+Where to download lua binary executables and libraries?
+http://luabinaries.sourceforge.net/
+---
+How to run makefile in windows ? makefile make in windows?
+open VS2013 Native Command Prompt
+nmake /f makefile.win
+---
+gnu makefile special variables:
+(https://www.gnu.org/software/make/manual/html_node/Automatic-Variables.html)
+$@
+The file name of the target of the rule. If the target is an archive member, then ‘$@’ is the name of the archive file. In a pattern rule that has multiple targets (see Introduction to Pattern Rules), ‘$@’ is the name of whichever target caused the rule’s recipe to be run.
+$?
+The names of all the prerequisites that are newer than the target, with spaces between them. For prerequisites which are archive members, only the named member is used (see Archives).
+---
+Compilation fails with “relocation R_X86_64_32 against `.rodata.str1.8' can not be used when making a shared object”
+(http://stackoverflow.com/questions/19364969/compilation-fails-with-relocation-r-x86-64-32-against-rodata-str1-8-can-not)
+Do what the compiler tells you to do, i.e. recompile with -fPIC. To learn what does this flag do and why you need it in this case, see Code Generation Options of the GCC manual.
 ---
 Github follow an organization
 (Following an organization wouldn't get you anything since they don't do anything. (People who belong to organizations do things).)

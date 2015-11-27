@@ -232,8 +232,328 @@ strings /usr/lib64/libstdc++.so.6| grep -i glibc
     cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=~/bin/mysql_connector
 	make
 	make install
-
 	
+27. extern void *memset(void *__s, int __c, size_t __n) __THROW __nonnull((1));
+    grep __THROW /usr/include/*h -nH | grep define
+	vim /usr/include/getopt.h
+	#define __THROW throw()
+	
+	nonnull:(https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#Common-Function-Attributes)
+	The nonnull attribute specifies that some function parameters should be non-null pointers. For instance, the declaration:
+    extern void * my_memcpy (void *dest, const void *src, size_t len) __attribute__((nonnull (1, 2)));
+	causes the compiler to check that, in calls to my_memcpy, arguments dest and src are non-null. 
+	If the compiler determines that a null pointer is passed in an argument slot marked as non-null, and the -Wnonnull option is enabled, a warning is issued.
+	If no argument index list is given to the nonnull attribute, all pointer arguments are marked as non-null
+	
+28. _MM_SET_FLUSH_ZERO_MODE means what ??(https://msdn.microsoft.com/en-us/library/a8b5ts9s(v=vs.90).aspx)
+    Writes to bit fifteen of the control register.
+	
+29. Fix build warning "class 'foo' was previously declared as a struct [-Wmismatched-tags]"
+    苦力活,将class struct 不一致的,统一下
+	
+30. What is the purpose of those command line options? Please help to decipher 解释 the meaning of the following command line:
+-Wl,--start-group -lmy_lib -lyour_lib -lhis_lib -Wl,--end-group -ltheir_lib
+It is for resolving circular dependences between several libraries (listed between -( and -)).
+-( archives -) or --start-group archives --end-group
+
+The archives should be a list of archive files. They may be either explicit file names, or -l options.
+
+The specified archives are searched repeatedly until no new undefined references are created. Normally, an archive is searched only once in the order that it is specified on the command line. If a symbol in that archive is needed to resolve an undefined symbol referred to by an object in an archive that appears later on the command line, the linker would not be able to resolve that reference. By grouping the archives, they all be searched repeatedly until all possible references are resolved.
+
+Using this option has a significant performance cost. It is best to use it only when there are unavoidable circular references between two or more archives.
+
+31. -static-libgcc
+On systems that provide libgcc as a shared library, these options force the use of either the shared or static version, respectively. 
+If no shared version of libgcc was built when the compiler was configured, these options have no effect.
+
+32. -static-libstdc++
+When the g++ program is used to link a C++ program, it normally automatically links against libstdc++. 
+If libstdc++ is available as a shared library, and the -static option is not used, then this links against the shared version of libstdc++. That is normally fine. 
+However, it is sometimes useful to freeze the version of libstdc++ used by the program without going all the way to a fully static link. 
+The -static-libstdc++ option directs the g++ driver to link libstdc++ statically, without necessarily linking other libraries statically. 
+
+
+gcc options
+--------------
+1. -fno-strict-aliasing (https://gcc.gnu.org/onlinedocs/gcc-4.3.6/gnat_ugn_unw/Switches-for-gcc.html)
+Causes the compiler to avoid assumptions regarding non-aliasing of objects of different types. See Optimization and Strict Aliasing for details. 
+
+
+---
+c knowledges
+How to print an address of a variable?
+The simplest answer, assuming you don't mind the vagaries and variations in format between different platforms, is the standard %p notation.
+The C99 standard (ISO/IEC 9899:1999) says in §7.19.6.1:
+p The argument shall be a pointer to void. 
+The value of the pointer is converted to a sequence of printing characters, in an implementation-defined manner.
+
+---
+compile debugging tricks
+1. How to show the value of a macro (#define) at compile-time ?
+#include <boost/preprocessor/stringize.hpp>
+#pragma message("BOOST_VERSION=" BOOST_PP_STRINGIZE(BOOST_VERSION))
+
+#define XSTR(x) STR(x)
+#define STR(x) #x
+
+gcc Diagnostic pragmas
+https://gcc.gnu.org/onlinedocs/gcc/Diagnostic-Pragmas.html#Diagnostic-Pragmas
+#pragma GCC diagnostic kind option
+Modifies the disposition of a diagnostic. Note that not all diagnostics are modifiable; at the moment only warnings (normally controlled by ‘-W...’) can be controlled, and not all of them. Use -fdiagnostics-show-option to determine which diagnostics are controllable and which option controls them.
+kind is ‘error’ to treat this diagnostic as an error, ‘warning’ to treat it like a warning (even if -Werror is in effect), or ‘ignored’ if the diagnostic is to be ignored. option is a double quoted string that matches the command-line option.
+
+          #pragma GCC diagnostic warning "-Wformat"
+          #pragma GCC diagnostic error "-Wformat"
+          #pragma GCC diagnostic ignored "-Wformat"
+Note that these pragmas override any command-line options. GCC keeps track of the location of each pragma, and issues diagnostics according to the state as of that point in the source file. Thus, pragmas occurring after a line do not affect diagnostics caused by that line. 
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic pop
+Causes GCC to remember the state of the diagnostics as of each push, and restore to that point at each pop. If a pop has no matching push, the command-line options are restored.
+          #pragma GCC diagnostic error "-Wuninitialized"
+            foo(a);                       /* error is given for this one */
+          #pragma GCC diagnostic push
+          #pragma GCC diagnostic ignored "-Wuninitialized"
+            foo(b);                       /* no diagnostic for this one */
+          #pragma GCC diagnostic pop
+            foo(c);                       /* error is given for this one */
+          #pragma GCC diagnostic pop
+            foo(d);                       /* depends on command-line options */
+			
+GCC also offers a simple mechanism for printing messages during compilation.
+#pragma message string
+Prints string as a compiler message on compilation. The message is informational only, and is neither a compilation warning nor an error.
+          #pragma message "Compiling " __FILE__ "..."
+string may be parenthesized, and is printed with location information. For example,
+
+          #define DO_PRAGMA(x) _Pragma (#x)
+          #define TODO(x) DO_PRAGMA(message ("TODO - " #x))
+          
+          TODO(Remember to fix this)
+prints ‘/tmp/file.c:4: note: #pragma message: TODO - Remember to fix this’.
+
+gcc stringification
+Sometimes you may want to convert a macro argument into a string constant. 
+Parameters are not replaced inside string constants, but you can use the ‘#’ preprocessing operator instead. 
+When a macro parameter is used with a leading ‘#’, the preprocessor replaces it with the literal text of the actual argument, converted to a string constant. 
+Unlike normal parameter replacement, the argument is not macro-expanded first. This is called stringification.
+
+All leading and trailing whitespace in text being stringified is ignored. Any sequence of whitespace in the middle of the text is converted to a single space in the stringified result. 
+Comments are replaced by whitespace long before stringification happens, so they never appear in stringified text.
+
+There is no way to convert a macro argument into a character constant.
+
+If you want to stringify the result of expansion of a macro argument, you have to use two levels of macros.
+     #define xstr(s) str(s)
+     #define str(s) #s
+     #define foo 4
+     str (foo)
+          ==> "foo"
+     xstr (foo)
+          ==> xstr (4)
+          ==> str (4)
+          ==> "4"
+	
+	
+
+---
+#ifndef __attribute__
+/* This feature is available in gcc versions 2.5 and later.  */
+# if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 5) || \
+  defined __STRICT_ANSI__
+#  define __attribute__(Spec) /* empty */
+# endif
+/* The __-protected variants of `format' and `printf' attributes
+   are accepted by gcc versions 2.6.4 (effectively 2.7) and later.  */
+# if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 7) || \
+  defined __STRICT_ANSI__
+#  define __format__ format
+#  define __printf__ printf
+# endif
+#endif
+   
+
+#define HK_ALIGN_REAL HK_ALIGN_FLOAT
+#define HK_ALIGN_FLOAT HK_ALIGN16
+#define HK_ALIGN16(DECL) DECL __attribute__((aligned(16)))
+#include <argp.h>
+// now __attribute__ is ignored, sizeof(AlignTest) = 4
+class AlignTest{
+  public:
+    HK_ALIGN16(float m_number);
+};
+
+// put #include <argp.h> here, sizeof(AlignTest) = 16
+
+#include <iostream>
+int main()
+{
+  std::cout << "sizeof is" << sizeof(AlignTest) << std::endl;
+  return 0;
+}
+
+implicit instantiation of undefined template 'hkCompileError::COMPILE_ASSERTION_FAILURE<false>'
+1470
+1487
+clang++ -g -U__STRICT_ANSI__ test_argp.cpp -o test_argp
+__attribute__((aligned(16)))
+---
+
+---
+1. C++ alignas specific
+The alignas specifier may be applied to the declaration of a variable or a non-bitfield class data member, or it can be applied to the declaration or definition of a class/struct/union or enumeration. 
+It cannot be applied to a function parameter or to the exception parameter of a catch clause.
+The object or the type declared by such a declaration will have its alignment requirement equal to the stricted (largest) non-zero expression of all alignas specifiers used in the declaration, 
+unless it would weaken the natural alignment of the type.
+alignas(0) is always ignored.
+// every object of type sse_t will be aligned to 16-byte boundary
+struct alignas(16) sse_t
+{
+  float sse_data[4];
+};
+ 
+// the array "cacheline" will be aligned to 128-byte boundary
+alignas(128) char cacheline[128];
+
+2. C structs alignment
+At least on most machines, a type is only ever aligned to a boundary as large as the type itself 
+[Edit: you can't really demand any "more" alignment than that, because you have to be able to create arrays, and you can't insert padding into an array]. 
+On your implementation, short is apparently 2 bytes, and int 4 bytes.
+
+That means your first struct is aligned to a 2-byte boundary. Since all the members are 2 bytes apiece, no padding is inserted between them.
+The second contains a 4-byte item, which gets aligned to a 4-byte boundary. 
+Since it's preceded by 6 bytes, 2 bytes of padding is inserted between v3 and i, giving 6 bytes of data in the shorts, two bytes of padding, and 4 more bytes of data in the int for a total of 12.
+technically the compile aligns to the largest alignment of any item in the struct.
+
+Can the alignment of a structure type be found if the alignments of the structure members are known?
+
+Eg. for:
+struct S
+{
+ a_t a;
+ b_t b;
+ c_t c[];
+};
+is the alignment of S = max(alignment_of(a), alignment_of(b), alignment_of(c))?
+There are two closely related concepts to here:
+
+The alignment required by the processor to access a particular object
+The alignment that the compiler actually uses to place objects in memory
+To ensure alignment requirements for structure members, the alignment of a structure must be at least as strict as the alignment of its strictest member. I don't think this is spelled out explicitly in the standard but it can be inferred from the the following facts (which are spelled out individually in the standard):
+
+Structures are allowed to have padding between their members (and at the end)
+Arrays are not allowed to have padding between their elements
+You can create an array of any structure type
+If the alignment of a structure was not at least as strict as each of its members you would not be able to create an array of structures since some structure members some elements would not be properly aligned.
+
+Now the compiler must ensure a minimum alignment for the structure based on the alignment requirements of its members but it can also align objects in a stricter fashion than required, this is often done for performance reasons. For example, many modern processors will allow access to 32-bit integers in any alignment but accesses may be significantly slower if they are not aligned on a 4-byte boundary.
+
+There is no portable way to determine the alignment enforced by the processor for any given type because this is not exposed by the language, although since the compiler obviously knows the alignment requirements of the target processor it could expose this information as an extension.
+There is also no portable way (at least in C) to determine how a compiler will actually align an object although many compilers have options to provide some level of control over the alignment.
+
+struct foo {
+  uint8_t bar;
+  uint8_t baz;
+} __attribute__((packed));
+__attribute__((aligned(1))) tells the compiler to begin each struct element on the next byte boundary but doesn't tell it how much space it can put at the end. 
+  This means that the compiler is allowed to round the struct up to a multiple of the machine word size for better use in arrays and similar.
+__attribute__((packed)) tells the compiler to not use any padding at all, even at the end of the struct
+What's the difference between "#pragma pack" and "__attribute__((aligned))"??
+The #pragma pack(byte-alignment) effect each member of the struct as specified by the byte-alignment input, or on their natural alignment boundary, whichever is less.
+The __attribute__((aligned(byte-alignment))) affect the minimum alignment of the variable (or struct field if specified within the struct).
+
+test_align.c
+#include <stdio.h>
+typedef struct foo{
+  int x[2] __attribute__ ((aligned(16)));
+} FooType;
+int main()
+{
+  printf("sizeof(foo) is %lu\n", sizeof(FooType));
+  return 0;
+}
+$ gcc -g test_align.c -o test_align
+$ ./test_align 
+sizeof(foo) is 16
+
+__attribute__ ((aligned))
+__attribute__ ((aligned (n)))
+__attribute__ ((packed))
+Whenever you leave out the alignment factor in an aligned attribute specification, 
+the OpenCL compiler automatically sets the alignment for the declared variable or field to the largest alignment which is ever used for any data type on the target device you are compiling for.
+The packed attribute specifies that a variable or structure field should have the smallest possible alignment -- one byte for a variable, unless you specify a larger value with the aligned attribute.
+
+How to reduce the size of C structure?
+http://www.catb.org/esr/structure-packing/
+
+3. print the sizeof a C++ class at compile time ?
+template <int s> struct PrintSize;
+PrintSize<sizeof(struct)> aa;
+template<int N> 
+struct print_size_as_warning
+{ 
+   char operator()() { return N + 256; } //deliberately causing overflow
+};
+
+int main() {
+        print_size_as_warning<sizeof(int)>()();
+        return 0;
+}
+4. reinterpret_cast
+reinterpret_cast < new_type > ( expression )		
+Unlike static_cast, but like const_cast, the reinterpret_cast expression does not compile to any CPU instructions. 
+It is purely a compiler directive which instructs the compiler to treat the sequence of bits (object representation) of expression as if it had the type new_type.
+
+Use reinterpret_cast to tell if CPU is little endian or big endian ?
+int i = 7;
+char *p = reinterpret_cast<char*>(&i);
+if p[0] == '\x7'
+{
+  printf("little endian");
+}
+else
+{
+  printf("big endian");
+}
+
+5. Standard C escape sequences
+Escape sequence	Hex value in ASCII	Character represented
+\a	07	Alarm (Beep, Bell)
+\b	08	Backspace
+\f	0C	Formfeed
+\n	0A	Newline (Line Feed); see notes below
+\r	0D	Carriage Return
+\t	09	Horizontal Tab
+\v	0B	Vertical Tab
+\\	5C	Backslash
+\'	27	Single quotation mark
+\"	22	Double quotation mark
+\?	3F	Question mark
+\nnn	any	The character whose numerical value is given by nnn interpreted as an octal number
+\xhh	any	The character whose numerical value is given by hh interpreted as a hexadecimal number
+
+6. What is nullptr?
+4.10 about pointer conversion says that a prvalue of type std::nullptr_t is a null pointer constant, and that an integral null pointer constant can be converted to std::nullptr_t. The opposite direction is not allowed. 
+This allows overloading a function for both pointers and integers, and passing nullptr to select the pointer version. Passing NULL or 0 would confusingly select the int version.
+A cast of nullptr_t to an integral type needs a reinterpret_cast, and has the same semantics as a cast of (void*)0 to an integral type (mapping implementation defined). 
+A reinterpret_cast cannot convert nullptr_t to any pointer type. Rely on the implicit conversion if possible or use static_cast.
+void func(int ); void func(void *);
+func(NULL);
+---
+
+---
+C++ Primer 5th edition
+Start at page 11,18
+Chapter 10, generic algorithm
+The generic algorithms, and a more detailed look at iterators, form the subject matter of this chapter.
+In general, the algorithms do not work directly on a container. Instead, they operate by traversing a range of elements bounded by two iterators
+
+---
+---
+cmake options
+cmake -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DBUILD_STATIC_LIBS=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS=-g -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=~/bin .
+---
+
 //gdb debugging tips
 ------------------------
  gbd installing tips

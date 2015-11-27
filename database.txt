@@ -244,6 +244,8 @@ insert into tableName(path, configname, id) select "C:\\windows\\", "config.xml"
 	mysql> SELECT 0x4D7953514C;
 	-> 'MySQL'
 	
+https://dev.mysql.com/doc/refman/5.7/en/mysql-real-connect.html
+	
 
 ========= basic commands
 1. alter (mysql basic commands)
