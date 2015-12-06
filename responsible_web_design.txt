@@ -144,9 +144,10 @@ sudo vim /etc/shadowsocks.json
     "method":"aes-256-cfb"
 }
 
+(sudo yum install supervisor -y)
 sudo vim /etc/supervisord.conf
 [program:shadowsocks]
-command=sudo ssserver -c /etc/shadowsocks.json
+command=ssserver -c /etc/shadowsocks.json
 autostart=true
 autorestart=true
 user=root

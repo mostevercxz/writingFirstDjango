@@ -251,6 +251,9 @@ def query_yes_no(question, default="yes"):
 18.	python shutil move no such file or directory
 	shutil.copyfile(fromPath, toPath)
 	
+	python move one file to another
+	shutil.move('common/a.txt', 'b.txt')
+	
 19.	How to check if file exists in Python ??
 	if os.path.exists("C:\AAA\BBB.txt"):
 		os.remove(file_name)

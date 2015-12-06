@@ -190,6 +190,40 @@ This will tell tar to c (create) an archive from the files in directory (tar is 
 	iptables -I INPUT -p tcp --dport 2124 --syn -j ACCEPT
 	service iptables save
 	semanage port -a -t ssh_port_t -p tcp 2124
+	
+	On a high-level iptables might contain multiple tables. Tables might contain multiple chains. Chains can be built-in or user-defined. Chains might contain multiple rules. Rules are defined for the packets.
+	1. Filter Table(mangle table, nat table, raw table)
+	Filter is default table for iptables. So, if you don’t define you own table, you’ll be using filter table. Iptables’s filter table has the following built-in chains.
+
+	INPUT chain – Incoming to firewall. For packets coming to the local server.
+	OUTPUT chain – Outgoing from firewall. For packets generated locally and going out of the local server.
+	FORWARD chain – Packet for another NIC on the local server. For packets routed through the local server.
+	
+	Following are the key points to remember for the iptables rules :
+	Rules contain a criteria 标准条件 and a target.
+	If the criteria is matched, it goes to the rules specified in the target (or) executes the special values mentioned in the target.
+	If the criteria is not matached, it moves on to the next rule.
+	
+	Target Values
+	Following are the possible special values that you can specify in the target.
+	ACCEPT – Firewall will accept the packet.
+	DROP – Firewall will drop the packet.
+	QUEUE – Firewall will pass the packet to the userspace.
+	RETURN – Firewall will stop executing the next set of rules in the current chain for this packet. The control will be returned to the calling chain.
+	
+	If you don’t specify the -t option, it will display the default filter table. So, both of the following commands are the same.
+	iptables -L
+	num – Rule number within the particular chain
+	target – Special target variable that we discussed above
+	prot – Protocols. tcp, udp, icmp, etc.,
+	opt – Special options for that specific rule.
+	source – Source ip-address of the packet
+	destination – Destination ip-address for the packet
+    
+    How to delete iptables rules?
+    sudo vim /etc/sysconfig/iptables , delete the old rules
+    sudo vim /etc/sysconfig/iptables.save, delete the old rules
+	
 19.	du -sh flodername show the entire size of the folder,查看整个文件夹大小
 20.	问题：在Xshell中设置了“自动将选中的文字复制到粘贴板”，之前一直没有问题，最近发现，
 只要选中屏幕上的文字，复制上了，但shell终端立即被中断了，即向终端发送了CTRL-C；
@@ -382,6 +416,11 @@ For the a contains b, use:
 
 if [[ $s1 == *"$s2"* ]]
 if [[ $s1 == *${s2}* ]]
+
+bash how to and expressions?
+if [ ! -z "$var" ] && [ 1 -lt 2 ]; then
+      # something ...
+fi
 
 3. search keywords : 'for line in grep'
 	--how to process each line received as a result of grep command??
@@ -898,6 +937,8 @@ awk '{if(NR==1)sub(/^\xef\xbb\xbf/,"");print}' filename.txt
 
 63. redirect output to two files
 $ date | tee file1 > file2
+
+
 	
 ==================
 YouCompleteMe

@@ -81,6 +81,21 @@ Set Full control permissions for directory Desktop (for example in Win7 & IIS 7 
 	netsh interface ipv4 show subinterfaces
 	netsh interface ipv4 set subinterface "VPN连接名称" mtu=1280 store=persistent
 	
+5. Set up Python on windows to not type python in cmd
+   C:\> assoc .py=Python
+   C:\> ftype Python="C:\python27\python.exe %1 %*"
+   similar to how it works for .exe files, add .py to the semi-colon separated list of the (global) PATHEXT variable.
+   echo %PATHEXT%
+   
+6. 华硕主板P8B75-V 开启 AHCI（Serial ATA Advanced Host Controller Interface）串行ATA高级主控接口/高级主机控制器接口
+   1. regedit 打开注册表编辑器,  找到 HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\services\msahci 双击右边的 Start 将其数值改为0
+   2. 重启电脑,按 DEL 进入 BIOS, 再进入 Advanced Mode, 选择 SATA configuration 将 IDE 改为 AHCI
+   3. 改完后进入系统, 系统会自动安装驱动,安装完后会问你是否立即重启,重启完成后就开启了AHCI
+   
+7. How to migrate system to SSD?
+   1. http://www.samsung.com/global/business/semiconductor/minisite/SSD/global/html/support/downloads.html
+   download SDM (Samsung data migration software)
+   2. install SDM and open it, then do it.
 
 batch file tips
 1.Commenting multiple lines (block comments) in batch file
@@ -146,6 +161,13 @@ SET date=%mm%%dd%%yyyy%
 14. 如何读取到Chrome的历史记录？
    C:\Users\UserName\AppData\Local\Google\Chrome\User Data\Default (on Windows 7).
    Install ODBC server for sqllite3.
+   
+15. How to copy contents of cmd prompt ? 如何拷贝cmd窗口里面的内容
+Open Command Prompt
+Right-click the title bar of the command prompt window, point to Edit, and then click Mark.
+Click the beginning of the text you want to copy.
+Press and hold down the SHIFT key, and then click the end of the text you want to copy (or you can click and drag the cursor to select the text).
+Right-click the title bar, point to Edit, and then click Copy.
 
 中英文术语对照表
 空格 whitespace
@@ -556,6 +578,17 @@ How to list all functions in lua file?
 (http://stackoverflow.com/questions/17294323/list-lua-functions-in-a-file)
 luac -o temp script.lua
 
+Chapter 25 the C API
+This ability to be used as a library to extend an application is what makes Lua an extension language.
+At the same time, a program that uses Lua can register new functions in the Lua environment; 
+such functions are implemented in C (or another language), so that they can add facilities that cannot be written directly in Lua. 
+This is what makes Lua an extensible language.
+
+In the first kind, C has the control and Lua is the library. The C code in this kind of interaction is what we call application code. 
+In the second kind, Lua has the control and C is the library. Here, the C code is called library code.
+
+A major component in the communication between Lua and C is an omnipresent virtual stack.
+Everything defined in lua.h has a lua_ prefix.
 
 ===
 Install luarocks

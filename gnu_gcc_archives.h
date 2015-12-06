@@ -539,6 +539,18 @@ A cast of nullptr_t to an integral type needs a reinterpret_cast, and has the sa
 A reinterpret_cast cannot convert nullptr_t to any pointer type. Rely on the implicit conversion if possible or use static_cast.
 void func(int ); void func(void *);
 func(NULL);
+
+7. print traceback in c++
+#include <execinfo.h>
+#define SIZE 100
+void *buffer[SIZE];
+char **strings = NULL;
+int nptrs = backtrace(buffer, SIZE);
+strings = backtrace_symbols(buffer, nptrs);
+for (int i = 0; i < nptrs; ++i)
+{
+ printf("%s", strings[i]);
+}
 ---
 
 ---
@@ -548,6 +560,11 @@ Chapter 10, generic algorithm
 The generic algorithms, and a more detailed look at iterators, form the subject matter of this chapter.
 In general, the algorithms do not work directly on a container. Instead, they operate by traversing a range of elements bounded by two iterators
 
+Trailing return type
+A trailing return type follows the parameter list and is preceded by ->. To signal that the return follows the parameter list, we use auto where the return type ordinarily appears:
+auto func(int i) -> int(*)[10];
+
+A predicate is an expression that can be called and that returns a value that can be used as a condition.
 ---
 ---
 cmake options

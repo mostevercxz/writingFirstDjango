@@ -293,6 +293,28 @@ total from portfolio group by client_id) as maxima using(client_id) where cash +
 |         2 |            4 | 40.44 |  50.55 |    90.99 |
 +-----------+--------------+-------+--------+----------+
 2 rows in set (0.00 sec)
+
+11. mysql having statement
+> SELECT `value` v FROM `table` WHERE `v`>5;
+Error #1054 - Unknown column 'v' in 'where clause'
+> SELECT `value` v FROM `table` HAVING `v`>5; -- Get 5 rows
+
+WHERE clause requires a condition to be a column in a table, but HAVING clause can use either column or alias.
+This is because WHERE clause filters data before select, but HAVING clause filters data after select.
+So put the conditions in WHERE clause will be more efficient if you have many many rows in a table.
+EXPLAIN SELECT `value` v FROM `table` WHERE `value`>5;
++----+-------------+-------+-------+---------------+-------+---------+------+------+--------------------------+
+| id | select_type | table | type  | possible_keys | key   | key_len | ref  | rows | Extra                    |
++----+-------------+-------+-------+---------------+-------+---------+------+------+--------------------------+
+|  1 | SIMPLE      | table | range | value         | value | 4       | NULL |    5 | Using where; Using index |
++----+-------------+-------+-------+---------------+-------+---------+------+------+--------------------------+
+
+EXPLAIN SELECT `value` v FROM `table` having `value`>5;
++----+-------------+-------+-------+---------------+-------+---------+------+------+-------------+
+| id | select_type | table | type  | possible_keys | key   | key_len | ref  | rows | Extra       |
++----+-------------+-------+-------+---------------+-------+---------+------+------+-------------+
+|  1 | SIMPLE      | table | index | NULL          | value | 4       | NULL |   10 | Using index |
++----+-------------+-------+-------+---------------+-------+---------+------+------+-------------+
 	
 	
 ======== interact with shell, files
