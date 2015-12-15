@@ -393,6 +393,13 @@ def make_content_with_boundary(dict):
 
 	# Replace stdout with an automatically flushing version
 	sys.stdout = FlushFile(sys.__stdout__)
+    
+34. hex to binary
+    "{0:020b}".format(int("ABCD", 16))
+    
+    binary to hex 
+    bstr = "111100001111"
+    hstr = '%0*X' % ((len(bstr) + 3) // 4, int(bstr, 2))
 
 --------------------------	
 	python errors handle

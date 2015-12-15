@@ -96,9 +96,26 @@ Set Full control permissions for directory Desktop (for example in Win7 & IIS 7 
    1. http://www.samsung.com/global/business/semiconductor/minisite/SSD/global/html/support/downloads.html
    download SDM (Samsung data migration software)
    2. install SDM and open it, then do it.
+   
+8. 如何查看 4K对齐?
+   WIN + R 
+   msinfo32
+   组件 -> 存储 -> 磁盘, 用 分区起始偏移 / 4 * 1024 = 如果是整数，表明4K 对齐
+   
+9. 查看windows激活状态
+   cmd 
+   slmgr /dlv
+   
+10. wireshark how to capture traffic for a specific program ?
+    netstat -b, find the program
+    127.0.0.1:xxxxx, where xxxxx is the local port number for the connection.
+    in Wireshark, tcp.port == xxxxx
 
 batch file tips
-1.Commenting multiple lines (block comments) in batch file
+1.comment one line :
+@rem this is the commet line
+
+Commenting multiple lines (block comments) in batch file
 goto comment
 ...skip this
 :comment
@@ -168,6 +185,21 @@ Right-click the title bar of the command prompt window, point to Edit, and then 
 Click the beginning of the text you want to copy.
 Press and hold down the SHIFT key, and then click the end of the text you want to copy (or you can click and drag the cursor to select the text).
 Right-click the title bar, point to Edit, and then click Copy.
+
+16. batch script arguments (http://ss64.com/nt/syntax.html)
+  %* for everything
+  %0 - the command used to call the batch file (could be foo, ..\foo, c:\bats\foo, etc.)
+  %1 is the first command line parameter,
+  %2 is the second command line parameter,
+  and so on till %9 (and SHIFT can be used for those after the 9th).
+  %~nx0 - the actual name of the batch file, regardless of calling method (some-batch.bat)
+  %~dp0 - drive and path to the script (d:\scripts)
+  %~dpnx0 - is the fully qualified path name of the script (d:\scripts\some-batch.bat)
+  
+17.  build VS2012 VS2013 project using msbuild
+  1.Find the position of VS2012 x86 native tools command prompt(start menu, right click)
+  2.copy to the project.sln file directory 
+  3.double click, and type "msbuild project.sln"
 
 中英文术语对照表
 空格 whitespace
@@ -250,6 +282,30 @@ A: Unlike most other DOS Make programs which accept any whitespace character at 
 
 Beginning with version 3.78, GNU Make prints a message that hints at a possible SPACEs-vs-TAB problem, like this:
 *** missing separator (did you mean TAB instead of 8 spaces?).  Stop.
+
+link errors:
+Error	LNK2038	mismatch detected for '_MSC_VER': value '1700' doesn't match value '1900' in RaycastCallbackDemo.obj hkBase.lib
+1. set _MSC_VER 
+  hkBase.lib is built with VS2012(1700)
+  RaycastCallbackDemo.obj is built with VS2015(1900)
+  Predefined libraries(https://msdn.microsoft.com/en-us/library/b0084kay.aspx)
+  For example, if the version number of the Visual C++ compiler is 17.00.51106.1, the _MSC_VER macro evaluates to 1700. Type cl /? at the command line to view the compiler's version number.
+2. project, right click, Properties
+  Properties > Config Properties > General > Platform Toolset is  v100 for visual studio 2010, v110 for visual studio 2012.
+
+3. Error	MSB8020	The build tools for Visual Studio 2012 (Platform Toolset = 'v110') cannot be found. To build using the v110 build tools, please install Visual Studio 2012 build tools.  Alternatively, you may upgrade to the current Visual Studio tools by selecting the Project menu or right-click the solution, and then selecting "Retarget solution".
+  google 'Microsoft Build Tools 2012'
+  
+如何不安装VS2012 但能够使用 cl.exe 进行编译?
+从 另一台电脑上压缩拷贝 
+C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\ 
+C:\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\
+检查环境变量里面  VS110COMNTOOLS 的路径是否正确
+最后尝试失败，重新安装vs2012
+
+---
+set up vps as proxy server
+https://www.digitalocean.com/community/tutorials/how-to-set-up-ssh-tunneling-on-a-vps
 
 ===
 VS 多行注释

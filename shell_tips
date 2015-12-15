@@ -938,6 +938,87 @@ awk '{if(NR==1)sub(/^\xef\xbb\xbf/,"");print}' filename.txt
 63. redirect output to two files
 $ date | tee file1 > file2
 
+64. how to emulate big endian platform on x86? (emulating a big-endian machine on little-endian hardware)
+  big endian systems:
+  ARM, MIPS, Sparc 
+  
+  command line test big endian little endian :
+  echo -n I | od -to2 | head -n1 | cut -f2 -d" " | cut -c6 
+  big endian : output 0; little endian : output 1
+  
+  QEMU documentation:
+  http://qemu.weilnetz.de/qemu-doc.html
+  
+  Successfully install big-endian on my windows 7 64-bit machine(成功在windows7 64位上安装Big-endian 开发环境):
+  reference : debian Sparc 32 youtube tutorial (https://www.youtube.com/watch?v=Ae5Qrz0j7cg)
+  1. download qemu(拼音ki mou) http://lassauge.free.fr/qemu/release/Qemu-2.4.0.1-windows.7z
+  2. download qemu image, (for example, sparc_small.qcow2, 140M) https://people.debian.org/~aurel32/qemu/sparc/debian_etch_sparc_small.qcow2
+  3. copy the qemu image to the qemu directory
+  4. open command prompt at the qemu directory, run :
+  qemu-system-sparc.exe -L Bios -m 256M  debian_etch_sparc_small.qcow2 -redir tcp:2222::22
+  5. If error occurs, open the error file stderr.txt, for example qemu: could not load prom 'openbios-sparc32', copy Bios/openbios-sparc32 to the exe directory
+  6. copy the following commands to a txt file, move the txt windows to the left of the screen; move the qemu windows to the right of the screen, and then log into the system. mind do not move mouse away from the qemu window, or the keyboard will not work and system need to be restarted. We need to update debian source list, install build-essential, install openssh-server(记住将要打的指令一次性都保存在一个记事本里,拖动到小窗口里,然后在qemu里依次打出来.因为鼠标一旦点击了其他窗口,qemu里面键盘好像就失灵了,打不出任何字符,只能重启系统)
+  
+  cp /etc/apt/sources.list /etc/apt/sources.list.bak
+  vi /etc/apt/sources.list
+  deb http://archive.debian.org/debian/ etch main non-free contrib
+  deb http://archive.debian.org/debian-security/ etch main non-free contrib
+  deb http://archive.debian.org/debian-volatile/ etch main non-free contrib
+  apt-get update 
+  apt-get install build-essential -y
+  apt-get install openssh-server -y
+  7. After installing ssh server, we do not need the graphic interface again, so we will start the sparc using the following command : 
+  qemu-system-sparc.exe -L Bios -m 256M -nographic debian_etch_sparc_small.qcow2 -redir tcp:2222::22
+  8. on windows, download ssh or github windows, open cmd, ssh -p 2222 root@localhost (open xshell, ssh root@localhost 2222)
+  
+  Keyboard: British English (br)
+  Language: English
+  Mirror: ftp.de.debian.org
+  Hostname: debian-sparc
+  Root password: root
+  User account: user
+  User password: user
+  
+  install debian squeeze on windows 7 64-bit(是big-endian, 但是资源太少,安装build-essential都不方便):
+  1. download debian_squeeze_powerpc_standard.qcow2 (https://people.debian.org/~aurel32/qemu/powerpc/)
+  2. copy debian_squeeze_powerpc_standard.qcow2 to qemu directory
+  3. run 
+  qemu-system-ppc.exe -name debianPPC -L Bios -m 512M -boot menu=on,splash=./bootsplash.bmp,splash-time=3000 -rtc base=localtime,clock=host -hda debian_squeeze_powerpc_standard.qcow2   -no-reboot
+  useful option : -nographic -redir tcp:2222::22
+  qemu-system-ppc.exe -name debianPPC -L Bios -m 512M -boot menu=on,splash=./bootsplash.bmp,splash-time=3000 -rtc base=localtime,clock=host -hda debian_squeeze_powerpc_standard.qcow2 -nographic -redir tcp:2222::22 -no-reboot
+  4. watch the stderr.txt on the qemu directory, do operations according to the error infomation.
+  5. 不能用国内的源,暂时没搜索到带powerpc的源,直接运行  apt-get update
+  
+  install debian wheezy under qemu(是 little-endian, 资源挺多的,安装起来方便):
+  1.download debian_wheezy_amd64_standard.qcow2 from  https://people.debian.org/~aurel32/qemu/amd64/
+  2.copy debian_wheezy_amd64_standard.qcow2 to qemu directory
+  3. open command prompt at the qemu directory, run qemu-system-x86_64  debian_wheezy_amd64_standard.qcow2
+  4. watch stderr.txt, copy files bios-256k.bin efi-e1000.rom kvmvapic.bin vgabios-stdvga.bin from Bios/ to current directory.
+  (http://tyom.blogspot.se/2013/03/debiansparc64-wheezy-under-qemu-how-to.html)
+  ssh to qemu guest debian wheezy(communications between guest and host):
+  https://en.wikibooks.org/wiki/QEMU/Networking
+  qemu-system-x86_64 -m 512 -redir tcp:2222::22 -nographic debian_wheezy_amd64_standard.qcow2
+  
+  change debian source 源 list to 163 or aliyun ? (http://mirrors.163.com/.help/debian.html)
+  cp /etc/apt/sources.list /etc/apt/sources.list.bak 
+  vim /etc/apt/sources.list  
+  
+  system emulation using qemu, https://gmplib.org/~tege/qemu.html
+  setup a PPC(Big-endian) VM using QEMU on a x86(Little-endian) host, debug endian issues, http://wiki.scummvm.org/index.php/HOWTO-Debug-Endian-Issues
+  
+  qemu image types(https://en.wikibooks.org/wiki/QEMU/Images):
+  raw : the raw format is a plain binary image of the disc image, and is very portable. On filesystems that support sparse files, images in this format only use the space actually used by the data recorded in them.
+  cloop : Compressed Loop format, mainly used for reading Knoppix and similar live CD image formats
+  cow :copy-on-write format, supported for historical reasons only and not available to QEMU on Windows
+  qcow : the old QEMU copy-on-write format, supported for historical reasons and superseded by qcow2
+  qcow2 : QEMU copy-on-write format with a range of special features, including the ability to take multiple snapshots, smaller images on filesystems that don't support sparse files, optional AES encryption, and optional zlib compression
+  vmdk : VMware 3 & 4, or 6 image format, for exchanging images with that product
+  vdi : VirtualBox 1.1 compatible image format, for exchanging images with VirtualBox.
+  
+  create a sparc system image :
+  http://codetao.blogspot.jp/2013/05/creating-qemu-sparc-system-image.html
+  
+
 
 	
 ==================
