@@ -174,11 +174,13 @@ sudo ufw status(Status: inactive, need use "sudo ufw enable")
 Django
 无法导入带中文文件名的.sql文件
 1.
-def user_defined_filename(instance, filename):
-    return myfilename
-	
 class SqlFile(models.Model):
-	filepath = models.FileField(upload_to = user_defined_filename, max_length=800)
+    savedir = MEDIA_ROOT + '/' + time.strftime('%Y%m%d')
+	filepath = models.FileField(upload_to = savedir, max_length=800)
+    
+2.Django asynchronous requests to remote api
+Celery, Async task queue
+total_count, complete_count store the value in cache.
 	
 
 =================

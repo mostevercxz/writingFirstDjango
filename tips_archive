@@ -587,6 +587,8 @@ $('.click').click(function() {
 	
 
 create git repository and upload to github
+github search:
+stars:>1 language:c++
 ------------------------------------------
 (reference:http://sirupsen.com/starting-with-git/)
 1.create ssh key, provide ssh key to git, introduce ourselves to git(https://help.github.com/articles/generating-ssh-keys/#platform-linux)
@@ -774,6 +776,17 @@ git config --global --get http.proxy
 git config --global --get https.proxy
 $ git config --global --unset http.proxy
 $ git config --global --unset https.proxy
+
+12. git clone, out of memory,
+git clone compressing objects, retrieving objects, fatal: index-pack failed
+set deltaBaseCacheLimit=512M
+git -c core.deltaBaseCacheLimit=512m clone --no-checkout --progress https://chromium.googlesource.com/chromium/src.git
+
+Or first clone a little files:
+git config --global core.compression 0
+git clone --depth 1 <repo_URI>
+git fetch --unshallow
+git pull --all
 	
 Svn tips
 ------------------------------

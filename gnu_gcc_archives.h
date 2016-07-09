@@ -17,7 +17,18 @@ It also tests the return value to see if the operation failed, which is rather u
 	gcc -c -g -Wa,-a,-ad  foo.c > foo.lst
 4.	How to translate assembly to binary??(http://stackoverflow.com/questions/3826692/how-do-i-translate-assembly-to-binary)
 	learn CPU instructions
-	
+    
+How to compile cef on Linux??
+(https://bitbucket.org/chromiumembedded/cef/wiki/MasterBuildQuickStart.md#markdown-header-linux-setup)
+./install-build-deps.sh will install 722 softwares, time used: 7 m 54s
+Press tab to focus on <ok>, press enter
+Press tab to <Yes>, press enter
+
+./update.sh(It takes About 14m 20s)
+
+How to find out what functions a static library has?
+Windows, dumpbin; Linux, nm.
+
 ---
 waf notes
 1. process flow
@@ -60,6 +71,12 @@ If the parent thread terminates, all of its child threads terminate as well.
 A thread can execute a thread join to wait until the other thread terminates. Thread join is for a parent to join with one of its child threads.
 4.thread yield
 When a thread executes a thread yield, the executing thread is suspended and the CPU is given to some other runnable thread.
+5. sigsegv handler not called child thread(but can be called in main thread)
+在主线程里面写 *(int*)=0发现会触发宕机处理函数;而子线程却不会
+sigset_t sig_mask;
+sigfillset(&sig_mask);
+sigdelset(&sig_mask, SIGSEGV);
+pthread_sigmask(SIG_SETMASK, &sig_mask, NULL)
 ---
 
 ------------------------
@@ -177,6 +194,7 @@ strings /usr/lib64/libstdc++.so.6| grep -i glibc
 	ld aaa bbb ccc
 	
 21. What does _GLIBCXX_VISIBILITY mean?(http://stackoverflow.com/questions/29270208/what-is-glibcxx-visibility)
+    attribute visibility hidden gcc
 	It's a preprocessor macro. And is defined as:
 	
 	#if _GLIBCXX_HAVE_ATTRIBUTE_VISIBILITY
@@ -271,6 +289,80 @@ When the g++ program is used to link a C++ program, it normally automatically li
 If libstdc++ is available as a shared library, and the -static option is not used, then this links against the shared version of libstdc++. That is normally fine. 
 However, it is sometimes useful to freeze the version of libstdc++ used by the program without going all the way to a fully static link. 
 The -static-libstdc++ option directs the g++ driver to link libstdc++ statically, without necessarily linking other libraries statically. 
+
+33. How to write/read ofstream in Unicode?
+std::ofstream fs;
+fs.open(filepath, std::ios::out|std::ios::binary);
+unsigned char smarker[3];
+smarker[0] = 0xEF;
+smarker[1] = 0xBB;
+smarker[2] = 0xBF;
+fs << smarker;
+fs.close();
+
+34. print a leading '+' for positive numbers in printf
+RTFM(read the fucking manual)
+printf("%+d %+d",10,-10); // prints +10 -10
+
+35. How does __attribute__((constructor)) work??
+__attribute__((constructor))
+static void initialize_navigationBarImages() {
+  navigationBarImages = [[NSMutableDictionary alloc] init];
+}
+
+__attribute__((destructor))
+static void destroy_navigationBarImages() {
+  [navigationBarImages release];
+}
+
+Constructor is run when a shared library is loaded, typically during program startup.
+The destructor is run when the shared library is unloaded, typically at program exit.
+
+So, the way the constructors and destructors work is that the shared object file contains special sections (.ctors and .dtors on ELF) 
+which contain references to the functions marked with the constructor and destructor attributes, respectively. 
+When the library is loaded/unloaded the dynamic loader program (ld.so or somesuch) checks whether such sections exist, and if so, calls the functions referenced therein.
+
+Come to think of it, there is probably some similar magic in the normal static linker, 
+so that the same code is run on startup/shutdown regardless if the user chooses static or dynamic linking.
+
+The constructor attribute causes the function to be called automatically before execution enters main (). 
+Similarly, the destructor attribute causes the function to be called automatically after main () completes or exit () is called. 
+Functions with these attributes are useful for initializing data that is used implicitly during the execution of the program.
+
+36. error:specialization of 'std::tr1::hash<const char*>' after instantiation
+/usr/include/c++/4.4.4/tr1/function_hash.h:54:12,error: redefinition of 'std::tr1::hash<const char*>', previous definition of 'struct std::tr1::hash<const char*>'
+这说明代码里其他包含 unordered_map 的文件已经声明了 std::tr1::hash<const char*> 导致 const char * 已经偏特化过了.
+所以1. 死劲分析包含文件,看看哪里调用了 'std::tr1::hash<const char*>'
+2. 代码里 grep -w hash *.*  | grep 'const char' 找到声明的那一行,改变下文件的包含顺序,要在声明 std::tr1::hash<const char*> 之前就偏特化,比如定义一个 allSTLInclude.h 里面
+#include <tr1/unordered_map> #include<backward/hash_func.h> 在该文件里面重写 std::tr1::hash<const char*>, 其他文件只包含 allSTLInclude.h ,然后再声明 std::tr1::hash<const char*> 即可.
+
+为什么 下面的代码会报错？(/usr/include/c++/4.9.2/tr1/function_hash.h 中对于类型定义的都是 inline size_t operator() 方法)
+template<> struct hash<string> : public std::unary_function<string, size_t> {
+    size_t operator() (string &s) const {return __gnu_cxx::__stl_hash_string(s.c_str()); }
+}
+而这样写就不会报错呢？(原因可能是因为 functional_hash.h 里面定义基本类型的hash 都是只定义了 operator() 方法,而非偏特化结构体
+指针类型的模板可以定义 struct,自己写的时候先定义 inline operator() ,以后再研究原因)
+template<> inline size_t hash<string>::operator() (string s) const 
+{
+    return __gnu_cxx::__stl_hash_string(s.c_str());
+}
+但对于 char * 和 const char * 两种写法却都不会报错呢？
+template<> struct hash<const char *> : public std::unary_function<const char*, size_t> {
+    size_t operator() (const char *s) const {return __gnu_cxx::__stl_hash_string(s); }
+}
+
+template<> inline size_t hash<const char *>::operator() (const char * s) const 
+{
+    return __gnu_cxx::__stl_hash_string(s);
+}
+
+一些常用的文件
+/usr/include/c++/4.4.4/backward/hash_func.h(被 backward/hashtable.h 包含)  里面定义了 __stl_hash_string 方法,实在 __gnu_cxx 命名空间下
+template <class _Key> struct hash{};
+偏特化了 char*, const char *(调用 __stl_hash_string 方法),bool,char,unsigned char,short,long,int 等常用类型
+
+c++11 中 定义在 bits/unordered_map, hash 定义在  bits/functional_hash.h 中,都是在 std 命名空间下的,不需要 std::tr1了
+但是都需要重载 char*, const char *, std::string
 
 
 gcc options
@@ -489,6 +581,7 @@ http://www.catb.org/esr/structure-packing/
 3. print the sizeof a C++ class at compile time ?
 template <int s> struct PrintSize;
 PrintSize<sizeof(struct)> aa;
+//incomplete type and cannot be defined
 template<int N> 
 struct print_size_as_warning
 { 
@@ -700,6 +793,27 @@ daemon(1,1)
 	disable display
 	enable display
 	info display
+    
+13. gdb print register values
+    info registers(or i r)
+    layout asm
+    layout reg
+    stepi
+    x
+    
+14. use asan to detect adress read/write out of bound
+    https://trac.torproject.org/projects/tor/ticket/13499
+    https://github.com/google/sanitizers/wiki/SanitizerCommonFlags
+    Make asan core dumped(easy to debug), ASAN_OPTIONS="disable_core=0:unmap_shadow_on_exit=1:abort_on_error=1:log_path=/home/giant/asan_error_log"
+    
+15. How can a C program produce a core dump of itself without terminating?
+    void create_dump(void)
+    {
+        if(!fork()) {
+            // Crash the app in your favorite way here
+            abort() || (*((void*)0) = 42);
+        }
+    }
 
 -------------------------------
 	gdb tricks I should know

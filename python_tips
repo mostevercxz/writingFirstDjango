@@ -194,6 +194,12 @@ pyCon many python tips
 	for root,dirs, filenames in os.walk(specific_dir):
 		for filename in glob.glob(root + "*.xml"):
 			self.file_list.append(os.path.join(root, filename))
+        
+    os.walk without hidden folders and files:
+    for root, dirs, files in os.walk(path, topdown=True):
+        files = [f for f in files if not f[0] == '.']
+        dirs[:] = [d for d in dirs if not d[0] == '.']
+        # use files and dirs
 			
 12.	How to do "rm -rf" in Python?
 	import shutil
@@ -261,6 +267,9 @@ def query_yes_no(question, default="yes"):
 		os.rmdir(dir_name)
 		# delete a directory and all its contents
 		shutil.rmtree(dir_name)
+        
+    How to check if directory exists in Python?
+    os.path.isdir(dirName)
 		
 20.	在TableMake 目录下添加了debug.py代码如下
 	def debug_line(*objs):
@@ -341,6 +350,15 @@ def query_yes_no(question, default="yes"):
 	import xml.etree.ElementTree as ET
     xmlp = ET.XMLParser(encoding="utf-8")
     f = ET.parse('a.xml',parser=xmlp)
+    
+    How to create a simple xml??
+    import xml.etree.cElementTree as ET
+    root = ET.Element("root")
+    doc = ET.SubElement(root, "doc")    
+    ET.SubElement(doc, "field1", name="blah").text = "some value1"
+    ET.SubElement(doc, "field2", name="asdfasd").text = "some vlaue2"    
+    tree = ET.ElementTree(root)
+    tree.write("filename.xml")
 	
 29. requests ssl certificate_verify_failed
     add 'verify = False' to post method
@@ -400,6 +418,36 @@ def make_content_with_boundary(dict):
     binary to hex 
     bstr = "111100001111"
     hstr = '%0*X' % ((len(bstr) + 3) // 4, int(bstr, 2))
+    
+35. ./test.py
+    : No such file or directory
+    (google keyword : python carriage return no such file or directory)
+    ：没有那个文件或目录3
+    (http://askubuntu.com/questions/372672/what-could-cause-a-script-to-fail-to-find-python-when-it-has-usr-bin-env-pyt)
+    Your shebang line has a carriage return at the end, presumably because it was edited under Windows (which uses CR,LF as a line separator). The CR character causes the cursor to move back to the beginning of the line after the shell prints the beginning of the message and so you only get to see the part after CR which ends the interpreter string that's part of the error message.
+    
+    dos2unix test.py
+    
+36. How to open two consoles from a single script?
+    import subprocess
+    proc = subclass.Popen("svn up Data", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, creationflags=subprocess.CREATE_NEW_CONSOLE)
+    proc1 = subclass.Popen("svn up Source", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, creationflags=subprocess.CREATE_NEW_CONSOLE)
+    
+37. How to double click to execute Python scripts?
+    (Simplest way : install python.xxx.amd64.msi, everything is OK)
+    assoc .py
+    ftype Python.File
+    set HKEY_CLASSES_ROOT\Applications\python26.exe\shell\open\command to "C:\Python26\python26.exe" "%1" %*
+    set HKEY_CLASSES_ROOT\py_auto_file\shell\open\command to the same value.
+    
+38.  pass string arguments to python thread
+    dRecieved = connFile.readline();
+    processThread = threading.Thread(target=processLine, args=(dRecieved,)); # <- note extra ','
+    #processThread = threading.Thread(target=processLine, args=[dRecieved]); # <- 1 element list
+    processThread.start();
+    
+    If you notice, from the stack trace: self.__target(*self.__args, **self.__kwargs)
+    The *self.__args turns your string into a list of characters, passing them to the processLine function. If you pass it a one element list, it will pass that element as the first argument - in your case, the string.
 
 --------------------------	
 	python errors handle
@@ -616,7 +664,7 @@ def log(*objs):
 		for x in content:
 			print(x)
 
-22. get current file directory Python
+22. get current file directory Python(Extract a part of the filepath (a directory) in Python)
 	import os
 	os.path.dirname(os.path.abspath(__file__))
 	
@@ -652,6 +700,10 @@ def log(*objs):
 28. check if a key is in a dict
     key in dict
 	dict.has_key(key)
+    
+29. python print stderr and exit
+    sys.exit('Error!')
+    If another type of object is passed, None is equivalent to passing zero, and any other object is printed to sys.stderr and results in an exit code of 1. In particular, sys.exit("some error message") is a quick way to exit a program when an error occurs.
 		
 -------------------------------
 	Python Built-in functions
@@ -771,6 +823,10 @@ when the argument is a unicode object; or the value of the byte when the argumen
 	ubuntu 中文乱码
 	记住安装ssh-server,在xshell或者sevure CRT中打开,并且export LANG=zh_CN.GBK
 	
+7.  vim Indent with tabs, align with spaces
+    "gg=G" indent all code blocks
+    Press "V=" indent a block of code
+    echo "set shiftwidth=4" >> ~/.vimrc  (Control the shift width when indent)
 	
 	
 -------------------------------

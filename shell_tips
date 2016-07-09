@@ -81,7 +81,15 @@
 	
 	find exclude path
 	find . -type f -name "*_peaks.bed" ! -path "./tmp/*" ! -path "./scripts/*"
-	! -path "./tmp/*" - Exclude all results whose path starts with ./tmp/
+	! -path "./tmp/*" - Exclude all results whose path starts with ./tmp/ 9
+    
+    copy a directory exclude .svn files
+    use svn export
+    rsync -r --exclude=.svn /home/user/progname/ /home/user/progname.copy
+    xcopy "..\source\" "..\destination\" /E /Y /R /exclude:exclude.txt
+    exclude.txt should contain:
+
+    .svn\
 
 11. run script in current shell without dot before command( ./script_name.sh)
 	alias script_name.sh='. ./script_name.sh'
@@ -174,6 +182,9 @@ This will tell tar to c (create) an archive from the files in directory (tar is 
 	
 	tar uncompress xz file
 	tar xf archive.tar.xz
+    
+    tar ignore directory, excluding certain directories/files
+    tar all_source.tar.bz2 source_code/ --exclude='file1' --exclude='patter*' --exclude='file2'
 
 18.	iptables
 	iptables -I INPUT -s 180.168.197.99 -p tcp -m state --state NEW -m tcp --dport 9823 -j ACCEPT	
@@ -266,6 +277,9 @@ uname -a
 	
 28.	install .deb file on ubuntu
 	dpkg -i PACKAGE.deb
+    
+    install pthread man pages on ubuntu(man pthreads)
+    sudo apt-get install manpages-posix manpages-posix-dev
 	
 29.	awk with grep
 	awk '{print $1}' input.txt | xargs -n 1 -I pattern grep -wnH pattern ScenesServer/
@@ -366,6 +380,16 @@ uname -a
 	ls -1 | tr '\n' ','
 	paste -d, -s file
 	cat file | xargs
+    
+45. How to check the timestamp of a file?
+    stat --printf '%n\nmtime: %y\nctime: %z\natime: %x\ncrtime:%w\n'
+    stat -c "%n %Z" file1.txt
+    Each file has three distinct associated timestamps: the time of last data access, the time of last data modification, and the time the file status last changed. These values are returned in the file characteristics structure struct stat, as described in <sys/stat.h>.
+    ls --full-time
+    
+46. rhel6 redhat 6 manually change time zone
+    ll /etc/localtime
+    ln -sf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
 	
 	
             
@@ -604,6 +628,10 @@ cecho y "Yellow!"
 	def apache_log(str):
 		print >> sys.stderr, str
 	
+    
+    How to remote tailf ?
+    (http://unix.stackexchange.com/questions/133951/how-to-terminate-remotely-called-tail-f-when-connection-is-closed)
+    ssh -t user@remote_host tail -f /some/file
 	
 22.	exec of '...' failed(No such file or directory:exec of)
 	change /usr/local/bin/python --> /usr/bin/python
@@ -828,6 +856,11 @@ For example, kill all connections that occupy port=38035?
 	
 	svn, cancel add before commit
 	svn revert --recursive folder_name
+    
+    svn how to export deleted files ?
+    Method 1 : svn up -r $revision $fileName && cat $fileName >> temp && rm $fileName
+    Method 2 : svn cp file_url_path@revision abc && cat abc >> temp && svn revert --recursive . && rm abc
+    Method 3 : svn export file_url_path@revision abc && cat abc >> temp && rm abc
 	
 52. svn how to rollback delete files?(if not commited, svn revert foo.txt)
     svn rm foo.txt
@@ -880,6 +913,14 @@ For example, kill all connections that occupy port=38035?
 	realm = Team
 	
 	sudo svnserve -d --foreground -r /usr/local/svn/repos
+    svn default port is 3690
+    
+    How to switch repository to a totally different URL?
+    svn switch --relocate old_path_url new_path_url .
+    
+    How to specific another port and checkout svn repository?
+    svnserve -d --listen-port 3691 -r /usr/local/svn/repos
+    svn co svn://ip_address:3691/repository_name
 
 54. set a custom boundary form submit
     http://code.activestate.com/recipes/146306-http-client-to-post-using-multipartform-data/
@@ -925,6 +966,7 @@ $ cat infile | sed 's/\r$//' | od -c
 0000016
 
 62. How to convert files to UTF-8 without BOM?
+BOM flag(byte order mark) : 0xefbbbf
 BOMflag=`cat filename.txt | od -N 3 -t x`
 if [ -z $BOMflag ]; then
   echo "no bom"
@@ -968,7 +1010,7 @@ $ date | tee file1 > file2
   apt-get install build-essential -y
   apt-get install openssh-server -y
   7. After installing ssh server, we do not need the graphic interface again, so we will start the sparc using the following command : 
-  qemu-system-sparc.exe -L Bios -m 256M -nographic debian_etch_sparc_small.qcow2 -redir tcp:2222::22
+  qemu-system-sparc.exe -L Bios -m 256M debian_etch_sparc_small.qcow2 -nographic -redir tcp:2222::22
   8. on windows, download ssh or github windows, open cmd, ssh -p 2222 root@localhost (open xshell, ssh root@localhost 2222)
   
   Keyboard: British English (br)
@@ -1018,8 +1060,34 @@ $ date | tee file1 > file2
   create a sparc system image :
   http://codetao.blogspot.jp/2013/05/creating-qemu-sparc-system-image.html
   
+  Is there ant big endian OS on which latest gcc could be installed ?? by now, (uname -a)Sparc 2.6 x32 can only install gcc 4.4.1(gcc -Og is not available).
+  
 
-
+65. How to debug bash script ?
+    Add the following content:
+    echo $variable
+    sleep 500
+    
+66. How to run scp(linux processes) as background process?
+    1. nohup scp file_to_copy user@server:/path/to/copy/the/file > nohup.out 2>&1
+    2. Press CTRL + Z
+    3. enter command : "bg" 
+    4. tailf nohup.out to see the logs.
+    
+67. How to add a swap file?
+sudo su
+dd if=/dev/zero of=/swapfile1 bs=1024 count=1048000
+chown root:root /swapfile1
+chmod 0600 /swapfile1
+mkswap /swapfile1
+swapon /swapfile1
+vi /etc/fstab
+/swapfile1 none swap sw 0 0
+free -m
+swapon -S
+cat /proc/meminfo
+swapoff /swapfile1
+swapon -s
 	
 ==================
 YouCompleteMe

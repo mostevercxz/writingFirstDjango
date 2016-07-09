@@ -200,6 +200,141 @@ Right-click the title bar, point to Edit, and then click Copy.
   1.Find the position of VS2012 x86 native tools command prompt(start menu, right click)
   2.copy to the project.sln file directory 
   3.double click, and type "msbuild project.sln"
+  
+18. svn update error : 
+    sqllite: database disk image is malformed
+    sqlite3 .svn/wc.db "reindex nodes"
+    sqlite3 .svn/wc.db "reindex pristine"
+    
+    sqlite common commands
+    (http://www.sqlite.org/cli.html)
+    (http://zetcode.com/db/sqlitepythontutorial/)
+    (http://sebastianraschka.com/Articles/2014_sqlite_in_python_tutorial.html)
+    .help
+    .exit
+    .tables
+    .schema
+    .schema tableName
+    create table tbl1(col1 INT, col2 INT, col3 INT)
+    insert into tableName values(1,2,strftime('%s', '2015-05-20 11:00:00'))
+    .mode list
+    .separator ","
+    .width 12 6
+    .output all_results.txt
+    left join:
+    SELECT table1.*, table2.column as my_column_name_no_in_table1 FROM table1 LEFT JOIN table2 ON table1.column = table2.column
+    
+19. find where did incredibuild "MakeDirsForLink" come from?
+    1. google, find MakeDir Task, https://msdn.microsoft.com/en-us/library/s2448zz7(v=vs.110).aspx
+    2. search the .vcxproj file, did not find MakeDir Task configuration
+    3. open x86 native tools command prompt, run msbuild /v:d proj.sln > temp
+    4. search "MakeDirsForLink" the file named temp, find 3 positions, 来自项目 aaa.vcxproj 的文件 "C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v110\Microsoft.CppBuild.targets"中的目标"MakeDirsForLink"(目标"_Link"依赖于它):
+    任务 MakeDir
+       Target "MakeDirsForLink: (TargetId:160)" in file "C:\\Program Files (x86)\\MSBuild\\Microsoft.Cpp\\v4.0\\Microsoft.CppBuild.targets" from project "C:\\Builds\\17\\RoLAN\\IntelTest\\Sources\\projects\\rolansource\\RoLAN\\IntelProcessing\\Empty\\Empty.vcxproj" (target "_Link" depends on it):
+    5. Open C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\v110\Microsoft.CppBuild.targets
+    6. find MakeDirsForLink,  <PropertyGroup><_LinkImportLibrary>%(Link.ImportLibrary)</_LinkImportLibrary></PropertyGroup>
+       right click project, properties, Linker,  advance, import library, set it to null.
+    (Problem solved.)
+    
+20. Link : fatal error LNK1104, 无法打开文件 "..\..\aaa.lib"
+    1. search .vcxproj file, did not find aaa.lib 
+    2. msbuild /p:Configuration=Release /v:d .sln > temp, still did not give a clue
+    3. search "aaa.lib" in source code, find #pragma comment(lib, "..\..\aaa.lib"), according to MSDN, https://msdn.microsoft.com/en-us/library/7f0aews7(v=vs.110).aspx
+    #pragma comment( comment-type [,"commentstring"] )
+    Places a library-search record in the object file. This comment type must be accompanied by a commentstring parameter containing the name (and possibly the path) of the library that you want the linker to search.
+    According to SO, http://stackoverflow.com/questions/12199595/c-what-does-pragma-commentlib-xxx-actually-do-with-xxx
+    Mostly, it's used to support different versions: 
+    #ifdef USE_FIRST_VERSION
+    #pragma comment(lib, "vers1.lib")
+    #else
+    #pragma comment(lib, "vers2.lib")
+    #endif
+    When your application uses a dynamically-linked library, a lib file tells you information about what symbols are exported in the dll. So basically you only need the lib to compile & link, but you need the dll to run the program, as it contains all the binary code.
+    
+21.  github search 
+    user:mozilla language:python
+    
+22. dbghelper dump example(How to write a sample code that will crash and produce dump file?)
+http://stackoverflow.com/questions/5028781/how-to-write-a-sample-code-that-will-crash-and-produce-dump-file
+#include <Windows.h>
+#include <Dbghelp.h>
+
+void make_minidump(EXCEPTION_POINTERS* e)
+{
+    auto hDbgHelp = LoadLibraryA("dbghelp");
+    if(hDbgHelp == nullptr)
+        return;
+    auto pMiniDumpWriteDump = (decltype(&MiniDumpWriteDump))GetProcAddress(hDbgHelp, "MiniDumpWriteDump");
+    if(pMiniDumpWriteDump == nullptr)
+        return;
+
+    char name[MAX_PATH];
+    {
+        auto nameEnd = name + GetModuleFileNameA(GetModuleHandleA(0), name, MAX_PATH);
+        SYSTEMTIME t;
+        GetSystemTime(&t);
+        wsprintfA(nameEnd - strlen(".exe"),
+            "_%4d%02d%02d_%02d%02d%02d.dmp",
+            t.wYear, t.wMonth, t.wDay, t.wHour, t.wMinute, t.wSecond);
+    }
+
+    auto hFile = CreateFileA(name, GENERIC_WRITE, FILE_SHARE_READ, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+    if(hFile == INVALID_HANDLE_VALUE)
+        return;
+
+    MINIDUMP_EXCEPTION_INFORMATION exceptionInfo;
+    exceptionInfo.ThreadId = GetCurrentThreadId();
+    exceptionInfo.ExceptionPointers = e;
+    exceptionInfo.ClientPointers = FALSE;
+
+    auto dumped = pMiniDumpWriteDump(
+        GetCurrentProcess(),
+        GetCurrentProcessId(),
+        hFile,
+        MINIDUMP_TYPE(MiniDumpWithIndirectlyReferencedMemory | MiniDumpScanMemory),
+        e ? &exceptionInfo : nullptr,
+        nullptr,
+        nullptr);
+
+    CloseHandle(hFile);
+
+    return;
+}
+
+LONG CALLBACK unhandled_handler(EXCEPTION_POINTERS* e)
+{
+    make_minidump(e);
+    return EXCEPTION_CONTINUE_SEARCH;
+}
+
+int main()
+{
+    SetUnhandledExceptionFilter(unhandled_handler);
+
+    return *(int*)0;
+}
+
+23. How to break on access violation handler code??
+前能想到的办法就是封装一个类,然后再代码中调用该类的方法.
+windbg -y -i ..\exe -v -z gameserver_20160529_084601.dmp
+
+24. fprintf flush
+fprintf(m_fPointer, "output string to file");
+fflush(m_fPointer);
+
+25. How to use windbg to debug dmp files??
+http://www.debuginfo.com/articles/effminidumps.html
+
+26. How to make VS break only on unhandled exceptions?
+Make sure you have Just My Code Enabled by going into Tools-->Options-->Debugger-->General--> Enable Just My Code.
+This will change your Debug--> Exceptions Dialog Box to show a CheckBox for User-unhandled Errors.
+
+27. How to break on handled exceptions?
+
+
+28. How to Catching access violation exceptions?
+http://stackoverflow.com/questions/457577/catching-access-violation-exceptions
+
 
 中英文术语对照表
 空格 whitespace
@@ -274,6 +409,16 @@ g++ -g test_client.cpp BaseTCPClient.cpp BaseSocket.cpp BaseThread.cpp BaseByteB
 visual studio auto refresh file changes
 Options --> Environment --> Documents --> Detect when file is changed outside the document, auto-load changes, if saved
 
+visual studio disable all assert in debug mode?(http://stackoverflow.com/questions/28041359/how-to-turn-off-asserts-in-debug-mode-in-visual-studio-2013)
+_set_error_mode(_OUT_TO_STDERR);
+int iPrev = _CrtSetReportMode(_CRT_ASSERT,0);
+// Start Operation with no ASSERTs
+...
+// Restore previous mode with ASSERTs
+_CrtSetReportMode(_CRT_ASSERT,iPrev);
+#undef assert
+#define assert(x) ((void)0)
+
 ========================
 make errors(vim Makefile :%s/^[ ]\+/^I/)
 NUL character seen; rest of line ignored
@@ -312,6 +457,9 @@ VS 多行注释
 CTRL +K, CTRL + C
 CTRL + E,CTRL + U,取消注释
 编辑 --> 高级 里面可以设置
+
+set breakpoints to all methods in a class at once in VS?
+CTRL + B, ClassName::*
 
 ===
 Game making viedos
@@ -684,6 +832,59 @@ LUA_A = liblua.so
 
 Where to download lua binary executables and libraries?
 http://luabinaries.sourceforge.net/
+
+Lua syntax:
+1. The __index Metamethod
+I said earlier that, when we access an absent field in a table, the result is nil. This is true, but it is not the whole truth. Actually, such access triggers the interpreter to look for an __index metamethod: If there is no such method, as usually happens, then the access results in nil; otherwise, the metamethod will provide the result.
+
+    -- create a namespace
+    Window = {}
+    -- create the prototype with default values
+    Window.prototype = {x=0, y=0, width=100, height=100, }
+    -- create a metatable
+    Window.mt = {}
+    -- declare the constructor function
+    function Window.new (o)
+      setmetatable(o, Window.mt)
+      return o
+    end
+    
+    Window.mt.__index = function (table, key)
+      return Window.prototype[key]
+    end
+    
+    w = Window.new{x=10, y=20}
+    print(w.width)    --> 100
+    
+    When it is a table, Lua redoes the access in that table. Therefore, in our previous example, we could declare __index simply as :
+    Window.mt.__index = Window.prototype
+    
+    The __newindex metamethod does for table updates what __index does for table accesses. When you assign a value to an absent index in a table, the interpreter looks for a __newindex metamethod: If there is one, the interpreter calls it instead of making the assignment. Like __index, if the metamethod is a table, the interpreter does the assignment in that table, instead of in the original one. Moreover, there is a raw function that allows you to bypass the metamethod: The call rawset(t, k, v) sets the value v in key k of table t without invoking any metamethod.
+
+    The combined use of __index and __newindex metamethods allows several powerful constructs in Lua, from read-only tables to tables with default values to inheritance for object-oriented programming. In the rest of this chapter we see some of these uses. Object-oriented programming has its own chapter.
+    
+2. ipairs and pairs difference
+(http://www.luafaq.org/#T1.10)
+ipairs(t)
+Returns three values (an iterator function, the table t, and 0) so that the construction
+     for i,v in ipairs(t) do body end
+will iterate over the key–value pairs (1,t[1]), (2,t[2]), ..., up to the first nil value.
+
+pairs(t)
+If t has a metamethod __pairs, calls it with t as argument and returns the first three results from the call.
+Otherwise, returns three values: the next function, the table t, and nil, so that the construction
+     for k,v in pairs(t) do body end
+will iterate over all key–value pairs of table t.
+
+next (table [, index])
+Allows a program to traverse all fields of a table. Its first argument is a table and its second argument is an index in this table. next returns the next index of the table and its associated value. When called with nil as its second argument, next returns an initial index and its associated value. When called with the last index, or with nil in an empty table, next returns nil. If the second argument is absent, then it is interpreted as nil. In particular, you can use next(t) to check whether a table is empty.
+
+The order in which the indices are enumerated is not specified, even for numeric indices. (To traverse a table in numerical order, use a numerical for.)
+
+The behavior of next is undefined if, during the traversal, you assign any value to a non-existent field in the table. You may however modify existing fields. In particular, you may clear existing fields.
+
+
+
 ---
 How to run makefile in windows ? makefile make in windows?
 open VS2013 Native Command Prompt

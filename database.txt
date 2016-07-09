@@ -41,6 +41,8 @@ echo "character-set-server = utf8" >> /etc/my.cnf
 echo "collation-server = utf8_general_ci" >> /etc/my.cnf
 12. scripts/mysql_install_db --user=mysql --defaults-file=./my.cnf --ldata=./mysql
 13. bin/mysqladmin -u root password 123456
+14. select into outfile local(no such methods, only use redirect)
+The SELECT ... INTO OUTFILE statement is intended primarily to let you very quickly dump a table to a text file on the server machine. If you want to create the resulting file on some client host other than the server host, you cannot use SELECT ... INTO OUTFILE. In that case, you should instead use a command such as mysql -e "SELECT ..." >  file_name to generate the file on the client host."
 
 errors
 1.MySQL Error on Startup: ambiguous option '--log=/var/log/mysqld.log'
@@ -67,6 +69,18 @@ delete user, restart mysql, create use again, then everything is OK.
 [mysqld]
 general_log = on
 general_log_file=/path/to/query.log
+
+6. help load data;
+load data local infile '/tmp/filename.sql' into table table-name CHARACTER SET latin1 FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"' LINES TERMINATED BY '\r\n' IGNORE 1 LINES
+"The used command is not allowed with this MySQL version"
+LOCAL works only if your server and your client both have been configured to permit it. For example, if mysqld was started with --local-infile=0, LOCAL does not work. See Section 6.1.6, “Security Issues with LOAD DATA LOCAL”.
+
+vim /etc/my.cnf
+local-infile=1
+restart mysql server
+
+Or:
+mysql --local-infile -uroot -pyourpwd yourdbname
 
 //查一个pymysql导致查询中文失败的问题
 根据日志判断,navicat发过去的是 %潇洒%,而pymysql发过去的是 乱码,所以想断点看下两者不同之处
