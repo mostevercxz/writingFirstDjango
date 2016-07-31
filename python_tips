@@ -378,6 +378,13 @@ def make_content_with_boundary(dict):
     l.append('--' + boundary + '--')
     content = CRLF.join(l)
     return content
+    
+    iterate dictionaries
+    Python 3.x
+    for k,v in d.items():
+    
+    Python 2.x
+    for k,v in d.iteritems():
 	
 31. python json serialize
     (http://kaira.sgo.fi/2014/05/saving-and-loading-data-in-python-with.html)
@@ -619,6 +626,12 @@ errors met when using python mysql connector
 	>>>bytearray.fromhex("de ad be ef 00")
 	python2
 	>>> hex_data = hex_string.decode("hex")
+    
+    x = int("deadbeef", 16)
+    >>> print int("0xdeadbeef", 0)
+    3735928559
+    >>> print int("10", 0)
+    10
 
 14.	os.mkdir(path[,mode])#default mode is 0o777
 	os.makedirs(path[,model])#default mode is Oo777
@@ -685,6 +698,18 @@ def log(*objs):
 	>>>print "We are the {:%d, %b %Y}".format(today)
 	'We are the 01, 06 2008'
 	(Since PEP3101, every object can have its own format used automatically by the method format of any string. In the case of the datetime, the format is the same used in strftime. So you can do the same as above like this:)
+    
+    print '{:10s} {:3d}  {:7.2f}'.format('xxx', 123, 98)
+    print '{:10s} {:3d}  {:7.2f}'.format('yyyy', 3, 1.0)
+    print '{:10s} {:3d}  {:7.2f}'.format('zz', 42, 123.34)
+    
+    left space
+    >>> '{0:>5}'.format('ss')
+    '   ss'
+    right space
+    >>> '{0:<5}'.format('ss')
+    'ss   '
+
 	
 25. How to make a Python program running as a daemon??
 	
@@ -701,9 +726,32 @@ def log(*objs):
     key in dict
 	dict.has_key(key)
     
+    remove a key from dictionary
+    my_dict.pop("key", None)
+    
+    def removekey(d, key):
+    r = dict(d)
+    del r[key]
+    return r
+    
 29. python print stderr and exit
     sys.exit('Error!')
-    If another type of object is passed, None is equivalent to passing zero, and any other object is printed to sys.stderr and results in an exit code of 1. In particular, sys.exit("some error message") is a quick way to exit a program when an error occurs.
+    If another type of object is passed, None is equivalent to passing zero, and any other object is printed to sys.stderr and results in an exit code of 1. 
+    In particular, sys.exit("some error message") is a quick way to exit a program when an error occurs.
+    
+30. python multimap implementation
+    >>> from collections import defaultdict
+    >>> md = defaultdict(list)
+    >>> md[1].append('a')
+    >>> md[1].append('b')
+    >>> md[2].append('c')
+    >>> md[1]
+    ['a', 'b']
+    >>> md[2]
+    ['c']
+    >>> for k, v in md.items():
+    ...     for w in v:
+    ...         print("md[%d] = '%s'" % (k, w))
 		
 -------------------------------
 	Python Built-in functions

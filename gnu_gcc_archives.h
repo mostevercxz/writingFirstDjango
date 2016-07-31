@@ -251,7 +251,15 @@ strings /usr/lib64/libstdc++.so.6| grep -i glibc
 	make
 	make install
 	
-27. extern void *memset(void *__s, int __c, size_t __n) __THROW __nonnull((1));
+27. where is size_t defined in Linux? How to find ??
+    /usr/lib/x86_64-redhat-linux/4.1.1/include/stddef.h
+    typedef __SIZE_TYPE__ size_t;
+    echo '#include <time.h>' | cpp -I/usr/include - > time_expanded.c
+    
+    How to print uLongf?
+    1. find where uLongf is defined. typedef unsigned long uLong; typedef uLong uLongf;
+    
+    extern void *memset(void *__s, int __c, size_t __n) __THROW __nonnull((1));
     grep __THROW /usr/include/*h -nH | grep define
 	vim /usr/include/getopt.h
 	#define __THROW throw()
@@ -363,6 +371,31 @@ template <class _Key> struct hash{};
 
 c++11 中 定义在 bits/unordered_map, hash 定义在  bits/functional_hash.h 中,都是在 std 命名空间下的,不需要 std::tr1了
 但是都需要重载 char*, const char *, std::string
+
+37. What does __builtin_popcount do??(https://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html#Other-Builtins)
+Returns the number of 1-bits in x.
+Why to use it?
+This function tries to use CPU specific instructions, which will always  be orders of magnitude faster than any algorithm you manage to come up  with.
+Other bit twiddling hacks:
+http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel
+
+38. C struct bit fields
+The declaration of a bit-field has the following form inside a structure −
+
+struct {
+   type [member_name] : width ;
+};
+
+39. operator new inside namespace
+namespace X
+{
+  void* operator new (size_t);
+}
+error: ‘void* X::operator new(size_t)’ may not be declared within a namespace
+3.7.3.1 Allocation functions [basic.stc.dynamic.allocation]
+
+An allocation function shall be a class member function or a global function;
+a program is ill-formed if an allocation function is declared in a namespace scope other than global scope or declared static in global scope. [..]
 
 
 gcc options
@@ -804,7 +837,8 @@ daemon(1,1)
 14. use asan to detect adress read/write out of bound
     https://trac.torproject.org/projects/tor/ticket/13499
     https://github.com/google/sanitizers/wiki/SanitizerCommonFlags
-    Make asan core dumped(easy to debug), ASAN_OPTIONS="disable_core=0:unmap_shadow_on_exit=1:abort_on_error=1:log_path=/home/giant/asan_error_log"
+    Make asan core dumped(easy to debug,only 32-bit is available, 64-bit NO!!!), ASAN_OPTIONS="disable_core=0:unmap_shadow_on_exit=1:abort_on_error=1:log_path=/home/giant/asan_error_log"
+    
     
 15. How can a C program produce a core dump of itself without terminating?
     void create_dump(void)
@@ -814,6 +848,56 @@ daemon(1,1)
             abort() || (*((void*)0) = 42);
         }
     }
+    
+16. How to execute a Linux program in the C program?
+    man system
+    
+17. How to disable abrt?
+$ sudo systemctl stop abrt-ccpp
+
+Before:
+
+$ cat /proc/sys/kernel/core_pattern
+|/usr/libexec/abrt-hook-ccpp %s %c %p %u %g %t e
+
+i.e. send core dumps to abrt.
+
+After:
+
+$ cat /proc/sys/kernel/core_pattern
+core
+$ cat /proc/sys/kernel/core_uses_pid
+1
+systemctl disable abrtd.service
+systemctl start abrt-ccpp
+
+18. How to detect memory leaks in C?(not C++,overload new delete, not valgrind)
+(asan leak checker,https://github.com/google/sanitizers/wiki/AddressSanitizerLeakSanitizer
+clang -fsanitize=address -g memory-leak.c
+g++ -fsanitize=address main.cpp
+ASAN_OPTIONS=detect_leaks=1 ./a.out
+)
+#define malloc(X) my_malloc( X, __FILE__, __LINE__, __FUNCTION__)
+
+void* my_malloc(size_t size, const char *file, int line, const char *func)
+{
+
+    void *p = malloc(size);
+    printf ("Allocated = %s, %i, %s, %p[%li]\n", file, line, func, p, size);
+
+    /*Link List functionality goes in here*/
+
+    return p;
+}
+You maintain a Linked List of addresses being allocated with the file and line number from where there allocated. You update the link list with entries in your malloc.
+
+Similar to above you can write an implementation for free, wherein you check the address entries being asked to be freed against your linked list. If there is no matching entry its a usage error and you can flag it so.
+
+At the end of your program you print or write the contents of your linked list to an logfile. If there are no leaks your linked list should have no entries but if there are some leaks then the logfile gives you exact location of where the memory was allocated.
+
+Note that in using this macro trick, you lose the type checking which functions offer but it's a neat little trick I use a lot of times.
+
+
 
 -------------------------------
 	gdb tricks I should know

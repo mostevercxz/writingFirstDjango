@@ -726,6 +726,7 @@ foo("ok")  --> "ok"
 
 -- 8.2 Precompiled code --
 How to produce a binary chunk ? luac -o prog.lc prog.lua
+compile lua to bytecode : luac -l test.lua
 loadfile() and load() accept precompiled code.
 string.dump() receives a Lua function and returns its precompiled code as a string.
 Google "lua opcode". Gain some knowledge about precompiled form Lua code.

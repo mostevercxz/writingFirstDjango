@@ -161,6 +161,9 @@
 	01
 	echo $num | awk 'BEGIN{printf("%02d", $0)}'
 	00
+    
+    awk print to the end of the line(column to the end)
+    awk -F':' '{for(i=4;i<=NF;++i){print("%s,$i")}; printf("\n")}'
 	
 	awk BEGIN meaning:(https://www.gnu.org/software/gawk/manual/html_node/Using-BEGIN_002fEND.html)
 	(https://www.gnu.org/software/gawk/manual/html_node/index.html#SEC_Contents)
@@ -390,7 +393,12 @@ uname -a
 46. rhel6 redhat 6 manually change time zone
     ll /etc/localtime
     ln -sf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
+    
+47. How to measure the average CPU utilization of a Linux process? 平均CPU使用率
+    sudo apt-get(yum) install sysstat
+    pidstat 3 -t pid
 	
+
 	
             
 Line 2 creates a variable called STR and assigns the string "Hello World!" to it. 
@@ -814,6 +822,9 @@ fi
 history | awk '{CMD[$2]++;count++;}END { for (a in CMD)print CMD[a] " " CMD[a]/count*100 "% " a;}'
 | grep -v "./" | column -c3 -s " " -t | sort -nr | nl |  head -n10
 
+memory usage by bytes top 10
+ps aux --sort -rss |head -10
+
 45. install locate on CentOS
 Debian : apt-get install locate
 CentOS : yum install mlocate
@@ -1088,6 +1099,10 @@ swapon -S
 cat /proc/meminfo
 swapoff /swapfile1
 swapon -s
+
+68. How to watch a file size on Linux?
+watch -n 5 "du -h club_prod.sql"
+watch -n 5 "ls -lh club_prod.sql | awk '{print \$5}'"
 	
 ==================
 YouCompleteMe
