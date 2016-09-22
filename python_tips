@@ -752,6 +752,25 @@ def log(*objs):
     >>> for k, v in md.items():
     ...     for w in v:
     ...         print("md[%d] = '%s'" % (k, w))
+    
+31. How to install BitTorrent?
+    1. down source code 
+    2. install wxPython (https://wiki.wxpython.org/How%20to%20install%20wxPython)
+    sudo apt-get install python-wxgtk3.0
+    sudo apt-get install gcc build-essential python-dev  -y
+    sudo apt-get install libboost-dev
+    wget http://downloads.sourceforge.net/wxpython/wxPython-src-3.0.2.0.tar.bz2
+    tar -xf wxPython-src-3.0.2.0.tar.bz2 
+    cd wxPython-src-3.0.2.0/wxPython
+    mkdir ~/wxpython_build
+    python build-wxpython.py --build_dir=/home/giant/wxpython_build/
+    
+    install boost.build 
+    wget https://github.com/boostorg/build/releases/download/2014.10/boost-build-2014-10.tar.bz2
+    tar -xf boost-build-2014-10.tar.bz2
+    cd boost-build
+    ./bootstrap.sh
+    sudo ./b2 install 
 		
 -------------------------------
 	Python Built-in functions

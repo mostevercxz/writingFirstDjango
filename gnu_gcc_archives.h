@@ -312,6 +312,26 @@ fs.close();
 RTFM(read the fucking manual)
 printf("%+d %+d",10,-10); // prints +10 -10
 
+left-pad printf with spaces
+printf("|%10s|", "Hello"); 
+|     Hello|
+right pad printf with spaces
+printf("|%-10s|", "Hello"); 
+|Hello     |
+
+variable sized padding in printf
+if you use * in your format string, it gets a number from the arguments:
+printf ("%0*d\n", 3, 5);
+Keep in mind you can only pad with spaces or zeros, If you want to pad with something else, you can use something like:
+#include <stdio.h>
+#include <string.h>
+int main (void) {
+    char *s = "MyText";
+    unsigned int sz = 9;
+    char *pad = "########################################";
+    printf ("%.*s%s\n", (sz < strlen(s)) ? 0 : sz - strlen(s), pad, s);
+}
+
 35. How does __attribute__((constructor)) work??
 __attribute__((constructor))
 static void initialize_navigationBarImages() {
@@ -397,12 +417,39 @@ error: ‘void* X::operator new(size_t)’ may not be declared within a namespac
 An allocation function shall be a class member function or a global function;
 a program is ill-formed if an allocation function is declared in a namespace scope other than global scope or declared static in global scope. [..]
 
+40. What is anonymous inode?
+At least in some contexts, an anonymous inode is an inode without an attached directory entry.
+int fd = open( "/tmp/file", O_CREAT | O_RDWR, 0666 );
+unlink( "/tmp/file" );
+// Note that the descriptor fd now points to an inode that has no filesystem entry; you
+// can still write to it, fstat() it, etc. but you can't find it in the filesystem.
+
+41. What does  /proc/id/maps mean??
+
+42. How to use clang++'s MemorySanitizer to check unintialized reads?
+http://clang.llvm.org/docs/MemorySanitizer.html#has-feature-memory-sanitizer
+MemorySanitizer (MSan) is a detector of uninitialized memory reads in C/C++ programs.
+cat umr.cc
+#include <stdio.h>
+
+int main(int argc, char** argv) {
+  int* a = new int[10];
+  a[5] = 0;
+  if (a[argc])
+    printf("xx\n");
+  return 0;
+}
+clang -fsanitize=memory -fsanitize-memory-track-origins -fPIE -pie -fno-omit-frame-pointer -g -O2 umr.cc
+
 
 gcc options
 --------------
 1. -fno-strict-aliasing (https://gcc.gnu.org/onlinedocs/gcc-4.3.6/gnat_ugn_unw/Switches-for-gcc.html)
 Causes the compiler to avoid assumptions regarding non-aliasing of objects of different types. See Optimization and Strict Aliasing for details. 
 
+2. Easy way to find uninitialized member variables
+    clang with clang-analyze.
+    g++ -Weffc++(There is also a bug that causes it to always give you a warning when using anonymous unions, #pragma GCC diagnostic ignored "-Weffc++")
 
 ---
 c knowledges
@@ -677,6 +724,18 @@ for (int i = 0; i < nptrs; ++i)
 {
  printf("%s", strings[i]);
 }
+
+8. when will gcc generate jump table? When will gcc generate compare and branch pairs?
+(https://gcc.gnu.org/bugzilla/show_bug.cgi?id=11823)
+stmt.c:expand_end_case_type()
+/* If range of values is much bigger than number of values,
+         make a sequence of conditional branches instead of a dispatch.
+         If the switch-index is a constant, do it this way
+         because we can optimize it.  */
+
+The heuristic following this comment now does:
+               || compare_tree_int (range, 10 * count) > 0//make a sequence of branches instead of dispatch
+range is the max case number, count is the number of case.
 ---
 
 ---
@@ -695,6 +754,7 @@ A predicate is an expression that can be called and that returns a value that ca
 ---
 cmake options
 cmake -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DBUILD_STATIC_LIBS=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS=-g -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=~/bin .
+cmake -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++
 ---
 
 //gdb debugging tips
@@ -897,7 +957,45 @@ At the end of your program you print or write the contents of your linked list t
 
 Note that in using this macro trick, you lose the type checking which functions offer but it's a neat little trick I use a lot of times.
 
+19. clock_gettime(), difference between CLOCK_REALTIME and CLOCK_MONOTONIC
+CLOCK_REALTIME represents the machine's best-guess as to the current wall-clock, time-of-day time
+CLOCK_REALTIME can jump forwards and backwards as the system time-of-day clock is changed, including by NTP.
 
+CLOCK_MONOTONIC represents the absolute elapsed wall-clock time since some arbitrary, fixed point(boot time) in the past.
+ It isn't affected by changes in the system time-of-day clock.
+CLOCK_MONOTONIC_RAW  is even better(no NTP adjustments).
+
+How to get boottime?
+#include <stddef.h>
+#include <stdio.h>
+#include <time.h>
+#include <sys/sysinfo.h>
+
+int main(void){
+    /* get uptime in seconds */
+    struct sysinfo info;
+    sysinfo(&info);
+
+    /* calculate boot time in seconds since the Epoch */
+    const time_t boottime = time(NULL) - info.uptime;
+
+    /* get monotonic clock time */
+    struct timespec monotime;
+    clock_gettime(CLOCK_MONOTONIC, &monotime);
+
+    /* calculate current time in seconds since the Epoch */
+    time_t curtime = boottime + monotime.tv_sec;
+
+    /* get realtime clock time for comparison */
+    struct timespec realtime;
+    clock_gettime(CLOCK_REALTIME, &realtime);
+
+    printf("Boot time = %s", ctime(&boottime));
+    printf("Current time = %s", ctime(&curtime));
+    printf("Real Time = %s", ctime(&realtime.tv_sec));
+
+    return 0;
+}
 
 -------------------------------
 	gdb tricks I should know

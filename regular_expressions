@@ -110,6 +110,9 @@ non line breaks, Regex.Replace(@"\\r\\n", "")
 	(This exception exists mostly because of historic reasons.那时一行一行读取文本,应用正则匹配,所以不存在Line break的情况)
 	When using the regex classes of the .NET framework, 
 	you activate this mode by specifying RegexOptions.Singleline, such as in Regex.Match("string", "regex", RegexOptions.Singleline).
+    
+12. How to delete a file with special characters in linux ?
+    ls |egrep -v "[a-zA-Z0-9]$"
 
 =========================
 C# character regular expressions

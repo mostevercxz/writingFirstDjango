@@ -83,13 +83,13 @@ Or:
 mysql --local-infile -uroot -pyourpwd yourdbname
 
 //查一个pymysql导致查询中文失败的问题
-根据日志判断,navicat发过去的是 %潇洒%,而pymysql发过去的是 乱码,所以想断点看下两者不同之处
+根据日志(/etc/my.cnf 里面设置,general_log=on,general_log_file=/tmp/name.txt)判断,navicat发过去的是 %潇洒%,而pymysql发过去的是 乱码,所以想断点看下两者不同之处
 1.对比法,navicat里面查询 select accid, name from CHARBASE WHERE NAME LIKE "%潇洒%"可以查出来
 而pymysql却查询不出来
 2.下载mysql源代码，捣鼓了3个小时将其编译通过并以bin/mysqld运行，将原来的数据库全部拷贝过去,新建mysql用户
 3.ls sql/|grep log，找到打日志的文件,和函数,gdb -p 给函数设置断点
 4.查看堆栈,找到上层的dispath_command函数
-5.直接断dispatch_command,将收到的packet按字节打印,发现 潇洒 两个字,pymysql是str.encode('utf-8')发过去的,而navicat是 'gbk'编码 (e4ec c8f7)发过去的
+5.直接断dispatch_command,将收到的 packet参数 按字节打印,发现 潇洒 两个字,pymysql是str.encode('utf-8')发过去的,而navicat是 'gbk'编码 (e4ec c8f7)发过去的
 6.将pymysql的 Connection 类里面的self.encoding直接赋值为'gbk'
 7.重试,发现还是不行。现在问题变成了：两条查询在/tmp/mysql_execute.log显示出的日志都是一模一样,一个有结果,一个没结果
 8.分析,mysql在进行字符串比较的时候用的是 character_set_connection, 于是就想对比下pymysql和navicat执行结果
@@ -99,6 +99,29 @@ navicat里直接执行show variables like "%char%" 发现 character_set_connecti
 10.同时也尝试了用mysql databaseName -e "select accid, name from CHARBASE WHERE NAME LIKE \"%潇洒%\"" 也没得到结果
 11.在pymysql de cursor.execute()前加了一句 cursor.execute('set names "latin1"'), cursor.fetchall(), 测试OK
 12.shell终端下mysql的执行语句前也加上一句 set names 'latin1'即可
+
+// 2016-08-03 查 linux mysql 终端下中文名显示乱码的问题
+1. select accid,charid,name from CHARBASE; 发现名字都是显示乱码
+2. 查询上面的记录 尝试在 linux mysql 终端下敲  set names 'latin1',再 select 发现名字显示正常了
+3. 不能每次都 set names 'latin1', 于是想查原因. 终端下 show variables like "%char%"; show variables like "%coll%"; 发现是 utf8 和 utf8_general_ci
+4. 回想代码里执行的操作就是 insert into, 于是在linux mysql 下执行 insert into CHARBASE(accid,charid,name)  values (1,2,'中文'); 插入后查询,发现中文显示是正常的
+5. 代码里单独写了个测试用例,只调用 insert into CHARBASE(accid,charid,name)  values (1,2,'中文')，插入后 select 查询出来的中文还是乱码
+6. gdb 断点 mysql_insert 函数,看下linux 终端下,和代码里到底有什么不同呢？ p *thd,对比输出结果
+7. 发现 linux mysql 执行语句时的 query_string.cs='my_charset_latin1', 而代码执行语句时的 query_string.cs='mysql_charset_utf8'
+8. 代码里单独写测试用例,调用 'show variables like "%char%"',返回的结果看了下,发现清一色的所有变量都是 latin1 的.
+9. 至此,解决方法有2种: 一种在 mysql_real_connect 之后调用 set names 'utf8' 去设置编码;另一种更改数据库配置 /etc/my.cnf, (http://stackoverflow.com/questions/3513773/change-mysql-default-character-set-to-utf-8-in-my-cnf)
+[client]
+default-character-set=utf8
+[mysql]
+default-character-set=utf8
+[mysqld]
+collation-server = utf8_unicode_ci
+init-connect='SET NAMES utf8'
+character-set-server = utf8
+
+如何单独写段测试用例用C呢？
+#include <mysql.h>
+
 
 总结：
 1. mysql是按照 charset_set_client的编码 去解析收到的字符串,所以出现日志乱码,

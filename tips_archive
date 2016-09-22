@@ -1318,6 +1318,10 @@ MAX.
 40. get most starred,forks github repos
     type 'stars:>1' in the search box
 	Sort : 'most stars'
+    
+41. baidu yun, OpenShift server failed, authorizing/refreshing with the Heroku server ...
+    solve method : rm -rf ~/.bypy
+    rm -rf C:\\Users\\username\\.bypy
 
 ipconfig/all
 ipconfig/flushdns,连接不上VPN的时候可以用哦
@@ -1420,6 +1424,10 @@ AppServer 让我trust一个IP 123.30.106.192
 
 
 ---
+cannot find -lboost_system
+sudo apt-get install libboost-dev
+sudo apt-get install libboost-all-dev
+
 boost basic library(mandatory boost knowledge)
 Boost.Assign
 Boost.Bind

@@ -409,6 +409,13 @@ g++ -g test_client.cpp BaseTCPClient.cpp BaseSocket.cpp BaseThread.cpp BaseByteB
 visual studio auto refresh file changes
 Options --> Environment --> Documents --> Detect when file is changed outside the document, auto-load changes, if saved
 
+visual studio include linux headers?
+tar -jcf all_linux_include.tar.bz2 /usr/include/
+copy all_linux_include.tar.bz2 to windows machine
+new folder linux under C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\crt\src
+Visual studio , Properties, C++, General, Additional Include Directiories, add C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\crt\src
+
+
 visual studio disable all assert in debug mode?(http://stackoverflow.com/questions/28041359/how-to-turn-off-asserts-in-debug-mode-in-visual-studio-2013)
 _set_error_mode(_OUT_TO_STDERR);
 int iPrev = _CrtSetReportMode(_CRT_ASSERT,0);
@@ -884,7 +891,21 @@ The order in which the indices are enumerated is not specified, even for numeric
 
 The behavior of next is undefined if, during the traversal, you assign any value to a non-existent field in the table. You may however modify existing fields. In particular, you may clear existing fields.
 
-
+3.How to copy table in lua?(http://lua-users.org/wiki/CopyTable)
+function deepcopy(orig)
+    local orig_type = type(orig)
+    local copy
+    if orig_type == 'table' then
+        copy = {}
+        for orig_key, orig_value in next, orig, nil do
+            copy[deepcopy(orig_key)] = deepcopy(orig_value)
+        end
+        setmetatable(copy, deepcopy(getmetatable(orig)))
+    else -- number, string, boolean, etc
+        copy = orig
+    end
+    return copy
+end
 
 ---
 How to run makefile in windows ? makefile make in windows?

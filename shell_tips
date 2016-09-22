@@ -283,6 +283,39 @@ uname -a
     
     install pthread man pages on ubuntu(man pthreads)
     sudo apt-get install manpages-posix manpages-posix-dev
+    
+    apt-key del, How to remove key added?
+    sudo apt-key list
+    pub   1024R/B455BEF0 2010-07-29
+    uid                  Launchpad clicompanion-nightlies
+    nits@nits-excalibur:~$ sudo apt-key del B455BEF0
+    nits@nits-excalibur:~$ apt-key list | grep clicompan
+    nits@nits-excalibur:~$ 
+    
+    apt-get install python-pip
+    Reading package lists... Done
+    Building dependency tree       
+    Reading state information... Done
+    You might want to run 'apt-get -f install' to correct these:
+    The following packages have unmet dependencies:
+    bittorrent : Depends: python-wxgtk2.6 but it is not installable
+                Depends: python-twisted (>= 2.0) but it is not going to be installed
+                Depends: python-crypto (>= 2.0) but it is not going to be installed
+                Depends: python-psyco but it is not installable
+                Depends: python-zopeinterface
+    python-pip : Depends: python-colorama but it is not going to be installed
+                Depends: python-distlib but it is not going to be installed
+                Depends: python-html5lib but it is not going to be installed
+                Depends: python-pkg-resources but it is not going to be installed
+                Depends: python-requests but it is not going to be installed
+                Depends: python-setuptools (>= 0.6c1) but it is not going to be installed
+                Depends: python-six but it is not going to be installed
+    E: Unmet dependencies. Try 'apt-get -f install' with no packages (or specify a solution)
+    How to solve the problem?
+    sudo apt-get -f install
+    dpkg --configure -a
+    sudo apt-get -f install
+    sudo apt-get install python-pip
 	
 29.	awk with grep
 	awk '{print $1}' input.txt | xargs -n 1 -I pattern grep -wnH pattern ScenesServer/
@@ -540,6 +573,14 @@ PS1='\[\033[1;31;40m\]\u@\h:\w\$ '
 	red='\033[0;31m'
 	NC='\033[0m' # No Color
 	echo -e "${red}Hello Stackoverflow${NC}"
+    
+    How to use echo to dynamically change content without newline?(echo -ne "\r")
+    #!/bin/bash         
+    while [ 1 ]    
+    do    
+        a=$(date)    
+        echo -ne "$a\r"
+    done 
 
 	cecho() {
   local code="\033["
@@ -697,6 +738,15 @@ cecho y "Yellow!"
 	
 30.	Forgot ubuntu user password
 	https://www.liberiangeek.net/2014/10/change-forgotten-password-ubuntu-14-04-servers/
+    
+    forget redhat root password
+    1. reboot
+    2. press the arrow keys to highlight the installation you want to edit, and  type A to enter append mode
+    grub append> ro root=LABEL=/
+    3. press Home button to add "single" to the end of "LABEL=/"
+    grub append> ro root=LABEL=/ single
+    4. Press Enter, grub will boot single user mode.
+    5. passwd root
 	
 31.	# Check if running as root
 if [ "$(id -u)" != "0" ]; then
@@ -1103,6 +1153,69 @@ swapon -s
 68. How to watch a file size on Linux?
 watch -n 5 "du -h club_prod.sql"
 watch -n 5 "ls -lh club_prod.sql | awk '{print \$5}'"
+
+69. Use strace to find all opening and closing files:
+strace -e trace="open,close" -o /tmp/my_trace -v GatewayServer
+strace -p $Gateway_PID
+
+70. lsof to find all opening files by a process:
+lsof -np $PID(network hostname)
+lsof -p $PID
+lsof -i:8080
+
+71. How to generate An error report file?(An error report file with more information is saved as:)
+environments, signal handlers, /proc/cpuinfo, /proc/meminfo
+
+72. ssh remote command get fewer environments than running manually?(man bash)
+ssh user@IP "export"
+export
+The SSH command execution shell is a non-interactive shell, whereas your normal shell is either a login shell or an interactive shell. 
+
+
+73. How to configure samba on ubuntu 14.04?(http://computernetworkingnotes.com/network-administration/how-to-configure-samba-on-rhel-6.html)
+sudo apt-get install samba -y
+Anonymous share:
+sudo mkdir -p /shares/anonymous
+sudo chown nobody:nogroup /shares/anonymous/
+sudo cp /etc/samba/smb.conf /etc/samba/smb.conf.bak
+sudo vim /etc/samba/smb.conf
+[Anonymous]
+       comment = Anonymous share access
+       path = /shares/anonymous
+       browsable = yes
+       writable = yes
+       guest ok = yes
+       read only = no
+       force user = nobody
+       force group = nogroup
+sudo ufw allow 139
+sudo ufw allow 445
+sudo service smbd restart
+Secure share:
+sudo mkdir -p /shares/project1
+sudo addgroup smbse
+sudo chown root:smbse /shares/project1/
+sudo chmod 770 /shares/project1/
+sudo vim /etc/samba/smb.conf
+[Project1]
+         comment = Project1 Share
+         path = /shares/project1
+         valid users = @smbse
+         guest ok = no
+         writable = yes
+         browsable = yes
+sudo useradd smbseuser -s /usr/sbin/nologin -G smbse(-s /usr/sbin/nologin : Restricting shell access,-G smbse : Added to smbse group)
+sudo smbpasswd -a smbseuser(server)
+sudo usermod mike -G smbse(add mike to group smbse)
+sudo usermod -a -G smbproj1,smbproj2 dave(add dave to smbproj1 and smbproj2 project)
+testparm(for trouble shooting problems)
+sudo service smbd restart
+
+---
+copy linux include header files to Visual studio
+cp -r /usr/include .
+tar -jcf all_linux.tar.gz include/
+add C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\crt\src\linux to include path.
 	
 ==================
 YouCompleteMe
