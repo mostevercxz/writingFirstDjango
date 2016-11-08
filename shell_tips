@@ -66,6 +66,20 @@
 	grep do not grep specific directories
 	grep pattern -r --include=\*.{cpp,h} rootdir
 	grep pattern -r --include="*.{cpp,h}" --exclude="*\.svn" --exclude-dir="*\.svn" rootdir
+    
+    How to grep/sed newline character??(Use tr instead, tr '\n' ' ' < input_filename, tr -d '\n' <input.txt > output.txt
+    How to use tr to replace newline with string? 1. use tr to replace newline with a character that don't appear in the text
+    2. Use sed to replace that character with string.)
+    grep and sed are matched against individual lines so there is no way for a pattern to match a newline.
+    pcregrep -M "pattern1.*\n.*pattern2" filename
+    using gnu sed (http://stackoverflow.com/questions/1251999/how-can-i-replace-a-newline-n-using-sed)
+    sed ':a;N;$!ba;s/\n/ /g'
+    BSD:
+    sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/ /g'
+    1. Create a label via ':a'
+    2. Append the current and next line to the pattern space via N
+    3. If we are before the last line, branch to the created label $!ba($! means not to do it on the last line as there should be one final newline).
+    4. Finally the substitution replaces every newline with a space on the pattern space (which is the whole file).
 	
 	python subprocess grep color
 	command = 'grep --color=always aaa file1.txt file2.txt' 
@@ -82,6 +96,13 @@
 	find exclude path
 	find . -type f -name "*_peaks.bed" ! -path "./tmp/*" ! -path "./scripts/*"
 	! -path "./tmp/*" - Exclude all results whose path starts with ./tmp/ 9
+    
+    find directories having size greater than xMB?
+    du -sm * | awk '$1 > 1'
+    find file greater than x bytes?
+    find ./ -maxdepth=1 -type f -size +4096c -exec ls -sh {} \;
+    smaller than x Bytes?
+    find ./ -maxdepth=1 -type f -size -4096c
     
     copy a directory exclude .svn files
     use svn export
@@ -255,7 +276,6 @@ uname -a
 22.	  #!/bin/bash          
             STR="Hello World!"
             echo $STR    
-            echo $STR    
 			
 23.	error while loading shared libraries : lib*** cannot open shared object file : No such file or directory
 	export LD_LIBRARY_PATH = path_of_lib:$LD_LIBRARY_PATH	
@@ -316,6 +336,22 @@ uname -a
     dpkg --configure -a
     sudo apt-get -f install
     sudo apt-get install python-pip
+    
+    How to change timezone in Ubuntu(to UTC)?
+    sudo dpkg-reconfigure tzdata
+    select None of the above, choose UTC.
+    
+    (由于地球公转一周为365日5时48分46秒（或365.25日），与一年相差5时48分46秒。这样每过四年就会多一天。
+    因而被四整除的非世纪年是闰年，但这样每过四百年又多出一天。所以后来规定世纪年只有能被四百整除的才是闰年)
+    How to get seconds in one year by year?
+    unsigned int getDaysInYear(unsigned int year)
+    {
+        if ((year % 4 == 0 && year % 100 != 0 ) || year % 400 == 0)//leap year
+        {
+            return 366;
+        }
+        return 365;
+    }
 	
 29.	awk with grep
 	awk '{print $1}' input.txt | xargs -n 1 -I pattern grep -wnH pattern ScenesServer/
@@ -431,8 +467,8 @@ uname -a
     sudo apt-get(yum) install sysstat
     pidstat 3 -t pid
 	
-
-	
+48. 
+	 
             
 Line 2 creates a variable called STR and assigns the string "Hello World!" to it. 
 Then the VALUE of this variable is retrieved by putting the '$' in at the beginning. 
@@ -875,6 +911,10 @@ history | awk '{CMD[$2]++;count++;}END { for (a in CMD)print CMD[a] " " CMD[a]/c
 memory usage by bytes top 10
 ps aux --sort -rss |head -10
 
+get all cores of CPU usage:
+1.top
+2.Press 1
+
 45. install locate on CentOS
 Debian : apt-get install locate
 CentOS : yum install mlocate
@@ -975,6 +1015,14 @@ For example, kill all connections that occupy port=38035?
 	
 	sudo svnserve -d --foreground -r /usr/local/svn/repos
     svn default port is 3690
+    Repository has not been enabled to accept revision propchanges;ask the administrator to create a pre-revprop-change hook
+    Let svn accept edit logs:
+    cd repos/hooks/
+    mv pre-revprop-change.tmpl pre-revprop-change
+    
+    stop svnserve linux:
+    ps aux|grep svnserve
+    kill -9 $pid
     
     How to switch repository to a totally different URL?
     svn switch --relocate old_path_url new_path_url .
@@ -1174,6 +1222,8 @@ The SSH command execution shell is a non-interactive shell, whereas your normal 
 
 73. How to configure samba on ubuntu 14.04?(http://computernetworkingnotes.com/network-administration/how-to-configure-samba-on-rhel-6.html)
 sudo apt-get install samba -y
+sudo ufw allow 139
+sudo ufw allow 445
 Anonymous share:
 sudo mkdir -p /shares/anonymous
 sudo chown nobody:nogroup /shares/anonymous/
@@ -1188,29 +1238,34 @@ sudo vim /etc/samba/smb.conf
        read only = no
        force user = nobody
        force group = nogroup
-sudo ufw allow 139
-sudo ufw allow 445
 sudo service smbd restart
+sudo service nmbd restart
+
 Secure share:
 sudo mkdir -p /shares/project1
 sudo addgroup smbse
 sudo chown root:smbse /shares/project1/
 sudo chmod 770 /shares/project1/
+sudo cp /etc/samba/smb.conf /etc/samba/smb.conf.bak
 sudo vim /etc/samba/smb.conf
-[Project1]
-         comment = Project1 Share
+# Change this to the workgroup/NT-domain name your Samba server will part of
+   workgroup = giant_haha.com
+[server]
+         comment = my server
          path = /shares/project1
+         available = yes
          valid users = @smbse
+         read only = no
          guest ok = no
          writable = yes
-         browsable = yes
+         browsable = yes         
 sudo useradd smbseuser -s /usr/sbin/nologin -G smbse(-s /usr/sbin/nologin : Restricting shell access,-G smbse : Added to smbse group)
 sudo smbpasswd -a smbseuser(server)
 sudo usermod mike -G smbse(add mike to group smbse)
 sudo usermod -a -G smbproj1,smbproj2 dave(add dave to smbproj1 and smbproj2 project)
 testparm(for trouble shooting problems)
 sudo service smbd restart
-
+sudo service nmbd restart
 ---
 copy linux include header files to Visual studio
 cp -r /usr/include .
@@ -1286,7 +1341,7 @@ Redhat搭建FTP服务器,并在windows资源管理器中下载文件(http://comp
 1.install
 rpm -ivh vsftpdXXX.rpm(yum install vsftpd)
 rpm -ivh ftpdXXX.rpm(yum install ftp)
-service vsftpd start | stop | restart
+service vsftpd start | stop | restart.
 2.configure
 2.1 check if you have configured the firewall properly
 iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 21 -j ACCEPT
@@ -1316,6 +1371,14 @@ Set Seconds between keepalive 30
 ---
 ---
 What you need when you buy a VPS
+How to touch file with certain size ? (generate a file with a given size in Linux)
+dd if=/dev/zero of=certain_size bs=1M count=100
+truncate -s 10G foo
+fallocate -l 5G bar
+du -B1 --apparent-size /tmp/foo.txt
+
+How to mmap the file into memory?
+
 1. How to make fail2ban bans persistent(fail2ban blacklist)
 sudo touch /etc/fail2ban/ip.blacklist
 make a copy of /etc/fail2ban/action.d/iptables-multiport.conf

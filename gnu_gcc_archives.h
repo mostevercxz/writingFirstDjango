@@ -254,7 +254,8 @@ strings /usr/lib64/libstdc++.so.6| grep -i glibc
 27. where is size_t defined in Linux? How to find ??
     /usr/lib/x86_64-redhat-linux/4.1.1/include/stddef.h
     typedef __SIZE_TYPE__ size_t;
-    echo '#include <time.h>' | cpp -I/usr/include - > time_expanded.c
+    echo '#include <time.h>' | cpp -I/usr/include -D_GNU_SOURCE - > time_expanded.c
+    (-D_GNU_SOURCE selects macro __USE_XOPEN, vim /usr/include/time.h, #ifdef __USE_XOPEN strptime #endif)
     
     How to print uLongf?
     1. find where uLongf is defined. typedef unsigned long uLong; typedef uLong uLongf;
@@ -899,6 +900,22 @@ daemon(1,1)
     https://github.com/google/sanitizers/wiki/SanitizerCommonFlags
     Make asan core dumped(easy to debug,only 32-bit is available, 64-bit NO!!!), ASAN_OPTIONS="disable_core=0:unmap_shadow_on_exit=1:abort_on_error=1:log_path=/home/giant/asan_error_log"
     
+    gcc version > 4.9
+    gcc -Werror -fsanitize=address -fsanitize=undefined test_assert.c -o test_assert
+    cat test_assert.c 
+    #include <stdio.h>
+    #include <assert.h>
+    
+    int main()
+    {
+        int *p = NULL;
+        *p = 3;
+        //assert(0);
+        printf("after assert");
+        return 0;
+    }
+
+    
     
 15. How can a C program produce a core dump of itself without terminating?
     void create_dump(void)
@@ -996,6 +1013,18 @@ int main(void){
 
     return 0;
 }
+
+How to erase from vector by value?
+Erase-remove idiom. (can not be used for containers that return const_iterator, set.)
+// initialises a vector that holds the numbers from 0-9.
+std::vector<int> v = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+print(v); 
+// removes all elements with the value 5
+v.erase( std::remove( v.begin(), v.end(), 5 ), v.end() ); 
+print(v);
+// removes all odd numbers
+v.erase( std::remove_if(v.begin(), v.end(), is_odd), v.end() );
+print(v);
 
 -------------------------------
 	gdb tricks I should know

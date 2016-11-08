@@ -771,6 +771,9 @@ def log(*objs):
     cd boost-build
     ./bootstrap.sh
     sudo ./b2 install 
+    
+32. python print leading zero
+    '%04d' % 9
 		
 -------------------------------
 	Python Built-in functions

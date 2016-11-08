@@ -1322,6 +1322,89 @@ MAX.
 41. baidu yun, OpenShift server failed, authorizing/refreshing with the Heroku server ...
     solve method : rm -rf ~/.bypy
     rm -rf C:\\Users\\username\\.bypy
+    
+42. How to reverse sorted dictionary ?
+SortedDictionary<float, int> sd = new SortedDictionary<float, int>();
+foeach(var each in sd)
+{
+    each.Key + each.Value;
+}
+
+ Method 1 : Use .Reverse method(Linq). foreach(var x in Dict.Reverse()) {Console.Write("{0}->{1}", x.Key, x.Value);}
+ Method 2 : Make the dictionary sort in descending order
+ class DescendingComparer<T> : IComparer<T> where T : IComparable<T> {
+        public int Compare(T x, T y) {
+            return y.CompareTo(x);
+        }
+    }
+    
+    
+    // ...
+    
+    
+    var Dict = new SortedDictionary<int, string>(new DescendingComparer<int>());
+ Method 3 : Use SortedList<TKey, TValue> instead. The performance is not as good as the dictionary's (O(n) instead of O(logn)), but you have random-access at the elements like in arrays.
+ 
+ C# 里定义比较函数来允许 mulitple key dictionary 不好,这样在 Remove 时候会删除多个元素.
+ 
+43. How to randomize an array?
+static class RandomExtensions
+{
+    public static void Shuffle<T> (this System.Random rng, T[] array)
+    {
+        int n = array.Length;
+        while (n > 1) 
+        {
+            int k = rng.Next(n--);
+            T temp = array[n];`
+            array[n] = array[k];
+            array[k] = temp;
+        }
+    }
+}
+
+var array = new int[] {1, 2, 3, 4};
+new System.Random().Shuffle<int>(array);
+
+44. How to spawn a process and capture its STDOUT?
+void HandleOutPut(string data);
+
+Process process = new Process();
+process.StartInfo.DoNotCreateWindow = true;//隐藏窗体
+process.StartInfo.UseShellExecute = false;
+process.StartInfo.RedirectStandardOutput = true;
+process.OutputDataReceived += (sender, args) => HandleOutPut(args.Data);
+process.Start();
+process.BeginOutputReadLine();
+
+45. How to run code before program exit?
+using System;
+class Test {
+    static void Main(string[] args)
+    {
+        AppDomain.CurrentDomain.ProcessExit += new EventHandler (OnProcessExit); 
+        // Do something here
+    }
+
+    static void OnProcessExit (object sender, EventArgs e)
+    {
+        Console.WriteLine ("exit");
+    }
+}
+
+46. What is difference between p.Kill() and p.Close() ?
+	
+What are the differences between Process.Close() and process.Kill()?
+The manual is pretty clear on that:
+
+Process.Close():
+The Close method causes the process to stop waiting for exit if it was waiting, closes the process handle, and clears process-specific properties. Close does not close the standard output, input, and error readers and writers in case they are being referenced externally. [i.e. the process itself keeps running, you just cannot control it anymore using your Process instance]
+
+Process.Kill():
+Kill forces a termination of the process, while CloseMainWindow only requests a termination. [...] The request to exit the process by calling CloseMainWindow does not force the application to quit. The application can ask for user verification before quitting, or it can refuse to quit. To force the application to quit, use the Kill method. The behavior of CloseMainWindow is identical to that of a user closing an application's main window using the system menu. Therefore, the request to exit the process by closing the main window does not force the application to quit immediately.
+Process.CloseMainWindow:
+
+Closes a process that has a user interface by sending a close message to its main window.
 
 ipconfig/all
 ipconfig/flushdns,连接不上VPN的时候可以用哦
@@ -1425,7 +1508,7 @@ AppServer 让我trust一个IP 123.30.106.192
 
 ---
 cannot find -lboost_system
-sudo apt-get install libboost-dev
+sudo apt-get install libboost-dev   
 sudo apt-get install libboost-all-dev
 
 boost basic library(mandatory boost knowledge)
@@ -1442,3 +1525,11 @@ https://searchcode.com
 https://github.com/search?q=keyword&type=Code&utf8=%E2%9C%93
 https://code.openhub.net
 ---
+filezilla 中文乱码,文件下载失败
+用抓包工具发现发 gb2312 的文件名过去,就可以下载；Utf8的不能下载
+文件-站点管理-选中要登陆的站点-字符集-使用自定义字符集GB2312
+
+How to block request domain in chrome?
+发现 chrome 被 DNS unlocker 污染了,摁 F12 发现一堆奇怪的请求，如何block 这些请求呢？
+chrome://flags/#enable-devtools-experiments 设置为 enable
+然后摁 F12，在 settings, expirements, 连续摁 6次 shift, 出现 request block, 勾选上即可。

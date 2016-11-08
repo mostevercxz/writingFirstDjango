@@ -330,11 +330,14 @@ Make sure you have Just My Code Enabled by going into Tools-->Options-->Debugger
 This will change your Debug--> Exceptions Dialog Box to show a CheckBox for User-unhandled Errors.
 
 27. How to break on handled exceptions?
-
+常用模式是 在exception 地方弹出一个messageBox,让进程锁住,然后用 vs 附加到该进程.
 
 28. How to Catching access violation exceptions?
 http://stackoverflow.com/questions/457577/catching-access-violation-exceptions
 
+
+29. How to debug exe without source code?
+File --> Open Project/Solution, Choose exe file. Press F5.
 
 中英文术语对照表
 空格 whitespace
@@ -359,6 +362,27 @@ lua.c:80:31: fatal error: readline/readline.h: No such file or directory
  #include <readline/readline.h>
 sudo apt-get install libreadline-dev 
 
+===
+How to produce high CPU load on Windows?(http://superuser.com/questions/396501/how-can-i-produce-high-cpu-load-on-windows)
+consume.exe from Windows Server 2003 Resource Toolkit.
+C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\x64>consume -cpu-time -time 5
+
+How to produce high CPU load on Linux?
+cat /dev/zero > /dev/null
+sudo apt-get install stress
+./stress --cpu 3
+from multiprocessing import Pool
+
+def f(x):
+    # Put any cpu (only) consuming operation here. I have given 1 below -
+    while True:
+        x * x
+
+# decide how many cpus you need to load with.
+no_of_cpu_to_be_consumed = 3
+
+p = Pool(processes=no_of_cpu_to_be_consumed)
+p.map(f, range(no_of_cpu_to_be_consumed))
 
 ====================
 why public virtual deconstructor??
