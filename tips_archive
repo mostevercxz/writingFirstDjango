@@ -613,6 +613,17 @@ stars:>1 language:c++
 	git remote add origin git@github.com:/writingFirstDjango.git(must use the word "origin"!! not "firstDjangoApp")
 	git push -u origin master 
 	https://github.com//django-blog-zinnia.git
+    
+    create git repository from existing one:
+    添加用户 git,并设置 git 的密码
+    su - git
+    mkdir repo && cd repo
+    git --bare init
+    cd 到已存在的 git repository
+    scp ~/.ssh/id_rsa.pub git@localhost:/home/git
+    cat id_rsa.pub >> ~/.ssh_authorized_keys
+    git push git@localhost:repo master 完成了新的git仓库的创建
+    
 3. cancel last commit
 	git reset --soft HEAD~1
 	eidt
@@ -726,6 +737,31 @@ stars:>1 language:c++
 	4.change some files, and git commit -m"add file"
 	5.git push -u origin develop
 
+10. migrate svn repository with histroy to git repository steps:
+    (reference : http://stackoverflow.com/questions/79165/how-to-migrate-svn-repository-with-history-to-a-new-git-repository
+    http://blokspeed.net/blog/2010/09/converting-from-subversion-to-git/
+    )
+    1. Create a users file, mapping svn users to git:
+    svn log --xml | grep author | sort -u | perl -pe 's/.*>(.*?)<.*/$1 = /' | tee users.txt
+    vim users.txt
+    user1 = fullname1 <mail1.com>
+    user2 = fullname2 <mail2.com>
+    2. If having the common "trunk/, branches/, tags/" SVN layout, user "--stdlayout" option, otherwise use "-tags --branches --trunk" options.
+    (if you omit the --no-metadata flag, Git will append information about the corresponding SVN revision to the commit message (i.e. git-svn-id: ))
+    git svn clone  --no-metadata --authors-file users.txt svn://root/to/project_repository
+    
+    git svn clone --stdlayout --no-metadata --authors-file=users.txt svn://root/to/project_repository snowball-tmp
+    git svn clone  --stdlayout --no-metadata -trunk=trunk --authors-file users.txt svn://root/to/project_repository
+    git svn init  --stdlayout --no-metadata --authors-file users.txt svn://root/to/project_repository
+    
+11. change repo url in tortoise git    
+    Right click on main folder
+    TortoiseGit
+    Settings
+    Git
+    Remote
+    In field remote select origin -> url of repository will appear in field URL: and can be changed from here.
+    Uncommited changes can be stashed, or committed locally.
 
 
 git Howtos, 2014-11-03
@@ -787,6 +823,19 @@ git config --global core.compression 0
 git clone --depth 1 <repo_URI>
 git fetch --unshallow
 git pull --all
+
+13. How to commit an empty directory in git?
+No way! put an empty .gitignore file in the empty directory, then commit it.
+
+14. Which gitignore is ignoring my file?
+    https://git-scm.com/docs/gitignore
+    git check-ignore -v filename
+    
+    echo "bin/" >> .gitignore
+    
+15. How do you stash an untracked file?
+git stash --include-untracked save -u
+git stash save --keep-index
 	
 Svn tips
 ------------------------------
@@ -1398,13 +1447,17 @@ What are the differences between Process.Close() and process.Kill()?
 The manual is pretty clear on that:
 
 Process.Close():
-The Close method causes the process to stop waiting for exit if it was waiting, closes the process handle, and clears process-specific properties. Close does not close the standard output, input, and error readers and writers in case they are being referenced externally. [i.e. the process itself keeps running, you just cannot control it anymore using your Process instance]
+The Close method causes the process to stop waiting for exit if it was waiting, closes the process handle, and clears process-specific properties.
+Close does not close the standard output, input, and error readers and writers in case they are being referenced externally. [i.e. the process itself keeps running, you just cannot control it anymore using your Process instance]
 
 Process.Kill():
 Kill forces a termination of the process, while CloseMainWindow only requests a termination. [...] The request to exit the process by calling CloseMainWindow does not force the application to quit. The application can ask for user verification before quitting, or it can refuse to quit. To force the application to quit, use the Kill method. The behavior of CloseMainWindow is identical to that of a user closing an application's main window using the system menu. Therefore, the request to exit the process by closing the main window does not force the application to quit immediately.
 Process.CloseMainWindow:
 
 Closes a process that has a user interface by sending a close message to its main window.
+
+47. 为 c# solution 的所有 project 添加引用(比如添加 UnityEngine 引用)
+Project --> Add Reference --> Browse --> 选择 UnityEngine.dll 所在目录,添加即可.
 
 ipconfig/all
 ipconfig/flushdns,连接不上VPN的时候可以用哦
@@ -1498,6 +1551,19 @@ error2:	undefined reference to `ospeed'
 
 yum --nogpgcheck localinstall http://pkgs.repoforge.org/subversion/subversion-devel-1.7.1-0.1.el6.rfx.i686.rpm		
 ftp://fr2.rpmfind.net/linux/opensuse/distribution/13.2/repo/oss/suse/x86_64
+
+(ruby on )rails gem remove a source:
+# gem sources -r https://rubygems.org
+source https://rubygems.org not present in cache
+先 gem sources 看清楚到底是 http 还是 https
+然后将要移除的source 复制下地址, gem sources -r https://rubygems.org
+添加 ruby on china 的 gem 地址: gem sources --add https://gems.ruby-china.org/
+
+vultr gem install-network is unreachable
+ERROR:  While executing gem ... (Errno::ENETUNREACH)
+    Network is unreachable - sendto(2) for "2001:19f0:300:1704::6" port 53
+
+sudo vim /etc/resolv.conf, put IPV6 address under IPV4 address.
 
 AppServer 让我trust一个IP 123.30.106.192
 我在权限xml里面加了一个<set ip="123.30.106.192">"showallsepts", "giveallreward", "getCharidName", "getRoleMessage"</set>

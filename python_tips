@@ -299,6 +299,18 @@ def query_yes_no(question, default="yes"):
 	b 9
 	Breakpoint 1 at .../pdb_break.py:9
 	condition 1 j > 0
+    
+    How to determine the type of a Python Object?
+    type([]) is list
+    type({}) is dict
+    >>> a = Test1()    
+    >>> type(a) is Test1
+    True
+    type() 只返回该object的类型,无法判断类型之间的继承关系,想判断继承,使用 isinstance(a, Test1)
+    >>> isinstance(b, Test1)
+    True
+    >>> isinstance('', (str, unicode))
+    True
 
 22. python3 print encoding
     An alternative solution to those already suggested is to set the PYTHONIOENCODING environment variable before Python starts, 
@@ -390,6 +402,7 @@ def make_content_with_boundary(dict):
     (http://kaira.sgo.fi/2014/05/saving-and-loading-data-in-python-with.html)
 	
 32. Constantly print subprocess stdout to screen(python subprocess stdout to screen)
+    subprocess 及时刷新
     proc = subprocess.Popen(cmd, shell=True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
 	
 	# Method 1
@@ -774,6 +787,19 @@ def log(*objs):
     
 32. python print leading zero
     '%04d' % 9
+    
+33. pass tuple as function arguments ?
+    tu = (1, 1)
+    myfunc_add(*tu) #myfunc_add(1, 1)
+    
+    tu_list = [(1,2), (2, 3), (3, 4)]
+    for args in tu_list:
+        myfunc_add(*args)
+        
+34. How to append to tuple?
+    a = (1,2)
+    b = a + (4, 5)
+    c = b[1:]
 		
 -------------------------------
 	Python Built-in functions

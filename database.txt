@@ -149,9 +149,9 @@ character-set-server = utf8
 	mysql -h192... -uuserName -p123456 databaseName < /home/userName/dbBak/bak.sql
 
 3. mysql user management
-	###########
-	create user 'userName'@'192.0.0.1' identified by 'password 123456';
-	CREATE USER 'monty'@'localhost' IDENTIFIED BY 'some_pass';
+	###########	
+    CREATE USER 'monty'@'%' IDENTIFIED BY 'some_password';
+	CREATE USER 'monty'@'localhost' IDENTIFIED BY 'some_password';
 		Why ?? using root, ERROR 1396 (HY000): Operation CREATE USER failed for 'jack'@'localhost'
 		run "flush privileges;", then it is OK!
 	set password for 'userName'@'192.0.0.1' = password('newpass');
@@ -160,6 +160,17 @@ character-set-server = utf8
 	
 	'zyw'这个用户有权限但是连接不上,drop user,delete from mysql.user where user='zyw' 后要重启服务器
 	
+    远程机器 mysql -ukbe -pkbe -h1.2.3.4 kbe
+    ERROR 2003 (HY000): Can't connect to MySQL server on '127.0.0.1' (111)
+    将 1.2.3.4 的  /etc/mysql/my.cnf 中的 bind-address=127.0.0.1注释掉,然后 sudo service mysql restart
+    
+    simple mysql test file:
+    g++ `mysql_config --cflags` test_mysql.cpp `mysql_config --libs` -o test_mysql
+    
+    How to decrypt mysql password?How to simulate mysql password encryption?
+    select sha1(unhex(sha1('kbe')));
+    select password('kbe');
+    select user,password from mysql.user;
 	
 4. Mysql user privileges management
 	(################# must run 'flush privileges' after change privileges)

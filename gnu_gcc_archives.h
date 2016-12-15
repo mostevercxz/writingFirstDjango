@@ -141,6 +141,21 @@ strings /usr/lib64/libstdc++.so.6| grep -i glibc
 
 	eit makefile, make -g3 test.cpp -o test
 	macro expand/exp
+    
+    Preprocess output:
+    The output from the C preprocessor looks much like the input, 
+    except that all preprocessing directive lines have been replaced with blank lines and all comments with spaces. Long runs of blank lines are discarded.
+    
+    Source file name and line number information is conveyed by lines of the form:
+    # linenum filename flags
+    These are called linemarkers. They mean that the following line originated in file filename at line linenum. 
+    Filename will never contain any non-printing characters; they are replaced with octal escape sequences.
+    
+    0 or more flags : 1,2,3,4
+    1 表明新文件的开始
+    2 在包含另一个文件后,返回到某个文件.
+    3 接下来的代码是系统头文件,某些特殊警告应当被禁止.
+    4 接下来的代码应该被视为包含在 extern "C" block 中.
 15.	gcc -O1 -S code_example.c
 	gcc -O1 -o program code_example.o main.c
 	ATT assembly-code formats VS Intel assembly-code formats
@@ -441,6 +456,33 @@ int main(int argc, char** argv) {
   return 0;
 }
 clang -fsanitize=memory -fsanitize-memory-track-origins -fPIE -pie -fno-omit-frame-pointer -g -O2 umr.cc
+
+43. How to identify platform/compiler from code?
+For Mac OS:
+#ifdef __APPLE__
+
+#ifdef _WIN32 // note the underscore: without it, it's not msdn official! Windows (x64 and x86)
+
+For MingW on Windows:
+#ifdef __MINGW32__
+
+For Linux:
+#ifdef __linux__
+
+
+Build gcc from source code:
+tar xzf gcc-4.6.2.tar.gz
+cd gcc-4.6.2
+./contrib/download_prerequisites
+cd ..
+mkdir objdir
+cd objdir
+$PWD/../gcc-4.6.2/configure --prefix=$HOME/gcc-4.6.2 --enable-languages=c,c++,fortran,go
+make
+make install
+
+44. Where the *.VC.db files are stored?
+echo %TEMP%
 
 
 gcc options
@@ -895,6 +937,18 @@ daemon(1,1)
     stepi
     x
     
+    gdb install from source code
+    sudo apt-get install libreadline
+    wget ftp://ftp.gnu.org/gnu/gdb/gdb-7.12.tar.xz
+    tar -xf gdb-7.12.tar.xz
+    ./configure --prefix=/usr --with-system-readline && make
+    (不要选择/usr/bin, gdb 自己会创建 bin 和 lib 目录的,/usr/bin/bin)
+    
+    gdb ptrace: Operation not permitted
+    解决方法:
+    sudo su
+    echo 0 >  /proc/sys/kernel/yama/ptrace_scope
+    
 14. use asan to detect adress read/write out of bound
     https://trac.torproject.org/projects/tor/ticket/13499
     https://github.com/google/sanitizers/wiki/SanitizerCommonFlags
@@ -1025,6 +1079,36 @@ print(v);
 // removes all odd numbers
 v.erase( std::remove_if(v.begin(), v.end(), is_odd), v.end() );
 print(v);
+
+20. How does gcc find the following header file?
+cat test.c
+#include <sys/ptrace.h>
+int main(){return 0;}
+cpp test.c -v
+gcc test.c -v
+#include "..." search starts here:
+#include <...> search starts here:
+ /usr/lib/gcc/x86_64-linux-gnu/5/include
+ /usr/local/include
+ /usr/lib/gcc/x86_64-linux-gnu/5/include-fixed
+ /usr/include/x86_64-linux-gnu
+ /usr/include
+End of search list.
+
+gcc test.c -M
+test.o: test.c /usr/include/stdc-predef.h \
+ /usr/include/x86_64-linux-gnu/sys/ptrace.h /usr/include/features.h \
+ /usr/include/x86_64-linux-gnu/sys/cdefs.h \
+ /usr/include/x86_64-linux-gnu/bits/wordsize.h \
+ /usr/include/x86_64-linux-gnu/gnu/stubs.h \
+ /usr/include/x86_64-linux-gnu/gnu/stubs-64.h \
+ /usr/include/x86_64-linux-gnu/bits/types.h \
+ /usr/include/x86_64-linux-gnu/bits/typesizes.h
+ 
+echo '#include <sys/ptrace.h>' | gcc -fsyntax-only -xc -v -H -
+
+21. Which header file defined the macro that specify the machine architecture:
+echo | gcc -E -dM -
 
 -------------------------------
 	gdb tricks I should know

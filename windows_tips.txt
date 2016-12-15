@@ -15,6 +15,10 @@ shift + Right Click, OPEN prompt
 D:\vs_community.exe /uninstall /force 
 wmic product where "name like 'microsoft visual%'" call uninstall /nointeractive
 
+Install vs2015, error log:
+[0428:14D0][2016-12-13T14:38:36]i000: MUX: P8 - Error 1935.An error occurred during the installation of assembly 'Microsoft.mshtml,version="7.0.3300.0",publicKeyToken="b03f5f7f11d50a3a",fileVersion="7.0.3300.1",culture="neutral"'. Please refer to Help and Support for more information. HRESULT: 0x80070020. 
+提示重启电脑,
+直接重启即可.
 ---
 How to force a blue screen in windows?
 http://www.wikihow.com/Force-a-Blue-Screen-in-Windows

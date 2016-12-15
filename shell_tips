@@ -30,6 +30,9 @@
 	text/x-c; charset=iso-8859-1	
 7. iconv -f ascii -t utf8 filename > newfilename
 	iconv -c -f utf-8 -t ascii filename	
+    
+   What is the difference between utf-8 and iso-8859-1?
+   UTF-8是能表示任意unicode字符的多字节编码;iso-8859-1是能代表前256个Unicode字符的单字节编码.对于ascii字符,两者是以相同方式编码的.
 
 8. su - userName@
 	make the shell as a login shell	
@@ -337,6 +340,17 @@ uname -a
     sudo apt-get -f install
     sudo apt-get install python-pip
     
+    sudo apt-get -f install fails
+    trying to overwrite '/usr/include/bits', which is also in package libc6-dev-amd64:i386 2.23-0ubuntu4
+    dpkg --purge --force-depends "gcc-multilib"
+    dpkg --purge --force-depends "gcc-5-multilib"
+    dpkg --purge --force-depends "g++-5-multilib"
+    dpkg --purge --force-depends "g++-multilib"
+    dpkg --purge --force-depends "libc6-dev-x32"
+        
+    cannot find device br0 failed to bring up br0
+    sudo apt-get install bridge-utils
+    
     How to change timezone in Ubuntu(to UTC)?
     sudo dpkg-reconfigure tzdata
     select None of the above, choose UTC.
@@ -467,8 +481,41 @@ uname -a
     sudo apt-get(yum) install sysstat
     pidstat 3 -t pid
 	
-48. 
-	 
+48. Linux use screen to keep process running background:
+    Method 1. nohup ./executable
+    Method 2. 
+        user@machineName:~$ screen,Press space
+        user@machineName:~$ ./executable
+        Ctrl a c - Creates a new screen session so that you can use more than one screen session at once.
+        Ctrl a n - Switches to the next screen session (if you use more than one).
+        Ctrl a p - Switches to the previous screen session (if you use more than one).
+        Ctrl a d - Detaches a screen session (without killing the processes in it - they continue).
+        Press "Ctrl a d" to detach from the screen while the processes is still running.
+        user@machineName:~$ screen -ls	 
+        user@machineName:~$ screen -r 2477.pts-0.server1
+        user@machineName:~$ exit(leave and finish a screen session)
+        
+    What does screen do?
+                                Terminal  (/dev/ttyX or /dev/pts/x)
+                                device
+                                   |
+                    (screen)<--[<output]----x-------(stdout) Process1
+        Terminal  (keyboard)---[input >]---o-\----->(stdin)
+                                            \ \
+(hardware console or                         \ `----(stdout) Process2
+ virtual console or terminal                  `---->(stdin)
+ emulators like xterm, …)
+ 
+ 
+             Terminal                   pseudo
+             devices              ,--> Terminal (/dev/pts/x)
+                |         _______/      device
+Terminal <--[<output]--- |       |        |
+ 1       ---[input >]--> |screen | <--[<output]---x-----(stdout) Process1
+                         |Process| ---[input >]--o-\--->(stdin)
+Terminal <--[<output]--- |       |                \ \
+ 2       ---[input >]--> |_______|                 \ `--(stdout) Process2
+                                                    `-->(stdin)
             
 Line 2 creates a variable called STR and assigns the string "Hello World!" to it. 
 Then the VALUE of this variable is retrieved by putting the '$' in at the beginning. 
@@ -672,7 +719,33 @@ cecho y "Yellow!"
 	add user on ubuntu 15.04, Ubuntu 14.04.2 LTS
 	adduser git
 	deluser git
+    
+    remove user from group ubuntu:
+    deluser giant docker(remove giant from group docker)
 	
+    
+    change a user's password in Linux from the command line with no interactivity:
+    echo username:password | /usr/sbin/chpasswd
+    (in BSD:echo "newpassword" | pw usermod theusername -h 0)
+    
+    change user name in linux:
+    login as root(or login with other user, enter "sudo su"):
+    usermod -l newUserName oldUserName
+    usermod -d /home/newHomeDir -m newUsername
+    
+    example:
+    sudo -i
+    killall -u belaje
+    id belaje
+    uid=1000(belaje) gid=1000(belaje) groups=1000(belaje),4(adm),24(cdrom),27(sudo),30(dip),46(plugdev),109(lpadmin),127(sambashare)
+    usermod -l  balaja belaje
+    groupmod -n balaja belaje
+    usermod -d /home/balaja -m  balaja
+    usermod -c "Bala Jagannathan" balaja
+    id balaja
+    
+    change group name in Linux:
+    groupmod -n <newgroup> <oldgroup>
 	
 	
 18.	Enter passphrase for key '/root/userName/id_dsa.pub':
@@ -907,6 +980,7 @@ fi
 44. Get top used command in my linux
 history | awk '{CMD[$2]++;count++;}END { for (a in CMD)print CMD[a] " " CMD[a]/count*100 "% " a;}'
 | grep -v "./" | column -c3 -s " " -t | sort -nr | nl |  head -n10
+sort -n -k 3,3 temp_blank
 
 memory usage by bytes top 10
 ps aux --sort -rss |head -10
@@ -1000,6 +1074,7 @@ For example, kill all connections that occupy port=38035?
 	svnadmin create /usr/local/svn/repos/test
 	umask 022
 	
+	
 	sudo vim /usr/local/svn/passwd-team
 	[users]
 	michal = somepassword
@@ -1030,6 +1105,11 @@ For example, kill all connections that occupy port=38035?
     How to specific another port and checkout svn repository?
     svnserve -d --listen-port 3691 -r /usr/local/svn/repos
     svn co svn://ip_address:3691/repository_name
+    
+    move subversion repository to another server:
+    1. svnadmin dump /path/to/repository > repo_name.svn_dump
+    2. umask 002 && svnadmin create /path/to/repository && umask 022
+    3. svnadmin load /path/to/repository < repo_name.svn_dump
 
 54. set a custom boundary form submit
     http://code.activestate.com/recipes/146306-http-client-to-post-using-multipartform-data/
@@ -1074,6 +1154,15 @@ $ cat infile | sed 's/\r$//' | od -c
 0000000   h   e   l   l   o  \n   g   o   o   d   b   y   e  \n
 0000016
 
+cat src/test_client/lua_test.cpp|  head -n 1 | od -c
+0000000   #   i   n   c   l   u   d   e       "   l   u   a   _   t   e
+0000020   s   t   .   h   "  \r  \n
+cat src/test_client/lua_test.cpp | head -n 1 | od -t x
+0000000 636e6923 6564756c 756c2220 65745f61
+0000020 682e7473 000a0d22
+
+注意是倒序的. 0d0a 是 \r\n, 22代表双引号
+
 62. How to convert files to UTF-8 without BOM?
 BOM flag(byte order mark) : 0xefbbbf
 BOMflag=`cat filename.txt | od -N 3 -t x`
@@ -1088,6 +1177,11 @@ awk '{if(NR==1)sub(/^\xef\xbb\xbf/,"");print}' filename.txt
 
 63. redirect output to two files
 $ date | tee file1 > file2
+How to redirect the output of an application in background to /dev/null?
+mycommand > /dev/null 2>&1 
+in background:
+mycommand > /dev/null 2>&1 &
+nohup mycommand &
 
 64. how to emulate big endian platform on x86? (emulating a big-endian machine on little-endian hardware)
   big endian systems:
@@ -1182,7 +1276,7 @@ $ date | tee file1 > file2
     2. Press CTRL + Z
     3. enter command : "bg" 
     4. tailf nohup.out to see the logs.
-    
+    837449
 67. How to add a swap file?
 sudo su
 dd if=/dev/zero of=/swapfile1 bs=1024 count=1048000
@@ -1248,6 +1342,9 @@ sudo chown root:smbse /shares/project1/
 sudo chmod 770 /shares/project1/
 sudo cp /etc/samba/smb.conf /etc/samba/smb.conf.bak
 sudo vim /etc/samba/smb.conf
+# 控制新创建的文件和目录的权限
+create mask = 0664
+directory mask = 0775
 # Change this to the workgroup/NT-domain name your Samba server will part of
    workgroup = giant_haha.com
 [server]
@@ -1266,6 +1363,17 @@ sudo usermod -a -G smbproj1,smbproj2 dave(add dave to smbproj1 and smbproj2 proj
 testparm(for trouble shooting problems)
 sudo service smbd restart
 sudo service nmbd restart
+
+windows clear samba cache:
+open cmd, net use * /d
+Control panel --> all Control Panel Items --> Credential Manager, delete the cache of specific host.
+Task Manager, close explorer.exe, reopen explorer.exe
+
+samba change share direcory:
+service smbd stop
+service nmbd stop
+vim /etc/samba/smb.conf
+change the old share name to a new share name, then start samba. 记住,要把旧的名字替换掉,否则可能会出现无法连接的情况.
 ---
 copy linux include header files to Visual studio
 cp -r /usr/include .
