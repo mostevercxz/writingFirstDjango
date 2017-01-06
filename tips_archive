@@ -762,6 +762,10 @@ stars:>1 language:c++
     Remote
     In field remote select origin -> url of repository will appear in field URL: and can be changed from here.
     Uncommited changes can be stashed, or committed locally.
+	
+12. git status shows typechange, What does typechange means?
+	It means that the type of a file changed. For example, a symbolic link that became a regular file.
+	As far as I know, this only applies to symlinks, submodules and regular files
 
 
 git Howtos, 2014-11-03
@@ -836,6 +840,9 @@ No way! put an empty .gitignore file in the empty directory, then commit it.
 15. How do you stash an untracked file?
 git stash --include-untracked save -u
 git stash save --keep-index
+
+16. cannot do a partial commit during a merge
+git commit -i -m"commit"(-i option啥意思?没懂..)
 	
 Svn tips
 ------------------------------

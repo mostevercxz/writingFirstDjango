@@ -184,6 +184,9 @@ pyCon many python tips
 	
 9.	Get dictionary sorted by key
 	sorted_key=sorted(dicts.keys())
+	
+	Reverse order of keys in python dict:
+	list(reversed(sorted(a.keys())))
 
 10.	How to exit a Python script?
 	exit(1)
@@ -299,6 +302,16 @@ def query_yes_no(question, default="yes"):
 	b 9
 	Breakpoint 1 at .../pdb_break.py:9
 	condition 1 j > 0
+	
+	===
+	How to break a function by name?(break a member function)?
+	(Pdb) from jam2dot import JamParser
+	(Pdb) b JamParser.parse
+	(Pdb) import socket
+	from scrapy import crawler
+	b crawler.CrawlerRunner.crawl
+	b socket._socketobject.__init__
+	b socket.SocketIO.write
     
     How to determine the type of a Python Object?
     type([]) is list
@@ -468,6 +481,21 @@ def make_content_with_boundary(dict):
     
     If you notice, from the stack trace: self.__target(*self.__args, **self.__kwargs)
     The *self.__args turns your string into a list of characters, passing them to the processLine function. If you pass it a one element list, it will pass that element as the first argument - in your case, the string.
+	
+39. Call a parent class's method from child class?
+	class Foo(Bar):
+		def baz(self, arg):
+			return super(Foo, self).baz(arg)
+	class A(object):     # deriving from 'object' declares A as a 'new-style-class'
+		def foo(self):
+			print "foo"
+	
+	class B(A):
+		def foo(self):
+			super(B, self).foo()   # calls 'A.foo()'
+	
+	myB = B()
+	myB.foo()
 
 --------------------------	
 	python errors handle
@@ -502,6 +530,18 @@ def make_content_with_boundary(dict):
 	("#!/usr/bin/python -tt" at the beginning of the code)
 	It is recommended that you don't use tabs in Python code.
 	
+6. TypeError: 'dict_keys' object does not support indexing
+test = {'foo': 'bar', 'hello': 'world'}
+keys = test.keys()  # dict_keys object
+
+keys.index(0)
+AttributeError: 'dict_keys' object has no attribute 'index'
+In Python 3, the dict.keys() method returns a dictionary view object, which acts as a set.
+>>> test = {'foo': 'bar', 'hello': 'world'}
+>>> list(test)
+['foo', 'hello']
+>>> list(test)[0]
+'foo'
 	
 --------------------------------
 1. Illegal mix of collations (latin1_swedish_ci,IMPLICIT) and (utf8_general_ci,COERCIBLE) for operation '='

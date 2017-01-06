@@ -798,6 +798,11 @@ A predicate is an expression that can be called and that returns a value that ca
 cmake options
 cmake -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DBUILD_STATIC_LIBS=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS=-g -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=~/bin .
 cmake -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++
+
+How to preprocessing Makefiles? like gcc -E
+(http://www.oreilly.com/openbook/make3/book/ch12.pdf)
+GNU make with option -n(--just-print), -p(--print-data-base),--warn-undefined-variables, -debug=verbose
+Use $(warning ) function to print Makefiles variables, eg : $(warning sub dir is $(SUBDIRS))
 ---
 
 //gdb debugging tips

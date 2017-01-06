@@ -905,6 +905,13 @@ find . -mindepth 3 -maxdepth 3 -type d -exec sh -c '
 	export LC_TYPE=en_US.UTF-8
 	source ~/.bashrc
 	
+	cannot change locale (en_US.UTF-8): No such file or directory
+	setlocale: LC_ALL: cannot change locale (en_US.UTF-8)
+	locale-gen en_US en_US.UTF-8
+	dpkg-reconfigure locales
+	echo "export LANG=\"en_US.UTF-8\"" >> ~/.bashrc
+	source ~/.bashrc
+	
 36. shell list contains(http://stackoverflow.com/questions/8063228/how-do-i-check-if-a-variable-exists-in-a-list-in-bash)
 contains() {
     [[ $1 =~ $2 ]] && exit(0) || exit(1)
@@ -1379,6 +1386,8 @@ copy linux include header files to Visual studio
 cp -r /usr/include .
 tar -jcf all_linux.tar.gz include/
 add C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\crt\src\linux to include path.
+
+cp -r 会使软链接不可用,应该使用 cp -rs 或者 cp -a
 	
 ==================
 YouCompleteMe
@@ -1521,5 +1530,7 @@ Bash Script error catching
 	fi
 
 ---
+bash script arithmetic Expressions:
+http://www.softpanorama.org/Scripting/Shellorama/arithmetic_expressions.shtml#Arithmetic_operations
 推荐算法
 content-based recommendation algorithms
