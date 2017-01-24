@@ -114,6 +114,20 @@ Set Full control permissions for directory Desktop (for example in Win7 & IIS 7 
     netstat -b, find the program
     127.0.0.1:xxxxx, where xxxxx is the local port number for the connection.
     in Wireshark, tcp.port == xxxxx
+	
+11. csharp Getting the thread ID from a thread
+	System.Threading.Thread.CurrentThread.ManagedThreadId
+
+12. class Test
+{
+        public unsafe void printInfo(string writeType)
+        {            
+            fixed (int* p = &wpos)
+            {
+                KBEngine.KBEngineApp.app.tempLog("往," + (int)p + ",streamid=" + myuniqueid + "写 " + writeType + " ,rpos=" + rpos + ",wpos=" + wpos + ",tid=" + System.Threading.Thread.CurrentThread.ManagedThreadId);
+            }
+        }
+}
 
 batch file tips
 1.comment one line :

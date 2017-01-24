@@ -1218,6 +1218,157 @@ $argc,$arg0,$arg1,$arg2
 	set $valpos++
 	出现这个，多半是复制代码,变量名打错了,应该是$statepos++
 	
+11. gdb 定位内存泄露(查看内存布局)
+示例代码:
+$ cat test.cpp
+#include <stdexcept>
+class TestClass
+{
+public:
+        virtual ~TestClass(){}
+        int i;
+        int j;
+};
+ 
+void f()
+{
+        for (int i = 0; i < 2; ++i)
+        {
+                TestClass* p = new TestClass;
+        }
+        throw std::bad_alloc();
+}
+ 
+int main()
+{
+        f();
+        return 0;
+}
+
+$ g++ -g test.cpp -o test
+$ gdb test
+terminate called after throwing an instance of 'std::bad_alloc'
+  what():  std::bad_alloc
+Aborted (core dumped)
+$ gdb test core
+(gdb) run
+开始运行程序,会宕掉
+(gdb) info proc
+process 11024
+cmdline = '/home/uname/test'
+cwd = '/home/uname'
+exe = '/home/uname/test'
+(gdb) shell pmap 11024
+0000000000400000      4K r-x-- test
+0000000000600000      4K r---- test
+0000000000601000      4K rw--- test
+0000000000602000    200K rw---   [ anon ]
+00007ffff716d000     88K r-x-- libgcc_s.so.1
+00007ffff7183000   2044K ----- libgcc_s.so.1
+00007ffff7382000      4K rw--- libgcc_s.so.1
+00007ffff7383000   1056K r-x-- libm-2.23.so
+00007ffff748b000   2044K ----- libm-2.23.so
+00007ffff768a000      4K r---- libm-2.23.so
+00007ffff768b000      4K rw--- libm-2.23.so
+00007ffff768c000   1788K r-x-- libc-2.23.so
+00007ffff784b000   2048K ----- libc-2.23.so
+00007ffff7a4b000     16K r---- libc-2.23.so
+00007ffff7a4f000      8K rw--- libc-2.23.so
+00007ffff7a51000     16K rw---   [ anon ]
+00007ffff7a55000   1480K r-x-- libstdc++.so.6.0.21
+00007ffff7bc7000   2048K ----- libstdc++.so.6.0.21
+00007ffff7dc7000     40K r---- libstdc++.so.6.0.21
+00007ffff7dd1000      8K rw--- libstdc++.so.6.0.21
+00007ffff7dd3000     16K rw---   [ anon ]
+00007ffff7dd7000    152K r-x-- ld-2.23.so
+00007ffff7fe7000     20K rw---   [ anon ]
+00007ffff7ff6000      8K rw---   [ anon ]
+00007ffff7ff8000      8K r----   [ anon ]
+00007ffff7ffa000      8K r-x--   [ anon ]
+00007ffff7ffc000      4K r---- ld-2.23.so
+00007ffff7ffd000      4K rw--- ld-2.23.so
+00007ffff7ffe000      4K rw---   [ anon ]
+00007ffffffde000    132K rw---   [ stack ]
+ffffffffff600000      4K r-x--   [ anon ]
+ total            13268K
+(gdb) shell cat /proc/11024/maps 
+00400000-00401000 r-xp 00000000 fc:00 2628660                            /home/cxz/test
+00600000-00601000 r--p 00000000 fc:00 2628660                            /home/cxz/test
+00601000-00602000 rw-p 00001000 fc:00 2628660                            /home/cxz/test
+00602000-00634000 rw-p 00000000 00:00 0                                  [heap]
+7ffff716d000-7ffff7183000 r-xp 00000000 fc:00 41157143                   /lib/x86_64-linux-gnu/libgcc_s.so.1
+7ffff7183000-7ffff7382000 ---p 00016000 fc:00 41157143                   /lib/x86_64-linux-gnu/libgcc_s.so.1
+7ffff7382000-7ffff7383000 rw-p 00015000 fc:00 41157143                   /lib/x86_64-linux-gnu/libgcc_s.so.1
+7ffff7383000-7ffff748b000 r-xp 00000000 fc:00 41160980                   /lib/x86_64-linux-gnu/libm-2.23.so
+7ffff748b000-7ffff768a000 ---p 00108000 fc:00 41160980                   /lib/x86_64-linux-gnu/libm-2.23.so
+7ffff768a000-7ffff768b000 r--p 00107000 fc:00 41160980                   /lib/x86_64-linux-gnu/libm-2.23.so
+7ffff768b000-7ffff768c000 rw-p 00108000 fc:00 41160980                   /lib/x86_64-linux-gnu/libm-2.23.so
+7ffff768c000-7ffff784b000 r-xp 00000000 fc:00 41160988                   /lib/x86_64-linux-gnu/libc-2.23.so
+7ffff784b000-7ffff7a4b000 ---p 001bf000 fc:00 41160988                   /lib/x86_64-linux-gnu/libc-2.23.so
+7ffff7a4b000-7ffff7a4f000 r--p 001bf000 fc:00 41160988                   /lib/x86_64-linux-gnu/libc-2.23.so
+7ffff7a4f000-7ffff7a51000 rw-p 001c3000 fc:00 41160988                   /lib/x86_64-linux-gnu/libc-2.23.so
+7ffff7a51000-7ffff7a55000 rw-p 00000000 00:00 0 
+7ffff7a55000-7ffff7bc7000 r-xp 00000000 fc:00 55838749                   /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.21
+7ffff7bc7000-7ffff7dc7000 ---p 00172000 fc:00 55838749                   /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.21
+7ffff7dc7000-7ffff7dd1000 r--p 00172000 fc:00 55838749                   /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.21
+7ffff7dd1000-7ffff7dd3000 rw-p 0017c000 fc:00 55838749                   /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.21
+7ffff7dd3000-7ffff7dd7000 rw-p 00000000 00:00 0 
+7ffff7dd7000-7ffff7dfd000 r-xp 00000000 fc:00 41160984                   /lib/x86_64-linux-gnu/ld-2.23.so
+7ffff7fe7000-7ffff7fec000 rw-p 00000000 00:00 0 
+7ffff7ff6000-7ffff7ff8000 rw-p 00000000 00:00 0 
+7ffff7ff8000-7ffff7ffa000 r--p 00000000 00:00 0                          [vvar]
+7ffff7ffa000-7ffff7ffc000 r-xp 00000000 00:00 0                          [vdso]
+7ffff7ffc000-7ffff7ffd000 r--p 00025000 fc:00 41160984                   /lib/x86_64-linux-gnu/ld-2.23.so
+7ffff7ffd000-7ffff7ffe000 rw-p 00026000 fc:00 41160984                   /lib/x86_64-linux-gnu/ld-2.23.so
+7ffff7ffe000-7ffff7fff000 rw-p 00000000 00:00 0 
+7ffffffde000-7ffffffff000 rw-p 00000000 00:00 0                          [stack]
+ffffffffff600000-ffffffffff601000 r-xp 00000000 00:00 0                  [vsyscall]
+(gdb) p 200 * 1024 / 8,64位下指针占8个字节,加上虚表,一个 TestClass 占 16 字节
+$1 = 25600
+(gdb) set logging file all_memory
+(gdb) set height 0
+(gdb) set logging on
+(gdb) x/25600a 0000000000602000
+(gdb) set logging off
+(gdb) q
+$ cat all_memory |egrep -v '0x0\s*0x0' 
+0x602000:	0x0	0x11c11
+0x602010:	0x11c00	0x0
+0x613c10:	0x0	0x411
+0x614020:	0x0	0x21
+0x614030:	0x400aa8 <_ZTV3TestClass+16>	0x0
+0x614040:	0x0	0x21
+0x614050:	0x400aa8 <_ZTV3TestClass+16>	0x0
+0x614060:	0x0	0x1ffa1
+
+如何分析 core文件中的内存占用?(或者说new出来的class)
+$ objdump -p core
+That will give the information from the first three columns of pmap, but in a different format.
+The first three columns in pmap correspond to the vaddr, memsz and flags values in the objdump output resepectively.
+The fourth column from pmap, the path of the mapped file, appears to be unavailable from the core file.
+objdump -p core 
+
+core:     file format elf64-x86-64
+
+Program Header:
+    NOTE off    0x0000000000000740 vaddr 0x0000000000000000 paddr 0x0000000000000000 align 2**0
+         filesz 0x0000000000000e28 memsz 0x0000000000000000 flags ---
+    LOAD off    0x0000000000002000 vaddr 0x0000000000400000 paddr 0x0000000000000000 align 2**12
+         filesz 0x0000000000001000 memsz 0x0000000000001000 flags r-x
+    LOAD off    0x0000000000003000 vaddr 0x0000000000600000 paddr 0x0000000000000000 align 2**12
+         filesz 0x0000000000001000 memsz 0x0000000000001000 flags r--
+    LOAD off    0x0000000000004000 vaddr 0x0000000000601000 paddr 0x0000000000000000 align 2**12
+         filesz 0x0000000000001000 memsz 0x0000000000001000 flags rw-
+    LOAD off    0x0000000000005000 vaddr 0x00000000006b7000 paddr 0x0000000000000000 align 2**12
+         filesz 0x0000000000032000 memsz 0x0000000000032000 flags rw-
+
+最靠前的,flags 为 rw- 的即为 heap ,分别分析地址 0x0000000000601000 和地址 0x00000000006b7000
+$ gdb test core
+(gdb) x/25600a 0x00000000006b7000
+打印到文件中即可查到内存中的 class.
+gdb 带参数调试:
+gdb --args ./testprg arg1 arg2
+	
 -----------------------
 	valgrind
 -----------------------

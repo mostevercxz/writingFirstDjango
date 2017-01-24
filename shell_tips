@@ -732,6 +732,16 @@ cecho y "Yellow!"
     login as root(or login with other user, enter "sudo su"):
     usermod -l newUserName oldUserName
     usermod -d /home/newHomeDir -m newUsername
+	
+	change user and group id(uid) on Linux:
+	1. assign a new UID to user using the usermod command.
+	2. assign a new GID to group using the groupmod command.
+	3. use the chown and chgrp commands to change old UID and GID respectively. You can automate this with the help of find command.
+	change userid from 1000 to 2005
+	usermod -u 2005 old_username
+	groupmod -g 2005 old_groupname
+	find / -group 1000 -exec chgrp -h foo {} \;
+	find / -user 1000 -exec chown -h foo {} \;
     
     example:
     sudo -i
