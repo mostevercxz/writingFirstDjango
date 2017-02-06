@@ -963,6 +963,10 @@ when the argument is a unicode object; or the value of the byte when the argumen
     "gg=G" indent all code blocks
     Press "V=" indent a block of code
     echo "set shiftwidth=4" >> ~/.vimrc  (Control the shift width when indent)
+
+8. redirect vim commands to a file
+:redir > vim.output | :map | redir END
+:he cmdline-special
 	
 	
 -------------------------------

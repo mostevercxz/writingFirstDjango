@@ -276,6 +276,14 @@ uname -a
  grep flags /proc/cpuinfo
  grep -o -w 'lm' /proc/cpuinfo(lm flag means Long mode cpu - 64 bit CPU )
 
+Find out the current operating system:
+uname -a
+lsb_release -a
+cat /etc/lsb-release
+cat /etc/issue.net
+cat /etc/debian_version
+cat /etc/redhat-release
+
 22.	  #!/bin/bash          
             STR="Hello World!"
             echo $STR    
