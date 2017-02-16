@@ -843,6 +843,13 @@ git stash save --keep-index
 
 16. cannot do a partial commit during a merge
 git commit -i -m"commit"(-i option啥意思?没懂..)
+
+17. get the latest revision using git
+git clone --depth=1 <remote-repo-url>
+git archive --format=tar --remote=<repository_URL> HEAD > all_git.tar && tar -xf all_git.tar
+git clone --depth=1 --separate-git-dir=/path/to/another/git/repository <remote-repo-url>
+git clone --depth=1 --branch=master git://someserver/somerepo dirformynewrepo && rm -rf !$/.git
+!$ means take the last argument from the previous command
 	
 Svn tips
 ------------------------------
@@ -1465,6 +1472,9 @@ Closes a process that has a user interface by sending a close message to its mai
 
 47. 为 c# solution 的所有 project 添加引用(比如添加 UnityEngine 引用)
 Project --> Add Reference --> Browse --> 选择 UnityEngine.dll 所在目录,添加即可.
+
+Unity 如何快捷键暂停游戏来着?
+看菜单 Edit 里面的 Pause(Ctrl + Shift + P),或者定义自己的快捷键,该快捷键摁下时候调用 Debug.Break()
 
 ipconfig/all
 ipconfig/flushdns,连接不上VPN的时候可以用哦

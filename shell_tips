@@ -479,6 +479,7 @@ cat /etc/redhat-release
     stat --printf '%n\nmtime: %y\nctime: %z\natime: %x\ncrtime:%w\n'
     stat -c "%n %Z" file1.txt
     Each file has three distinct associated timestamps: the time of last data access, the time of last data modification, and the time the file status last changed. These values are returned in the file characteristics structure struct stat, as described in <sys/stat.h>.
+	linux ls time seconds
     ls --full-time
     
 46. rhel6 redhat 6 manually change time zone
@@ -994,6 +995,9 @@ contains() {
 	starting Amazon EC2 instance via Web Management Console with following 'user data':
 	控制台,选择EC2,第一排"启动实例""连接"的右边有个"操作" --> "实例设置" --> "查看更改用户数据"
 	https://alestic.com/2010/12/ec2-ssh-port-80/
+
+	How to reverse ssh tunneling?(https://www.howtoforge.com/reverse-ssh-tunneling)
+	ssh -i /path/to/private_key/id_rsa -f -N -R 19998:localhost:22 remoteuser@1.2.3.4
 	
 43. check status of last command
 res=`echo $?`
@@ -1552,3 +1556,23 @@ bash script arithmetic Expressions:
 http://www.softpanorama.org/Scripting/Shellorama/arithmetic_expressions.shtml#Arithmetic_operations
 推荐算法
 content-based recommendation algorithms
+
+
+---
+Difference between df and fdisk?
+df -h displayed all of the mounted partitions
+fdisk -l displays all of the partitions that exist on your disk.(Apparently there are some partitions which exist, but which are not mounted.)
+
+使用 fdisk 给磁盘分区
+fdisk /dev/vdb
+p
+n
+1
++100G
+p
+root@localhost ~]#mkfs.ext3 /dev/vdb1
+[root@localhost ~]#mkfs.ext3 /dev/vdb2
+[root@localhost ~]#mkdir /vdb1 /vdb2
+[root@localhost ~]#mount /dev/vdb1 /vdb1
+[root@localhost ~]#mount /dev/vdb2 /vdb2
+[root@localhost ~]#df -h
