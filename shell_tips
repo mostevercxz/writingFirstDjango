@@ -5,6 +5,8 @@
 	Linux commands comes first
 ####################
 1.netstat -n 1 |grep 192.168.204.128(find the number of sockets)
+ip -6 addr
+ping6 -c 4 -n www.google.com
 2. time writes its output to stderr, time is part of the syntax of bash, and it times an entire pipeline. Consequetnly, I need to wrap the pipeline in braces, or run it in a subshell:
 	{ time ls -l > /dev/null; } |& grep real(tested in ubuntu)
 	(\& is an abbreviation for '2>&1 |')
@@ -46,6 +48,8 @@
 	find . -iname \.*h -exec grep -nH keyword {} \;
 	find . -iname \.*cpp -exec grep -nH keyword {} \;
 	find . -iname \.*cpp -exec ls -alh $1 {} \;
+	How to use find to FIND all the .cpp and .h files?
+	find . \( -name \*.h -o -name \*.cpp \) -exec grep -nH keyword \{\} \;
 	
 	after:
 	
@@ -89,6 +93,9 @@
 	proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	ok, err=proc.communicate()
 	print(ok)
+
+	grep each line of a file in another file?
+	grep -Fwf file2 file1 > out(-F means plain string matching, faster without having to engage the regex engine)
 	
 	grep exclude binary files
 	grep -I keyword -rnH directory/
@@ -200,6 +207,32 @@
 	11.79     7.87    11.79    68.00
 	11.79     7.87    11.79    68.00
 	11.79     7.87    11.79    68.00
+
+	Read records from a file and grep in another file?
+	assume name.txt:
+	John
+	Mike
+	Smith
+	---
+	data.txt:
+	Go to work, Lee, 2017-02-26
+	Go to work, John, 2017-02-26
+	Go to work, Smith, 2017-02-26
+
+	1. Write a shell script:
+	while read name; do
+		grep $name data.txt
+	done < name.txt > all_grep_results
+	2. Using grep
+	grep -Fwf name.txt data.txt > all_grep_results
+	3. Using awk
+	awk -v FS="[ ,]" 'NR==FNR{rows[$1]++;next} ($5 in rows)' name.txt data.txt
+	(去掉($5 in rows)的括号也可以.为什么不用{$5 in rows}? 因为大括号是 action,awk不会打印出该行;不加括号awk默认为 condition,判断为true后,会打印出该行
+	原因参见 http://backreference.org/2010/02/10/idiomatic-awk/	
+	)
+	#awk -v FS="[ =]" 'NR==FNR{rows[$1]++;next}(substr($NF,1,length($NF)-1) in rows)' File1 File2
+	#awk -v FS="[ =]" 'NR==FNR{rows[$1]++;next} {for (k in rows){print k": "rows[k]}}' File1 File2
+	#awk '{my_dict[$1] = $2} END { for (key in my_dict) { print key ": " my_dict[key] } }' zen
 	
 17. tar commands
 	tar -zcvf archive.tar.gz directory/ 
@@ -261,6 +294,19 @@ This will tell tar to c (create) an archive from the files in directory (tar is 
     How to delete iptables rules?
     sudo vim /etc/sysconfig/iptables , delete the old rules
     sudo vim /etc/sysconfig/iptables.save, delete the old rules
+	or : iptables -L --line-number
+	iptables -D INPUT 2
+
+	How to open TCP port 2015 on RHEL6?
+	iptables -I INPUT -p tcp --dport 2015 -j ACCEPT(insert)
+	iptables -L -n
+	iptables -A INPUT -p udp -m udp --dport 10000:20000 -j ACCEPT(append)
+
+	What is sport and dport?
+	--sport --source-port
+	--dport --destination-port
+	iptables -A OUTPUT -p tcp --dport 80 -j DROP
+
 	
 19.	du -sh flodername show the entire size of the folder,查看整个文件夹大小
 20.	问题：在Xshell中设置了“自动将选中的文字复制到粘贴板”，之前一直没有问题，最近发现，
@@ -718,6 +764,10 @@ cecho y "Yellow!"
 	#display all errors
 	echo -e "\n\e[01;31m===errors===\e[0m"
 	cat $temp_file
+
+	bash escape exclamation mark
+	echo "#"'!'"/usr/bin/python" >> haha
+	echo '#!/usr/bin/python' >> haha
 	
 17.	add and delete user
 	useradd giant
@@ -930,6 +980,11 @@ find . -mindepth 3 -maxdepth 3 -type d -exec sh -c '
 	dpkg-reconfigure locales
 	echo "export LANG=\"en_US.UTF-8\"" >> ~/.bashrc
 	source ~/.bashrc
+
+	Linux 终端中文乱码,python3 输入中文也乱码
+	先在 ~/.bashrc 里面加上 export LANG="en_US.UTF-8"
+	再 locale-gen en_US en_US.UTF-8
+	发现终端和 python3 下中文都正常了..(跟中转服务器没关系,重新登录下就可以了)
 	
 36. shell list contains(http://stackoverflow.com/questions/8063228/how-do-i-check-if-a-variable-exists-in-a-list-in-bash)
 contains() {

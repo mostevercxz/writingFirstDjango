@@ -359,6 +359,16 @@ def query_yes_no(question, default="yes"):
 	其实去掉百分号,从左到右,两两组成十六进制数,通常是 utf-8 编码(2,3,4个十六进制数)或者 GB2312 编码(2个十六进制数)
 	python3 -c "import urllib.request;print(urllib.request.quote('七彩', encoding='gb2312'))"
 	urllib.request.unquote('七彩', encoding='gb2312')
+
+	Python3, Import error : no module named urllib2
+	import urllib2.request
+	from urllib.request import urlopen
+	html = urlopen('http://www.google.com')
+	print(html)
+	Python2,
+	import urllib2
+	response = urllib2.urlopen('http://www.google.com')
+	html = response.read()
 	
 26. python downlaod file to disk
     url = urllib.request.URLopener()
@@ -887,6 +897,24 @@ when the argument is a unicode object; or the value of the byte when the argumen
 	(the same when replacing "Django==1.8" with "-r requirements.txt")
 	pip install Django==1.8 --download /path/to/some/directory
 	pip install Django==1.8 --no-index --find-links /path/to/some/directory
+
+	Download file from web using python3:
+	Method 1:
+	import urllib.request
+	url = 'http://example.com/'
+	response = urllib.request.urlopen(url)
+	data = response.read()      # a `bytes` object
+
+	Method 2:
+	urllib.request.urlretrieve(url, file_name)
+
+	Method 3(maybe most correct way):
+	import urllib.request
+	import shutil
+	...
+	# Download the file from `url` and save it locally under `file_name`:
+	with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
+	    shutil.copyfileobj(response, out_file)
 	
 3.	install vim with python support
 	git clone https://github.com/b4winckler/vim.git vim

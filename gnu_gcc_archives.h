@@ -1007,6 +1007,22 @@ $ cat /proc/sys/kernel/core_uses_pid
 systemctl disable abrtd.service
 systemctl start abrt-ccpp
 
+How to specify core filename and paths?
+echo "/tmp/cores/core.%e.%p.%h.%t" > /proc/sys/kernel/core_pattern
+%p: pid
+%: '%' is dropped
+%%: output one '%'
+%u: uid
+%g: gid
+%s: signal number
+%t: UNIX time of dump
+%h: hostname
+%e: executable filename
+%: both are dropped
+
+Configure core_pattern forever:
+kernel.core_pattern=/tmp/cores/core.%e.%p.%h.%t
+
 18. How to detect memory leaks in C?(not C++,overload new delete, not valgrind)
 (asan leak checker,https://github.com/google/sanitizers/wiki/AddressSanitizerLeakSanitizer
 clang -fsanitize=address -g memory-leak.c
