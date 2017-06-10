@@ -1,0 +1,28 @@
+sudo apt-get install phpize php-pear pkg-config openssl-dev
+sudo pecl install mongodb
+#sudo vim /etc/php/7.0/cli/conf.d/30-mongodb.ini
+查看php的配置文件位置:
+php -i|grep Configu
+
+
+sudo vi /etc/php/7.0/apache2/php.ini
+extensionon=mongodb.so
+
+php 脚本 debug:
+ini_set('display_errors', 'On');
+php 中 json_encode 函数遇到尖括号会停止编码,在json_encode时候最好加上选项 
+
+php 读取 post 内容:
+$entityBody = file_get_contents('php://input');
+$entityBody = stream_get_contents(STDIN);
+
+<?php
+
+function detectRequestBody() {
+    $rawInput = fopen('php://input', 'r');
+    $tempStream = fopen('php://temp', 'r+');
+    stream_copy_to_stream($rawInput, $tempStream);
+    rewind($tempStream);
+
+    return $tempStream;
+}
