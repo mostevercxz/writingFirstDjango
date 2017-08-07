@@ -329,6 +329,7 @@ cat /etc/lsb-release
 cat /etc/issue.net
 cat /etc/debian_version
 cat /etc/redhat-release
+cat /etc/centos-release
 
 22.	  #!/bin/bash          
             STR="Hello World!"
@@ -487,6 +488,22 @@ cat /etc/redhat-release
 	
 39. How to make ssh quiet ?
 	ssh -f root@192.1.1.1 "echo background"
+
+	ssh-keygen do not prompt passphase
+	ssh-keygen  -t rsa -f /etc/ssh/ssh_host_rsa_key -N ''
+	ssh-keygen  -t dsa -f /etc/ssh/ssh_host_dsa_key -N ''
+
+	scp do not prompt fingerprint
+	scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no file1 user@host:pwd
+
+	openssh-server, /usr/sbin/sshd,
+	Could not load host key: /etc/ssh/ssh_host_rsa_key
+	Could not load host key: /etc/ssh/ssh_host_dsa_key
+	Could not load host key: /etc/ssh/ssh_host_ecdsa_key
+	Disabling protocol version 2. Could not load host key
+	sshd: no hostkeys available -- exiting.
+
+	solve: use ssh-keygen to generate host key file
 	
 40. putty login without password
 	(https://www.digitalocean.com/community/tutorials/how-to-create-ssh-keys-with-putty-to-connect-to-a-vps)
@@ -575,6 +592,12 @@ Terminal <--[<output]--- |       |                \ \
 Line 2 creates a variable called STR and assigns the string "Hello World!" to it. 
 Then the VALUE of this variable is retrieved by putting the '$' in at the beginning. 
 Please notice (try it!) that if you don't use the '$' sign, the output of the program will be different, and probably not what you want it to be. 
+
+How to cd into directory starts with '-', eg. 
+$ cd -v
+1. cd -- -v
+or
+2. cd ./-v
 
 
 1. special shell variables(http://unixhelp.ed.ac.uk/scrpt/scrpt2.2.2.html)
@@ -1631,3 +1654,19 @@ root@localhost ~]#mkfs.ext3 /dev/vdb1
 [root@localhost ~]#mount /dev/vdb1 /vdb1
 [root@localhost ~]#mount /dev/vdb2 /vdb2
 [root@localhost ~]#df -h
+
+
+---
+/boot disk is full,how to remove old linux images?
+使用 apt-add-repository link 添加了codeblock 的安装源
+执行安装的时候,无法安装,提示说需要运行 apt-get -f install 安装
+执行 apt-get -f install 的时候,又开始下载linux镜像,导致/boot盘空间满了
+按网上说的运行 apt-get purge linux-image-x.x.x-x-generic 发现在运行的过程中，又开始生成linux镜像,又导致空间满了
+运行 apt -f autoremove 也不行,运行过程中也开始生成linux镜像，空间又满了
+最后执行了下 sudo update-grub
+sudo apt-get remove linux-image-4.4.0-70-generic linux-image-4.4.0-71-generic linux-image-4.4.0-72-generic -y
+终于成功地移除了镜像,清理出一大半的/boot空间
+再运行 apt autoremove 将没用的镜像也移除了
+最后运行 apt-get -f install 解决未解决的依赖关系
+(感悟:以后安装软件还是跑到虚拟机里面去装,用docker,除非自己十分确定或熟悉的软件,否则弄坏了折腾起来费时间)
+

@@ -114,6 +114,10 @@ Set Full control permissions for directory Desktop (for example in Win7 & IIS 7 
     netstat -b, find the program
     127.0.0.1:xxxxx, where xxxxx is the local port number for the connection.
     in Wireshark, tcp.port == xxxxx
+
+	How to capture packets of specific length?
+	frame.len == 243
+	ip.len == 243
 	
 11. csharp Getting the thread ID from a thread
 	System.Threading.Thread.CurrentThread.ManagedThreadId
@@ -869,6 +873,34 @@ export LUA_CPATH="/home/giant/bin/lua/lib/lua/5.3/?.so;?.so"
 Print lua stack 
 print(debug.traceback())
 ---
+lua get current time in millseconds
+method 1:
+require "socket"
+print("Milliseconds: " .. socket.gettime()*1000)
+
+method 2:
+Write you own dll/.so in C, and use it in lua.
+package.cpath = "./Timer.so"     --assuming Timer.so is in the same directory
+require "HighResolutionTimer"    --load up the module
+timer.readHiResTimerFrequency(); --stores the tickFrequency
+
+
+--call this before code that is being measured for execution time
+function start()
+	timer.storeTime();
+end
+
+--call this after code that is being measured for execution time
+function stop()
+	timer.storeTime();
+end
+
+--once the prior two functions have been called, call this to get the 
+--time elapsed between them in nanoseconds
+function getNanosElapsed()
+	return timer.getNanoElapsed();
+end
+
 lua 5.1 -> 5.2 error
 LUA_HOOKTAILRET  --> LUA_HOOKTAILCALL 
 lua_getfenv --> lua_getenv
@@ -948,6 +980,33 @@ function deepcopy(orig)
     end
     return copy
 end
+
+4. 对于键值不连续的 table,不能指望 pairs 的时候,是按键值排序.只有每次调用 table.insert后,调用pairs得出的才是连续的
+Lua 5.3.4  Copyright (C) 1994-2017 Lua.org, PUC-Rio
+> tbl={}
+> tbl[299]={}
+> tbl[349]={}
+> for k,v in pairs(tbl) do print(k,v) end
+349	table: 0xfeed50
+299	table: 0xfee740
+> tbl[300]=2
+> for k,v in pairs(tbl) do print(k,v) end
+300	2
+349	table: 0xfeed50
+299	table: 0xfee740
+> tbl[310]=2
+> for k,v in pairs(tbl) do print(k,v) end
+300	2
+349	table: 0xfeed50
+310	2
+299	table: 0xfee740
+> tbl[320]={}
+> for k,v in pairs(tbl) do print(k,v) end
+320	table: 0xff1f50
+299	table: 0xfee740
+300	2
+349	table: 0xfeed50
+310	2
 
 ---
 How to run makefile in windows ? makefile make in windows?

@@ -1500,3 +1500,22 @@ struct epoll_event
         char b = BYTE(0100,0001); //equivalent to b = 65; or b = 'A'; or b = 0x41;
         unsigned int w = WORD(1101,1111,0100,0011); //equivalent to w = 57155; or w = 0xdf43;
         unsigned long int dw = DWORD(1101,1111,0100,0011,1111,1101,0010,1000); //equivalent to dw = 3745774888; or dw = 0xdf43fd28;
+
+
+openssl, undefined reference to pqueue_free
+reverse the order of libssl and libcrypto
+
+---
+How to build log4cxx from source code? 包括解决中文乱码的问题
+1. download apr, apr-util, apache-log4cxx source code to the same directory
+2. build apr, ./configure --enable-threads CPPFLAGS="-I/usr/local/include" LDFLAGS="-L/usr/local/lib" --prefix=../apr_install
+3. build apt-util, ./configure --with-apr=../apr-1.4.2 CPPFLAGS="-I/usr/local/include" LDFLAGS="-L/usr/local/lib" --prefix=../apt_util_install
+4. vim apache-log4cxx-0.10.0/src/main/cpp/inputstreamreader.cpp, add #include <string.h>
+5. vim apache-log4cxx-0.10.0/src/main/cpp/socketoutputstream.cpp, add #include <string.h>
+6. vim apache-log4cxx-0.10.0/src/main/cpp/socketoutputstream.cpp, add #include <string.h>, #include <stdio.h>
+7. /configure  --with-charset=utf-8 --with-logchar=utf-8 --with-apr=../apr-1.4.2 --with-apr-util=../apr-util-1.3.9 CPPFLAGS="-I/usr/local/include" LDFLAGS="-L/usr/local/lib" --prefix=../log4cxx_install
+
+How to fix error?
+/home/yangning/myproject/log4cxx/apr-util-1.3.4/xlate/xlate.c 75 undefined reference to `apr_os_locale_encoding' 
+link libraries with following order: liblog4cxx.a libaprutil-1.a libapr-1.a
+-llog4cxx -laprutil-1 -lapr-1

@@ -767,6 +767,14 @@ stars:>1 language:c++
 	It means that the type of a file changed. For example, a symbolic link that became a regular file.
 	As far as I know, this only applies to symlinks, submodules and regular files
 
+13. git update to revision
+	git checkout -b tempbranchname SHA-1
+	Do not use : git reset --hard SHA-1
+
+14. Change git commit message after push
+git commit --amend -m "New commit message"
+git push --force origin <BRANCH-NAME>
+
 
 git Howtos, 2014-11-03
 ----------------
@@ -794,6 +802,9 @@ git Howtos, 2014-11-03
 	2.Ask someone to prepare a bundle, then download the bundle!!				
 7.	How to diff between current revision and last revision
 	git diff HEAD^ HEAD
+
+	How to diff one file between commit A and commit B?
+	git diff SHA-1-A SHA-1-B filename.txt
 	
 8.	show this commit changed files
 git diff-tree --no-commit-id --name-only -r bd61ad98
@@ -850,6 +861,10 @@ git archive --format=tar --remote=<repository_URL> HEAD > all_git.tar && tar -xf
 git clone --depth=1 --separate-git-dir=/path/to/another/git/repository <remote-repo-url>
 git clone --depth=1 --branch=master git://someserver/somerepo dirformynewrepo && rm -rf !$/.git
 !$ means take the last argument from the previous command
+
+18. git merge a commit from another git repository
+git format-patch -k -1 --stdout commit_sha1
+git apply --reject --whitespace=fix 0001xxx.patch
 	
 Svn tips
 ------------------------------
@@ -1504,6 +1519,14 @@ ifconfig查看虚拟机网址 192.168.192.200
 其他机器ping 网址,看下能否ping通
 若不能Ping通,虚拟机网络改成 桥接Bridge模式,再Ping下.应该就OK了。
 
+
+install git on centos 5.11 using yum?
+sudo yum install epel-release
+sudo yum install git
+
+install g++ on centos?
+yum install gcc-c++
+
 yum install git
 Loaded plugins: amazon-id, product-id, rhui-lb, security, subscription-manager
 Updating certificate-based repositories.
@@ -1616,3 +1639,39 @@ How to block request domain in chrome?
 发现 chrome 被 DNS unlocker 污染了,摁 F12 发现一堆奇怪的请求，如何block 这些请求呢？
 chrome://flags/#enable-devtools-experiments 设置为 enable
 然后摁 F12，在 settings, expirements, 连续摁 6次 shift, 出现 request block, 勾选上即可。
+
+How to get packages and dependiencies for installing offline? apt-get
+apt-get --print-uris --yes install apache2| grep ^\' | cut -d\' -f2 >downloads.list
+wget --input-file downloads.list
+copy, unpack and rename the Sources files in /var/lib/apt/lists
+
+Where id data stored in Redis?
+redis-cli config get dir
+
+docker 给容器设置物理IP时提示
+can't add test to bridge enp3s0: Operation not supported
+cat /etc/network/interfaces
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# The primary network interface
+auto enp3s0
+iface enp3s0 inet dhcp
+
+解决办法,增加br0桥接接口
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# The primary network interface
+auto enp3s0
+iface enp3s0 inet dhcp
+auto br0
+iface br0 inet static
+address 192.168.92.104
+netmask 255.255.255.0
+gateway 192.168.92.1
+bridge_ports enp3s0
+bridge_stp off
+dns-nameservers 192.168.92.1

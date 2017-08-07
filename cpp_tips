@@ -476,3 +476,20 @@ As for why there is no bounds checking, there are a couple aspects to the answer
 An array is a leftover from C. C arrays are about as primitive as you can get. Just a sequence of elements with contiguous addresses. There is no bounds checking because it is simply exposing raw memory. Implementing a robust bounds-checking mechanism would have been almost impossible in C.
 In C++, bounds-checking is possible on class types. But an array is still the plain old C-compatible one. it is not a class. Further, C++ is also built on another rule which makes bounds-checking non-ideal. The C++ guiding principle is "you don't pay for what you don't use". If your code is correct, you don't need bounds-checking, and you shouldn't be forced to pay for the overhead of runtime bounds-checking.
 So C++ offers the std::vector class template, which allows both. operator[] is designed to be efficient. The language standard does not require that it performs bounds checking (although it does not forbid it either). A vector also has the at() member function which is guaranteed to perform bounds-checking. So in C++, you get the best of both worlds if you use a vector. You get array-like performance without bounds-checking, and you get the ability to use bounds-checked access when you want it.
+
+21. call erase with a reverse iterator
+&*(reverse_iterator(i)) == &*(i - 1)
+m_CursorStack.erase( std::next(i).base() );
+it = std::map<int,int>::reverse_iterator(testmap.erase( std::next(it).base() ));
+
+for (auto it = testcont.rbegin(), nit = it; it != testcont.rend(); it = nit) {
+    nit = next(it);
+
+    // whatever... maybe a continue somewhere or maybe not
+
+    if (WE_WANT_TO_ERASE(it)) {
+        nit = decltype(it){ testcont.erase(std::next(it).base()) };
+    }
+
+    // whatever... maybe a continue somewhere or maybe not
+}

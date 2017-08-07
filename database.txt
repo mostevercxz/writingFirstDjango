@@ -578,3 +578,6 @@ access
 #####################################
 1. How to read excel spreadsheet in C# quickly??
 http://stackoverflow.com/questions/7613898/how-to-read-an-excel-spreadsheet-in-c-sharp-quickly
+
+mongodb How to print out more than 20 items in mongodb shell?
+DBQuery.shellBatchSize = 300
