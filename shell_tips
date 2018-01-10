@@ -1670,3 +1670,7 @@ sudo apt-get remove linux-image-4.4.0-70-generic linux-image-4.4.0-71-generic li
 最后运行 apt-get -f install 解决未解决的依赖关系
 (感悟:以后安装软件还是跑到虚拟机里面去装,用docker,除非自己十分确定或熟悉的软件,否则弄坏了折腾起来费时间)
 
+
+Redhat change machine name(How to change hostname??):
+hostnamectl set-hostname Game-Haha --static
+hostnamectl set-hostname "" --transient

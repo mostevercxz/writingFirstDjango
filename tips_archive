@@ -865,6 +865,27 @@ git clone --depth=1 --branch=master git://someserver/somerepo dirformynewrepo &&
 18. git merge a commit from another git repository
 git format-patch -k -1 --stdout commit_sha1
 git apply --reject --whitespace=fix 0001xxx.patch
+
+19. git merge all commits into another branch 
+git checkout master
+git merge --squash my_branch_name
+fix conflicts
+git add .
+git commit -m "merge all commits"
+
+How to resolve binary conflicts?
+git checkout --ours binary_file
+
+How to revert?
+git revert -m 2(revert 2 commits)
+
+.gitignore not working, file status is modified
+The file is already stored in your local commit tree, you need to remove them from the repository.
+git rm --cached system/application/config/config.php
+
+How to remove untracked files from the current git working tree?
+1. git clean -n
+2. git clean -f -d
 	
 Svn tips
 ------------------------------
@@ -1675,3 +1696,17 @@ gateway 192.168.92.1
 bridge_ports enp3s0
 bridge_stp off
 dns-nameservers 192.168.92.1
+
+centos install docker:(link:https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-centos-7)
+sudo yum check-update
+curl -fsSL https://get.docker.com/ | sh
+sudo systemctl start docker
+sudo systemctl status docker
+sudo systemctl enable docker
+
+centos install ffmpeg:
+sudo yum update -y
+sudo rpm --import http://li.nux.ro/download/nux/RPM-GPG-KEY-nux.ro
+sudo rpm -Uvh http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-5.el7.nux.noarch.rpm
+sudo yum install ffmpeg ffmpeg-devel -y
+ffmpeg -h
